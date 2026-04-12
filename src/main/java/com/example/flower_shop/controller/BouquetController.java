@@ -24,7 +24,7 @@ public class BouquetController {
     }
 
     @GetMapping("/{id}")
-    public Bouquet getBouquetById(@PathVariable Long id){
+    public Bouquet getBouquetById(@PathVariable Integer id){
         return bouquetRepository.findById(id).orElse(null);
     }
 
@@ -34,12 +34,12 @@ public class BouquetController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteBouquet(@PathVariable Long id){
+    public void deleteBouquet(@PathVariable Integer id){
         bouquetRepository.deleteById(id);
     }
     
     @PutMapping("/{id}")
-    public Bouquet updateBouquet(@PathVariable Long id, @RequestBody Bouquet bouquetDetails) {
+    public Bouquet updateBouquet(@PathVariable Integer id, @RequestBody Bouquet bouquetDetails) {
         Bouquet bouquet = bouquetRepository.findById(id).orElse(null);
         if(bouquet != null){
             bouquet.setEmertimi(bouquetDetails.getEmertimi());

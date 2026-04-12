@@ -10,7 +10,7 @@ public class Flower {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     private String emertimi;
     private String lloji;
     private String ngjyra;

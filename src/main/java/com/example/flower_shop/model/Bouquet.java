@@ -10,7 +10,7 @@ public class Bouquet {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     private String emertimi;
     private String pershkrimi;
     private Double cmimi;
@@ -19,5 +19,5 @@ public class Bouquet {
 
     @Column(name = "a_eshte_aktiv")
     private Boolean eshteAktiv;
-    
+
 }
