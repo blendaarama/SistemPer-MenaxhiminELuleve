@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface BouquetFlowerRepository extends JpaRepository<BouquetFlower, Long> {
-    List<BouquetFlower> findByBouquetId(Integer bouquetId);
+    List<BouquetFlower> findByBouquetId(Long bouquetId);
 }

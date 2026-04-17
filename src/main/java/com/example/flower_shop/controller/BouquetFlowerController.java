@@ -21,7 +21,7 @@ public class BouquetFlowerController {
     }
 
     @GetMapping("/bouquet/{bouquetId}")
-    public List<BouquetFlower> getByBouquet(@PathVariable Integer bouquetId) {
+    public List<BouquetFlower> getByBouquet(@PathVariable Long bouquetId) {
         return bouquetFlowerRepository.findByBouquetId(bouquetId);
     }
 
@@ -31,7 +31,7 @@ public class BouquetFlowerController {
     }
 
     @DeleteMapping("/{id}") //fshije te dhena
-    public void removeFlowerFromBouquet(@PathVariable Integer id) {
+    public void removeFlowerFromBouquet(@PathVariable Long id) {
         bouquetFlowerRepository.deleteById(id);
     }
 }
