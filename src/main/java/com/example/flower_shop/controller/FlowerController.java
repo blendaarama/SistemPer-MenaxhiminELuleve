@@ -2,8 +2,6 @@ package com.example.flower_shop.controller;
 
 import com.example.flower_shop.model.Flower;
 import com.example.flower_shop.repository.FlowerRepository;
-
-import com.example.flower_shop.repository.SupplierRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,12 +12,10 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000") 
 public class FlowerController {
 
-    private final SupplierRepository supplierRepository;
     private final FlowerRepository flowerRepository;
 
-    FlowerController(FlowerRepository flowerRepository, SupplierRepository supplierRepository){
+    FlowerController(FlowerRepository flowerRepository){
         this.flowerRepository = flowerRepository;
-        this.supplierRepository = supplierRepository;
     }
 
     @GetMapping
