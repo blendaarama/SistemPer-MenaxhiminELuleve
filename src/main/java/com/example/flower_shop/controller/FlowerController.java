@@ -2,7 +2,8 @@ package com.example.flower_shop.controller;
 
 import com.example.flower_shop.model.Flower;
 import com.example.flower_shop.repository.FlowerRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,8 +13,11 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000") 
 public class FlowerController {
 
-    @Autowired
-    private FlowerRepository flowerRepository;
+    private final FlowerRepository flowerRepository;
+
+    FlowerController(FlowerRepository flowerRepository){
+        this.flowerRepository = flowerRepository;
+    }
 
     @GetMapping
     public List<Flower> getAllFlowers() {
@@ -21,22 +25,24 @@ public class FlowerController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED) //kthen 201 per create
     public Flower addFlower(@RequestBody Flower flower) {
         return flowerRepository.save(flower);
     }
    
     @GetMapping("/{id}")
-    public Flower getFlowerById(@PathVariable Integer id) {
+    public Flower getFlowerById(@PathVariable Long id) {
         return flowerRepository.findById(id).orElse(null);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteFlower(@PathVariable Integer id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT) // kthe 204 per delete sepse nuk ka body
+    public void deleteFlower(@PathVariable Long id) {
         flowerRepository.deleteById(id);
     }
 
     @PutMapping("/{id}")
-    public Flower updateFlower(@PathVariable Integer id, @RequestBody Flower flowerDetails) {
+    public Flower updateFlower(@PathVariable Long id, @RequestBody Flower flowerDetails) {
         Flower flower = flowerRepository.findById(id).orElse(null);
         if (flower != null) {
             flower.setEmertimi(flowerDetails.getEmertimi());

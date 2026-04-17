@@ -10,13 +10,18 @@ public class Flower {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
+
+    @Column(nullable = false)
     private String emertimi;
+
     private String lloji;
     private String ngjyra;
+
+    @Column(nullable = false)
     private Double cmimi;
     
-    @Column(name = "sasia_stokut")
+    @Column(name = "sasia_stokut", nullable = false)
     private Integer sasiaStokut;
 
     private String sezoni;
