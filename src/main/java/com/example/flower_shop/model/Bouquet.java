@@ -11,9 +11,15 @@ public class Bouquet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Column(nullable = false)
     private String emertimi;
+
     private String pershkrimi;
+
+    @Column(nullable = false)
     private Double cmimi;
+    
     private String madhesia;
     private String foto;
 

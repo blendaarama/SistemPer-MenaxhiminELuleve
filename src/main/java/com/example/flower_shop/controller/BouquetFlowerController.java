@@ -32,6 +32,8 @@ public class BouquetFlowerController {
 
     @DeleteMapping("/{id}") //fshije te dhena
     public void removeFlowerFromBouquet(@PathVariable Long id) {
-        bouquetFlowerRepository.deleteById(id);
+        if(bouquetFlowerRepository.existsById(id)){
+            bouquetFlowerRepository.deleteById(id);
+        }
     }
 }

@@ -33,7 +33,9 @@ public class BouquetController {
 
     @DeleteMapping("/{id}")
     public void deleteBouquet(@PathVariable Long id){
-        bouquetRepository.deleteById(id);
+        if(bouquetRepository.existsById(id)){
+            bouquetRepository.deleteById(id);
+        }
     }
     
     @PutMapping("/{id}")

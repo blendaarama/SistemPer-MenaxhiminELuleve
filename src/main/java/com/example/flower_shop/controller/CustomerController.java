@@ -38,7 +38,9 @@ public class CustomerController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCustomer(@PathVariable Long id){
-        customerRepository.deleteById(id);
+        if(customerRepository.existsById(id)){
+            customerRepository.deleteById(id);
+        }
     }
 
     @PutMapping("/{id}")
