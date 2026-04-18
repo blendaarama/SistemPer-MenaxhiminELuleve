@@ -14,7 +14,7 @@ private Long id;
 
 @ManyToOne
 @JoinColumn(name = "klienti_id")
-private Customer klientiId;
+private Customer klienti;
 
 @Column(name = "data_porosis")
 private Date dataPorosise;
@@ -40,11 +40,11 @@ public Long getId(){
 public void setId(Long id){
     this.id=id;
 }
-public Integer getKlientiId(){
-    return klientiId;
+public Customer getKlienti(){
+    return klienti;
 }
-public void setKlientiId(Integer klientiId){
-    this.klientiId=klientiId;
+public void setKlienti(Customer klienti){
+    this.klienti=klienti;
 }
 public Date getDataPorosise(){
     return dataPorosise;
