@@ -9,18 +9,27 @@ public class Porosi {
     
 @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
+
 private Long id;
 
+@Column(name = "klienti_id")
 private Integer klientiId;
 
+@Column(name = "data_porosis")
 private Date dataPorosise;
+
+@Column(name = "data_dorezimit")
 private Date dataDorezimit;
 
+@Column(name = "adresa_dorezimit")
 private String adresaDorezimit;
 
+@Column(name = "mesazhi_kartoline")
 private String mesazhiKartoline;
 
+@Column(name = "shuma_totale")
 private Double shumeTotale;
+
 
 private String statusi;
 
