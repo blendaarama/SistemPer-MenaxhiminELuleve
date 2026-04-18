@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/bouquets")
-@CrossOrigin(origins = "http://localhost:3000") // leje komunikimi me front
+@CrossOrigin(origins = "http://localhost:5173") // leje komunikimi me front
 public class BouquetController {
 
     @Autowired
