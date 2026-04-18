@@ -12,8 +12,9 @@ public class Porosi {
 
 private Long id;
 
-@Column(name = "klienti_id")
-private Integer klientiId;
+@ManyToOne
+@JoinColumn(name = "klienti_id")
+private Customer klientiId;
 
 @Column(name = "data_porosis")
 private Date dataPorosise;
