@@ -1,8 +1,7 @@
 package com.example.flower_shop.model;
 
-import java.util.Date;
-import java.sql.Time;
 import java.time.LocalTime;
+import java.util.Date;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
