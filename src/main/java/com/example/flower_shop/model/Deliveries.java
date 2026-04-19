@@ -3,6 +3,7 @@ package com.example.flower_shop.model;
 import java.time.LocalTime;
 import java.util.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,13 +28,19 @@ public class Deliveries {
     @ManyToOne
     @JoinColumn(name = "korrieri_id")
     private Supplier korrieri;
+    
 
+    @Column(name = "data_dorezimit")
     private Date dataDorezimit;
+    @Column(name = "ora_dorezimit")
     private LocalTime oraDorezimit;
     private String statusi;
+    @Column(name = "firma_pranuesit")
     private String firmaPranuesit;
 
-
+    public Integer getId(){
+        return id;
+    }
     public Porosi getPorosia(){
         return porosia;
     }
