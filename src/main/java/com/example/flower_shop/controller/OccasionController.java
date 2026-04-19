@@ -29,20 +29,20 @@ public class OccasionController {
     }
 
     @GetMapping("/{id}")
-    public Occasion getOccasionById(@PathVariable Long id){
+    public Occasion getOccasionById(@PathVariable Integer id){
         return occasionRepository.findById(id).orElse(null);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteOccasion(@PathVariable Long id){
+    public void deleteOccasion(@PathVariable Integer id){
         if(occasionRepository.existsById(id)){
             occasionRepository.deleteById(id);
         }
     }
 
     @PutMapping("/{id}")
-    public Occasion updateOccasion(@PathVariable Long id,@RequestBody Occasion occasionDetails){
+    public Occasion updateOccasion(@PathVariable Integer id,@RequestBody Occasion occasionDetails){
         Occasion occasion = occasionRepository.findById(id).orElse(null);
         if(occasion != null){
             occasion.setEmertimi(occasionDetails.getEmertimi());

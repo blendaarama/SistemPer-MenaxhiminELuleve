@@ -2,7 +2,6 @@ package com.example.flower_shop.controller;
 
 import com.example.flower_shop.model.Bouquet;
 import com.example.flower_shop.repository.BouquetRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,8 +12,10 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173") // leje komunikimi me front
 public class BouquetController {
 
-    @Autowired
     private BouquetRepository bouquetRepository;
+    BouquetController(BouquetRepository bouquetRepository){
+        this.bouquetRepository = bouquetRepository;
+    }
 
     @GetMapping
     public List<Bouquet> getAllBouquets(){
@@ -22,7 +23,7 @@ public class BouquetController {
     }
 
     @GetMapping("/{id}")
-    public Bouquet getBouquetById(@PathVariable Long id){
+    public Bouquet getBouquetById(@PathVariable Integer id){
         return bouquetRepository.findById(id).orElse(null);
     }
 
@@ -32,14 +33,14 @@ public class BouquetController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteBouquet(@PathVariable Long id){
+    public void deleteBouquet(@PathVariable Integer id){
         if(bouquetRepository.existsById(id)){
             bouquetRepository.deleteById(id);
         }
     }
     
     @PutMapping("/{id}")
-    public Bouquet updateBouquet(@PathVariable Long id, @RequestBody Bouquet bouquetDetails) {
+    public Bouquet updateBouquet(@PathVariable Integer id, @RequestBody Bouquet bouquetDetails) {
         Bouquet bouquet = bouquetRepository.findById(id).orElse(null);
         if(bouquet != null){
             bouquet.setEmertimi(bouquetDetails.getEmertimi());

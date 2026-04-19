@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List; 
 
 @Repository
-public interface BouquetFlowerRepository extends JpaRepository<BouquetFlower, Long> {
-    List<BouquetFlower> findByBouquetId(Long bouquetId);
+public interface BouquetFlowerRepository extends JpaRepository<BouquetFlower, Integer> {
+    List<BouquetFlower> findByBouquetId(Integer bouquetId);
 }

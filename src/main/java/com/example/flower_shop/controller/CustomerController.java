@@ -31,20 +31,20 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}")
-    public Customer getCustomerById(@PathVariable Long id){
+    public Customer getCustomerById(@PathVariable Integer id){
         return customerRepository.findById(id).orElse(null);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCustomer(@PathVariable Long id){
+    public void deleteCustomer(@PathVariable Integer id){
         if(customerRepository.existsById(id)){
             customerRepository.deleteById(id);
         }
     }
 
     @PutMapping("/{id}")
-    public Customer updateCustomer(@PathVariable Long id, @RequestBody Customer customerDetails) {
+    public Customer updateCustomer(@PathVariable Integer id, @RequestBody Customer customerDetails) {
         Customer customer = customerRepository.findById(id).orElse(null);
         if (customer != null) {
             customer.setEmri(customerDetails.getEmri());

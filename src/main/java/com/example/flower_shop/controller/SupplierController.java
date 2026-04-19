@@ -31,20 +31,20 @@ public class SupplierController {
     }
     
     @GetMapping("/{id}")
-    public Supplier getSupplierById(@PathVariable Long id){
+    public Supplier getSupplierById(@PathVariable Integer id){
         return supplierRepository.findById(id).orElse(null);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteSupplier(@PathVariable Long id){
+    public void deleteSupplier(@PathVariable Integer id){
         if(supplierRepository.existsById(id)) {
             supplierRepository.deleteById(id);
     }
     }
 
     @PutMapping("/{id}")
-    public Supplier updateSupplier(@PathVariable Long id,@RequestBody Supplier supplierDetails){
+    public Supplier updateSupplier(@PathVariable Integer id,@RequestBody Supplier supplierDetails){
         Supplier supplier= supplierRepository.findById(id).orElse(null);
         if(supplier != null){
             supplier.setEmertimi(supplierDetails.getEmertimi());

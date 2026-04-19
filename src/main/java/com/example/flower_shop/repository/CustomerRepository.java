@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository; //krijimi i interf
 import org.springframework.stereotype.Repository; //importohet per organizim dhe konfigurim ne Spring
 
 @Repository  //shenon klasen si shtrese per komunikim me databazen dhe mundeson menaxhimin e saj nga Spring.
-public interface CustomerRepository extends JpaRepository<Customer, Long>{
+public interface CustomerRepository extends JpaRepository<Customer, Integer>{
 
 }
