@@ -51,7 +51,7 @@ public class OrderDetailsController {
 
                     existing.setPorosi(updated.getPorosi());
                     existing.setBuqeta(updated.getBuqeta());
-                    // SPO BAN IDK CKA KA QE 2 OR JAM TE KQYR existing.setFlower(updated.getFlower());
+                    existing.setFlower(updated.getFlower());
 
                     return ResponseEntity.ok(repository.save(existing));
                 })
