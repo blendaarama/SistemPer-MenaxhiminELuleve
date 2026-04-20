@@ -1,5 +1,4 @@
 package com.example.flower_shop.model;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +15,7 @@ public class OrderDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "porosia_id")
@@ -36,16 +35,16 @@ public class OrderDetails {
 
     private Double shuma;
 
-    // ID
-    public Long getId() {
+    
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    // POROSIA
+    
     public Porosi getPorosi() {
         return porosia;
     }
@@ -54,7 +53,7 @@ public class OrderDetails {
         this.porosia = porosia;
     }
 
-    // BUQETA
+   
     public Bouquet getBuqeta() {
         return buqeta;
     }
@@ -63,7 +62,7 @@ public class OrderDetails {
         this.buqeta = buqeta;
     }
 
-    // FLOWER
+    
     public Flower getFlower() {
         return flower;
     }
@@ -72,7 +71,7 @@ public class OrderDetails {
         this.flower = flower;
     }
 
-    // SASIA
+    
     public Integer getSasia() {
         return sasia;
     }
@@ -81,7 +80,7 @@ public class OrderDetails {
         this.sasia = sasia;
     }
 
-    // CMIMI NJESI
+    
     public Double getCmimiNjesi() {
         return cmimi_njesi;
     }
@@ -90,7 +89,7 @@ public class OrderDetails {
         this.cmimi_njesi = cmimi_njesi;
     }
 
-    // SHUMA
+  
     public Double getShuma() {
         return shuma;
     }
