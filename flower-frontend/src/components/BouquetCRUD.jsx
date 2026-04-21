@@ -44,23 +44,31 @@ const BouquetCRUD = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        const payload = {
+            ...bouquetForm,
+            cmimi: bouquetForm.cmimi ? Number(bouquetForm.cmimi) : 0
+        };
+
         try {
             if (bouquetForm.id) {
-                await axios.put(`http://localhost:8080/api/bouquets/${bouquetForm.id}`, bouquetForm);
+                await axios.put(`http://localhost:8080/api/bouquets/${bouquetForm.id}`, payload);
             } else {
-                await axios.post('http://localhost:8080/api/bouquets', bouquetForm);
+                await axios.post('http://localhost:8080/api/bouquets', payload);
             }
             alert(bouquetForm.id ? "Buqeta u përditësua!" : "Buqeta u shtua!");
             resetForm();
             loadBouquets();
-        } catch (err) { alert("Gabim gjatë ruajtjes!"); }
+        } catch (err) { 
+            console.error(err);
+            alert("Gabim gjatë ruajtjes!"); 
+        }
     };
 
     const openAddFlowersModal = async (bouquet) => {
         setSelectedBouquet(bouquet);
         try {
             const res = await axios.get(`http://localhost:8080/api/bouquet-flowers/bouquet/${bouquet.id}`);
-         
             const existingIds = res.data.map(bf => bf.flowerId);
             setSelectedFlowerIds(existingIds);
             setShowModal(true);
@@ -149,7 +157,7 @@ const BouquetCRUD = () => {
                     </div>
                     <div className="col-md-4">
                         <label className="form-label fw-bold">URL e Fotos</label>
-                        <input className="form-control" name="foto" value={bouquetForm.foto} onChange={handleInput} />
+                        <input className="form-control" name="foto" value={bouquetForm.foto} onChange={handleInput} placeholder="https://..." />
                     </div>
                     <div className="col-md-4 d-flex align-items-center mt-4">
                         <div className="form-check form-switch">
@@ -157,42 +165,45 @@ const BouquetCRUD = () => {
                             <label className="form-check-label fw-bold" htmlFor="switchAktiv">Aktiv</label>
                         </div>
                     </div>
-                    <div className="col-md-12 d-grid">
+                    <div className="col-md-12 d-grid gap-2">
                         <button className={`btn ${bouquetForm.id ? 'btn-warning' : 'btn-success'} fw-bold text-white`} type="submit">
                             {bouquetForm.id ? "PËRDITËSO" : "SHTO BUQETËN"}
                         </button>
+                        {bouquetForm.id && <button className="btn btn-outline-secondary" type="button" onClick={resetForm}>Anulo</button>}
                     </div>
                 </form>
             </div>
 
             <div className="card shadow p-4 border-0">
                 <h4 className="mb-3" style={{fontFamily: 'serif'}}>Lista e Buqetave</h4>
-                <table className="table table-hover align-middle">
-                    <thead className="table-dark">
-                        <tr>
-                            <th>Foto</th>
-                            <th>Emri</th>
-                            <th>Çmimi</th>
-                            <th>Statusi</th>
-                            <th className="text-center">Veprime</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {bouquets.map(b => (
-                            <tr key={b.id}>
-                                <td><img src={b.foto || "https://via.placeholder.com/50"} className="rounded" style={{width: '50px', height: '50px', objectFit: 'cover'}} alt="" /></td>
-                                <td className="fw-bold">{b.emertimi} <br/><small className="text-muted">{b.madhesia}</small></td>
-                                <td>{b.cmimi}€</td>
-                                <td><span className={`badge ${b.eshteAktiv ? 'bg-success' : 'bg-secondary'}`}>{b.eshteAktiv ? 'Aktiv' : 'Jo Aktiv'}</span></td>
-                                <td className="text-center">
-                                    <button className="btn btn-sm btn-info text-white me-2" onClick={() => openAddFlowersModal(b)}>+ Lule</button>
-                                    <button className="btn btn-sm btn-outline-warning me-2" onClick={() => handleEdit(b)}>Edit</button>
-                                    <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(b.id)}>Fshi</button>
-                                </td>
+                <div className="table-responsive">
+                    <table className="table table-hover align-middle">
+                        <thead className="table-dark">
+                            <tr>
+                                <th>Foto</th>
+                                <th>Emri</th>
+                                <th>Çmimi</th>
+                                <th>Statusi</th>
+                                <th className="text-center">Veprime</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {bouquets.map(b => (
+                                <tr key={b.id}>
+                                    <td><img src={b.foto || "https://via.placeholder.com/50"} className="rounded shadow-sm" style={{width: '50px', height: '50px', objectFit: 'cover'}} alt="" /></td>
+                                    <td className="fw-bold">{b.emertimi} <br/><small className="text-muted">{b.madhesia}</small></td>
+                                    <td>{b.cmimi}€</td>
+                                    <td><span className={`badge ${b.eshteAktiv ? 'bg-success' : 'bg-secondary'}`}>{b.eshteAktiv ? 'Aktiv' : 'Jo Aktiv'}</span></td>
+                                    <td className="text-center">
+                                        <button className="btn btn-sm btn-info text-white me-2" onClick={() => openAddFlowersModal(b)}>+ Lule</button>
+                                        <button className="btn btn-sm btn-outline-warning me-2" onClick={() => handleEdit(b)}>Edit</button>
+                                        <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(b.id)}>Fshi</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {showModal && (

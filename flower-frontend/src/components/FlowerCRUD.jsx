@@ -4,8 +4,15 @@ import axios from 'axios';
 const FlowerCRUD = () => {
     const [flowers, setFlowers] = useState([]);
     const [form, setForm] = useState({
-        id: null, emertimi: '', lloji: '', ngjyra: '', cmimi: '', 
-        sasiaStokut: '', sezoni: '', jetegjatesiaDitesh: '', foto: ''
+        id: null, 
+        emertimi: '', 
+        lloji: '', 
+        ngjyra: '', 
+        cmimi: '', 
+        sasiaStokut: '', 
+        sezoni: '', 
+        jetegjatesiaDitesh: '', 
+        foto: ''
     });
 
     useEffect(() => { loadFlowers(); }, []);
@@ -14,7 +21,9 @@ const FlowerCRUD = () => {
         try {
             const res = await axios.get('http://localhost:8080/api/flowers');
             setFlowers(res.data);
-        } catch (err) { console.error("Gabim gjatë ngarkimit!", err); }
+        } catch (err) { 
+            console.error("Gabim gjatë ngarkimit!", err); 
+        }
     };
 
     const handleInput = (e) => {
@@ -23,30 +32,49 @@ const FlowerCRUD = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const payload = {
+            ...form,
+            cmimi: form.cmimi ? Number(form.cmimi) : 0,
+            sasiaStokut: form.sasiaStokut ? Number(form.sasiaStokut) : 0,
+            jetegjatesiaDitesh: form.jetegjatesiaDitesh ? Number(form.jetegjatesiaDitesh) : 0
+        };
+
         try {
             if (form.id) {
-                await axios.put(`http://localhost:8080/api/flowers/${form.id}`, form);
-                alert("Lulja u përditësua!");
+                await axios.put(`http://localhost:8080/api/flowers/${form.id}`, payload);
+                alert("Lulja u përditësua me sukses!");
             } else {
-                await axios.post('http://localhost:8080/api/flowers', form);
+                await axios.post('http://localhost:8080/api/flowers', payload);
                 alert("Lulja u shtua me sukses!");
             }
-            setForm({ id: null, emertimi: '', lloji: '', ngjyra: '', cmimi: '', sasiaStokut: '', sezoni: '', jetegjatesiaDitesh: '', foto: '' });
+            
+            setForm({ 
+                id: null, emertimi: '', lloji: '', ngjyra: '', cmimi: '', 
+                sasiaStokut: '', sezoni: '', jetegjatesiaDitesh: '', foto: '' 
+            });
             loadFlowers();
-        } catch (err) { alert("Gabim gjatë ruajtjes!"); }
+        } catch (err) { 
+            console.error(err);
+            alert("Gabim gjatë ruajtjes! Kontrollo nëse serveri është i ndezur."); 
+        }
     };
 
     const handleDelete = async (id) => {
         if (window.confirm("A dëshironi ta fshini këtë lule?")) {
-            await axios.delete(`http://localhost:8080/api/flowers/${id}`);
-            loadFlowers();
+            try {
+                await axios.delete(`http://localhost:8080/api/flowers/${id}`);
+                loadFlowers();
+            } catch (err) {
+                alert("Nuk mund të fshihet! Mund të jetë pjesë e një buqete.");
+            }
         }
     };
 
     return (
         <div className="container mt-4">
             <div className="card shadow p-4 mb-5 border-0">
-                <h3 className="mb-4 text-center" style={{fontFamily: 'serif'}}>🌷 Regjistrimi i Luleve</h3>
+                <h3 className="mb-4 text-center" style={{fontFamily: 'serif'}}>🌷 Regjistrimi i Luleve (DTO Version)</h3>
                 <form onSubmit={handleSubmit} className="row g-3">
                     <div className="col-md-4">
                         <label className="form-label fw-bold">Emërtimi</label>
@@ -91,6 +119,14 @@ const FlowerCRUD = () => {
                         <button className={`btn ${form.id ? 'btn-warning' : 'btn-success'} fw-bold text-white`}>
                             {form.id ? "PËRDITËSO" : "RUAJ LULEN"}
                         </button>
+                        {form.id && (
+                            <button 
+                                className="btn btn-outline-secondary mt-2" 
+                                onClick={() => setForm({ id: null, emertimi: '', lloji: '', ngjyra: '', cmimi: '', sasiaStokut: '', sezoni: '', jetegjatesiaDitesh: '', foto: '' })}
+                            >
+                                Anulo
+                            </button>
+                        )}
                     </div>
                 </form>
             </div>
@@ -110,7 +146,14 @@ const FlowerCRUD = () => {
                     <tbody>
                         {flowers.map(f => (
                             <tr key={f.id}>
-                                <td><img src={f.foto || "https://via.placeholder.com/40"} alt="" className="rounded shadow-sm" style={{width: '40px', height: '40px', objectFit: 'cover'}} /></td>
+                                <td>
+                                    <img 
+                                        src={f.foto || "https://via.placeholder.com/40"} 
+                                        alt="" 
+                                        className="rounded shadow-sm" 
+                                        style={{width: '40px', height: '40px', objectFit: 'cover'}} 
+                                    />
+                                </td>
                                 <td className="fw-bold">{f.emertimi} <br/><small className="text-muted">{f.lloji}</small></td>
                                 <td><span className="badge bg-info text-dark">{f.sezoni}</span></td>
                                 <td>{f.sasiaStokut} koka</td>

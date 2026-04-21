@@ -30,12 +30,18 @@ const OccasionCRUD = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const payload = {
+            ...form,
+            zbritjaPerqindje: form.zbritjaPerqindje ? Number(form.zbritjaPerqindje) : 0
+        };
+
         try {
             if (form.id) {
-                await axios.put(`http://localhost:8080/api/occasions/${form.id}`, form);
+                await axios.put(`http://localhost:8080/api/occasions/${form.id}`, payload);
                 alert("Eventi u përditësua!");
             } else {
-                await axios.post('http://localhost:8080/api/occasions', form);
+                await axios.post('http://localhost:8080/api/occasions', payload);
                 alert("Eventi u shtua me sukses!");
             }
             resetForm();
@@ -47,7 +53,8 @@ const OccasionCRUD = () => {
     };
 
     const handleEdit = (occ) => {
-        setForm(occ);
+        const formattedDate = occ.dataNgjarjes ? occ.dataNgjarjes.split('T')[0] : '';
+        setForm({ ...occ, dataNgjarjes: formattedDate });
         window.scrollTo(0, 0);
     };
 
@@ -68,7 +75,6 @@ const OccasionCRUD = () => {
 
     return (
         <div className="container mt-5">
-            {}
             <div className="card shadow p-4 mb-5 bg-white rounded border-0">
                 <h2 className="text-center mb-4" style={{ fontFamily: 'serif' }}>~ Menaxhimi i Eventeve & Zbritjeve ~</h2>
                 <form onSubmit={handleSubmit} className="row g-3">
@@ -92,12 +98,11 @@ const OccasionCRUD = () => {
                         <button className={`btn ${form.id ? 'btn-warning' : 'btn-primary'} fw-bold text-white`} type="submit">
                             {form.id ? "PËRDITËSO EVENTIN" : "SHTO EVENTIN E RI"}
                         </button>
-                        {form.id && <button className="btn btn-outline-secondary btn-sm" onClick={resetForm}>Anulo Editimin</button>}
+                        {form.id && <button type="button" className="btn btn-outline-secondary btn-sm" onClick={resetForm}>Anulo Editimin</button>}
                     </div>
                 </form>
             </div>
 
-            {}
             <div className="card shadow p-4 border-0">
                 <h4 className="mb-3" style={{ fontFamily: 'serif' }}>Lista e Eventeve Aktive</h4>
                 <div className="table-responsive">
