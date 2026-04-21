@@ -1,60 +1,47 @@
 package com.example.flower_shop.controller;
 
-import com.example.flower_shop.model.Supplier;
-import com.example.flower_shop.repository.SupplierRepository;
-
+import com.example.flower_shop.dto.SupplierDTO;
+import com.example.flower_shop.service.SupplierService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/suppliers")
 @CrossOrigin(origins = "http://localhost:3000")
 public class SupplierController {
 
-    private final SupplierRepository supplierRepository;
+    private final SupplierService supplierService;
 
-    SupplierController(SupplierRepository supplierRepository){
-        this.supplierRepository = supplierRepository;
+    public SupplierController(SupplierService supplierService) {
+        this.supplierService = supplierService;
     }
 
     @GetMapping
-    public List<Supplier> getAllSuppliers(){
-        return supplierRepository.findAll();
+    public List<SupplierDTO> getAllSuppliers() {
+        return supplierService.getAllSuppliers();
     }
-    
+
+    @GetMapping("/{id}")
+    public SupplierDTO getSupplierById(@PathVariable Integer id) {
+        return supplierService.getSupplierById(id);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Supplier addSupplier(@RequestBody Supplier supplier){
-        return supplierRepository.save(supplier);
-    }
-    
-    @GetMapping("/{id}")
-    public Supplier getSupplierById(@PathVariable Integer id){
-        return supplierRepository.findById(id).orElse(null);
+    public SupplierDTO addSupplier(@RequestBody SupplierDTO supplierDTO) {
+        return supplierService.addSupplier(supplierDTO);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteSupplier(@PathVariable Integer id){
-        if(supplierRepository.existsById(id)) {
-            supplierRepository.deleteById(id);
-    }
+    public void deleteSupplier(@PathVariable Integer id) {
+        supplierService.deleteSupplier(id);
     }
 
     @PutMapping("/{id}")
-    public Supplier updateSupplier(@PathVariable Integer id,@RequestBody Supplier supplierDetails){
-        Supplier supplier= supplierRepository.findById(id).orElse(null);
-        if(supplier != null){
-            supplier.setEmertimi(supplierDetails.getEmertimi());
-            supplier.setKontakti(supplierDetails.getKontakti());
-            supplier.setEmail(supplierDetails.getEmail());
-            supplier.setTelefoni(supplierDetails.getTelefoni());
-            supplier.setAdresa(supplierDetails.getAdresa());
-
-            return supplierRepository.save(supplier);
-        }
-        return null;
+    public SupplierDTO updateSupplier(@PathVariable Integer id, @RequestBody SupplierDTO supplierDTO) {
+        return supplierService.updateSupplier(id, supplierDTO);
     }
 }

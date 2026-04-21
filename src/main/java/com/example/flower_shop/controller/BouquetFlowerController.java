@@ -1,7 +1,7 @@
 package com.example.flower_shop.controller;
 
-import com.example.flower_shop.model.BouquetFlower;
-import com.example.flower_shop.repository.BouquetFlowerRepository;
+import com.example.flower_shop.dto.BouquetFlowerDTO;
+import com.example.flower_shop.service.BouquetFlowerService;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -10,31 +10,29 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000")
 public class BouquetFlowerController {
 
-    private BouquetFlowerRepository bouquetFlowerRepository;
+    private final BouquetFlowerService bouquetFlowerService;
 
-    BouquetFlowerController(BouquetFlowerRepository bouquetFlowerRepository){
-        this.bouquetFlowerRepository = bouquetFlowerRepository;
+    public BouquetFlowerController(BouquetFlowerService bouquetFlowerService){
+        this.bouquetFlowerService = bouquetFlowerService;
     }
 
-    @GetMapping //get merr te dhena
-    public List<BouquetFlower> getAll() {
-        return bouquetFlowerRepository.findAll();
+    @GetMapping
+    public List<BouquetFlowerDTO> getAll() {
+        return bouquetFlowerService.getAll();
     }
 
     @GetMapping("/bouquet/{bouquetId}")
-    public List<BouquetFlower> getByBouquet(@PathVariable Integer bouquetId) {
-        return bouquetFlowerRepository.findByBouquetId(bouquetId);
+    public List<BouquetFlowerDTO> getByBouquet(@PathVariable Integer bouquetId) {
+        return bouquetFlowerService.getByBouquet(bouquetId);
     }
 
-    @PostMapping //shto te dhena
-    public BouquetFlower addFlowerToBouquet(@RequestBody BouquetFlower bouquetFlower) {
-        return bouquetFlowerRepository.save(bouquetFlower);
+    @PostMapping
+    public BouquetFlowerDTO addFlowerToBouquet(@RequestBody BouquetFlowerDTO bouquetFlowerDTO) {
+        return bouquetFlowerService.addFlowerToBouquet(bouquetFlowerDTO);
     }
 
-    @DeleteMapping("/{id}") //fshije te dhena
+    @DeleteMapping("/{id}")
     public void removeFlowerFromBouquet(@PathVariable Integer id) {
-        if(bouquetFlowerRepository.existsById(id)){
-            bouquetFlowerRepository.deleteById(id);
-        }
+        bouquetFlowerService.removeFlowerFromBouquet(id);
     }
 }

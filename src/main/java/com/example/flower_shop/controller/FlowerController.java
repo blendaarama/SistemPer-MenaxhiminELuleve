@@ -1,10 +1,9 @@
 package com.example.flower_shop.controller;
 
-import com.example.flower_shop.model.Flower;
-import com.example.flower_shop.repository.FlowerRepository;
+import com.example.flower_shop.dto.FlowerDTO;
+import com.example.flower_shop.service.FlowerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -12,51 +11,36 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000") 
 public class FlowerController {
 
-    private final FlowerRepository flowerRepository;
+    private final FlowerService flowerService;
 
-    FlowerController(FlowerRepository flowerRepository){
-        this.flowerRepository = flowerRepository;
+    public FlowerController(FlowerService flowerService){
+        this.flowerService = flowerService;
     }
 
     @GetMapping
-    public List<Flower> getAllFlowers() {
-        return flowerRepository.findAll();
+    public List<FlowerDTO> getAllFlowers() {
+        return flowerService.getAllFlowers();
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) //kthen 201 per create
-    public Flower addFlower(@RequestBody Flower flower) {
-        return flowerRepository.save(flower);
+    @ResponseStatus(HttpStatus.CREATED)
+    public FlowerDTO addFlower(@RequestBody FlowerDTO flowerDTO) {
+        return flowerService.addFlower(flowerDTO);
     }
    
     @GetMapping("/{id}")
-    public Flower getFlowerById(@PathVariable Integer id) {
-        return flowerRepository.findById(id).orElse(null);
+    public FlowerDTO getFlowerById(@PathVariable Integer id) {
+        return flowerService.getFlowerById(id);
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT) // kthe 204 per delete sepse nuk ka body
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFlower(@PathVariable Integer id) {
-        if(flowerRepository.existsById(id)){
-            flowerRepository.deleteById(id);
-        } 
+        flowerService.deleteFlower(id);
     }
 
     @PutMapping("/{id}")
-    public Flower updateFlower(@PathVariable Integer id, @RequestBody Flower flowerDetails) {
-        Flower flower = flowerRepository.findById(id).orElse(null);
-        if (flower != null) {
-            flower.setEmertimi(flowerDetails.getEmertimi());
-            flower.setLloji(flowerDetails.getLloji());
-            flower.setNgjyra(flowerDetails.getNgjyra());
-            flower.setCmimi(flowerDetails.getCmimi());
-            flower.setSasiaStokut(flowerDetails.getSasiaStokut());
-            flower.setSezoni(flowerDetails.getSezoni());
-            flower.setJetegjatesiaDitesh(flowerDetails.getJetegjatesiaDitesh());
-            flower.setFoto(flowerDetails.getFoto());
-    
-            return flowerRepository.save(flower);
-        }
-        return null;
+    public FlowerDTO updateFlower(@PathVariable Integer id, @RequestBody FlowerDTO flowerDTO) {
+        return flowerService.updateFlower(id, flowerDTO);
     }
 }

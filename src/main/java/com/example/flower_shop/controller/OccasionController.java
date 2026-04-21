@@ -1,7 +1,7 @@
 package com.example.flower_shop.controller;
 
-import com.example.flower_shop.model.Occasion;
-import com.example.flower_shop.repository.OccasionRepository;
+import com.example.flower_shop.dto.OccasionDTO;
+import com.example.flower_shop.service.OccasionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -11,47 +11,36 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000")
 public class OccasionController {
     
-    private final OccasionRepository occasionRepository;
+    private final OccasionService occasionService;
 
-    OccasionController(OccasionRepository occasionRepository){
-        this.occasionRepository = occasionRepository;
+    public OccasionController(OccasionService occasionService){
+        this.occasionService = occasionService;
     }
 
     @GetMapping
-    public List<Occasion> getAllOccasions(){
-        return occasionRepository.findAll();
+    public List<OccasionDTO> getAllOccasions(){
+        return occasionService.getAllOccasions();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Occasion addOccasion(@RequestBody Occasion occasion){
-        return occasionRepository.save(occasion);
+    public OccasionDTO addOccasion(@RequestBody OccasionDTO occasionDTO){
+        return occasionService.addOccasion(occasionDTO);
     }
 
     @GetMapping("/{id}")
-    public Occasion getOccasionById(@PathVariable Integer id){
-        return occasionRepository.findById(id).orElse(null);
+    public OccasionDTO getOccasionById(@PathVariable Integer id){
+        return occasionService.getOccasionById(id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteOccasion(@PathVariable Integer id){
-        if(occasionRepository.existsById(id)){
-            occasionRepository.deleteById(id);
-        }
+        occasionService.deleteOccasion(id);
     }
 
     @PutMapping("/{id}")
-    public Occasion updateOccasion(@PathVariable Integer id,@RequestBody Occasion occasionDetails){
-        Occasion occasion = occasionRepository.findById(id).orElse(null);
-        if(occasion != null){
-            occasion.setEmertimi(occasionDetails.getEmertimi());
-            occasion.setPershkrimi(occasionDetails.getPershkrimi());
-            occasion.setDataNgjarjes(occasionDetails.getDataNgjarjes());
-            occasion.setZbritjaPerqindje(occasionDetails.getZbritjaPerqindje());
-
-            return occasionRepository.save(occasion);
-        }
-        return null;
+    public OccasionDTO updateOccasion(@PathVariable Integer id, @RequestBody OccasionDTO occasionDTO){
+        return occasionService.updateOccasion(id, occasionDTO);
     }
 }
