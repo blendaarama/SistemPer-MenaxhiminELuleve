@@ -27,7 +27,7 @@ public ResponseEntity<List<Porosi>> getAllPorosi(){
 
    //Get by id
    @GetMapping("/{id}")
-   public ResponseEntity<Porosi> getPorosiById(@PathVariable Long id){
+   public ResponseEntity<Porosi> getPorosiById(@PathVariable Integer id){
     return repository.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
    }
 
@@ -40,7 +40,7 @@ public ResponseEntity<List<Porosi>> getAllPorosi(){
 
    //update
    @PutMapping("/{id}")
-   public ResponseEntity<Porosi> updatePorosi(@PathVariable Long id, @RequestBody Porosi updatePorosi){
+   public ResponseEntity<Porosi> updatePorosi(@PathVariable Integer id, @RequestBody Porosi updatePorosi){
     return repository.findById(id).map(existing -> {
         existing.setStatusi(updatePorosi.getStatusi());
         existing.setShumeTotale(updatePorosi.getShumeTotale());
@@ -54,7 +54,7 @@ public ResponseEntity<List<Porosi>> getAllPorosi(){
    }
     // delete
     @DeleteMapping("/{id}")
-     public ResponseEntity<?> deletePorosi(@PathVariable Long id) {
+     public ResponseEntity<?> deletePorosi(@PathVariable Integer id) {
 
         return repository.findById(id)
                 .map(existing -> {
