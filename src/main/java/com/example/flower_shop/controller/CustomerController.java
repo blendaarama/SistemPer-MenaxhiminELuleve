@@ -1,7 +1,7 @@
 package com.example.flower_shop.controller;
 
 import com.example.flower_shop.model.Customer;
-import com.example.flower_shop.repository.CustomerRepository;
+import com.example.flower_shop.service.CustomerService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -12,49 +12,37 @@ import java.util.List;
 @RequestMapping("/api/customers")
 @CrossOrigin(origins = "http://localhost:3000")
 public class CustomerController {
-   
-    private final CustomerRepository customerRepository;
 
-    CustomerController(CustomerRepository customerRepository) {
-        this.customerRepository = customerRepository;
+    private final CustomerService customerService;
+
+    public CustomerController(CustomerService customerService) {
+        this.customerService = customerService;
     }
 
     @GetMapping
-    public List<Customer> getAllCustomers(){
-        return customerRepository.findAll();
+    public List<Customer> getAllCustomers() {
+        return customerService.getAll();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Customer addCustomer(@RequestBody Customer customer){
-        return customerRepository.save(customer);
+    public Customer addCustomer(@RequestBody Customer customer) {
+        return customerService.create(customer);
     }
 
     @GetMapping("/{id}")
-    public Customer getCustomerById(@PathVariable Integer id){
-        return customerRepository.findById(id).orElse(null);
-    }
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCustomer(@PathVariable Integer id){
-        if(customerRepository.existsById(id)){
-            customerRepository.deleteById(id);
-        }
+    public Customer getById(@PathVariable Integer id) {
+        return customerService.getById(id);
     }
 
     @PutMapping("/{id}")
-    public Customer updateCustomer(@PathVariable Integer id, @RequestBody Customer customerDetails) {
-        Customer customer = customerRepository.findById(id).orElse(null);
-        if (customer != null) {
-            customer.setEmri(customerDetails.getEmri());
-            customer.setMbiemri(customerDetails.getMbiemri());
-            customer.setEmail(customerDetails.getEmail());
-            customer.setTelefoni(customerDetails.getTelefoni());
-            customer.setAdresa(customerDetails.getAdresa());
-    
-            return customerRepository.save(customer);
-        }
-        return null;
+    public Customer update(@PathVariable Integer id,
+                           @RequestBody Customer customer) {
+        return customerService.update(id, customer);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id) {
+        customerService.delete(id);
     }
 }

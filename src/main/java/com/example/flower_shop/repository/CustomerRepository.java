@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository; //importohet per organizim dhe
 
 @Repository  //shenon klasen si shtrese per komunikim me databazen dhe mundeson menaxhimin e saj nga Spring.
 public interface CustomerRepository extends JpaRepository<Customer, Integer>{
-
+boolean existsByEmail(String email);
 }
