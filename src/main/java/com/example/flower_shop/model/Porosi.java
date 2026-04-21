@@ -1,6 +1,8 @@
 package com.example.flower_shop.model;
 import lombok.*;
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.util.Date;
 @Data
 
@@ -18,7 +20,7 @@ private Integer id;
 private Customer klienti;
 
 @Column(name = "data_porosis")
-private Date dataPorosise;
+private LocalDate dataPorosise;
 
 @Column(name = "data_dorezimit")
 private Date dataDorezimit;

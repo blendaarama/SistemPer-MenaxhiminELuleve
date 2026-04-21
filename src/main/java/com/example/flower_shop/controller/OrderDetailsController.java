@@ -1,12 +1,12 @@
 package com.example.flower_shop.controller;
 
+import com.example.flower_shop.dto.OrderDetailsDTO;
 import com.example.flower_shop.model.OrderDetails;
-import com.example.flower_shop.repository.OrderDetailsRepository;
+import com.example.flower_shop.service.OrderDetailsService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/order-details")
@@ -14,58 +14,40 @@ import java.util.List;
 public class OrderDetailsController {
 
     @Autowired
-    private OrderDetailsRepository repository;
+private OrderDetailsService service;
 
     // GET ALL
     @GetMapping
-    public List<OrderDetails> getAll() {
-        return repository.findAll();
-    }
+public List<OrderDetails> getAll() {
+    return service.getAll();
+}
 
     // GET BY ID
     @GetMapping("/{id}")
-    public ResponseEntity<OrderDetails> getById(@PathVariable Long id) {
-        return repository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
+      public ResponseEntity<OrderDetails> getById(@PathVariable Integer id) {
+         OrderDetails od = service.getById(id);
+              return od != null ? ResponseEntity.ok(od) : ResponseEntity.notFound().build();
+}
     // CREATE
     @PostMapping
-    public OrderDetails create(@RequestBody OrderDetails od) {
-        return repository.save(od);
-    }
+      public OrderDetails create(@RequestBody OrderDetails od) {
+          return service.create(od);
+}
 
     // UPDATE
     @PutMapping("/{id}")
     public ResponseEntity<OrderDetails> update(
-            @PathVariable Long id,
-            @RequestBody OrderDetails updated) {
+        @PathVariable Integer id,
+        @RequestBody OrderDetailsDTO dto) {
 
-        return repository.findById(id)
-                .map(existing -> {
+    OrderDetails updated = service.update(id, dto);
 
-                    existing.setSasia(updated.getSasia());
-                    existing.setCmimiNjesi(updated.getCmimiNjesi());
-                    existing.setShuma(updated.getShuma());
-
-                    existing.setPorosi(updated.getPorosi());
-                    existing.setBuqeta(updated.getBuqeta());
-                    existing.setFlower(updated.getFlower());
-
-                    return ResponseEntity.ok(repository.save(existing));
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-
- @DeleteMapping("/{id}")
-public ResponseEntity<Void> delete(@PathVariable Long id) {
-
-    return repository.findById(id)
-            .map(existing -> {
-                repository.delete(existing);
-                return ResponseEntity.noContent().<Void>build();
-            })
-            .orElse(ResponseEntity.notFound().build());
+    return ResponseEntity.ok(updated);
+}
+    @DeleteMapping("/{id}")
+       public ResponseEntity<Void> delete(@PathVariable Integer id) {
+         boolean deleted = service.delete(id);
+          return deleted ? ResponseEntity.noContent().build()
+           : ResponseEntity.notFound().build();
 }
 }
