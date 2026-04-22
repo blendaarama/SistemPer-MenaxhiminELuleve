@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Data;
 
 @Entity
 @Table(name = "deliveries")
@@ -38,45 +39,6 @@ public class Deliveries {
     @Column(name = "firma_pranuesit")
     private String firmaPranuesit;
 
-    public Integer getId(){
-        return id;
-    }
-    public Porosi getPorosia(){
-        return porosia;
-    }
-    public void setPorosia(Porosi porosia){
-        this.porosia=porosia;
-    }
-    public Supplier getKorrieri(){
-        return korrieri;
-    }
-    public void setKorrieri(Supplier korrieri){
-        this.korrieri=korrieri;
-    }
-    public Date getDataDorezimit(){
-        return dataDorezimit;
-    }
-    public void setDataDorezimit(Date dataDorezimit){
-        this.dataDorezimit=dataDorezimit;
-    }
-    public LocalTime getOraDorezimit(){
-        return oraDorezimit;
-    }
-    public void setOraDorezimit(LocalTime oraDorezimit){
-        this.oraDorezimit=oraDorezimit;
-    }
-    public String getStatusi(){
-        return statusi;
-    }
-    public void setStatusi(String statusi){
-        this.statusi=statusi;
-    }
-    public String getFirmaPranuesit(){
-        return firmaPranuesit;
-    }
-    public void setFirmaPranuesit(String firmaPranuesit){
-        this.firmaPranuesit=firmaPranuesit;
-    }
-
+  
     
 }

@@ -1,10 +1,8 @@
 package com.example.flower_shop.controller;
 
-import com.example.flower_shop.model.Deliveries;
-import com.example.flower_shop.model.Porosi;
-import com.example.flower_shop.service.OrderService;
-import com.example.flower_shop.dto.DeliveriesDTO;
-import com.example.flower_shop.dto.PorosiUpdateDTO;
+import com.example.flower_shop.dto.ReviewDTO;
+import com.example.flower_shop.model.Review;
+import com.example.flower_shop.service.ReviewService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,45 +10,47 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/porosi")
+@RequestMapping("/api/reviews")
 @CrossOrigin(origins = "http://localhost:3000")
-public class PorosiController {
+public class ReviewController {
 
-    private final OrderService service;
+    private final ReviewService service;
 
-    public PorosiController(OrderService service) {
+    public ReviewController(ReviewService service) {
         this.service = service;
     }
 
     // GET ALL
     @GetMapping
-    public List<Porosi> getAll() {
+    public List<Review> getAll() {
         return service.getAll();
     }
 
     // GET BY ID
     @GetMapping("/{id}")
-    public ResponseEntity<Porosi> getById(@PathVariable Integer id) {
-        Porosi porosi = service.getById(id);
-        return porosi != null
-                ? ResponseEntity.ok(porosi)
+    public ResponseEntity<Review> getById(@PathVariable Integer id) {
+        Review review = service.getById(id);
+        return review != null
+                ? ResponseEntity.ok(review)
                 : ResponseEntity.notFound().build();
     }
 
     // CREATE
     @PostMapping
-public Deliveries create(@RequestBody DeliveriesDTO dto) {
-    return service.create(dto);
-}
+    public ResponseEntity<Review> create(@RequestBody ReviewDTO dto) {
+        Review created = service.create(dto);
+        return created != null
+                ? ResponseEntity.ok(created)
+                : ResponseEntity.badRequest().build();
+    }
 
-    // UPDATE (ME DTO)
+    // UPDATE
     @PutMapping("/{id}")
-    public ResponseEntity<Porosi> update(
+    public ResponseEntity<Review> update(
             @PathVariable Integer id,
-            @RequestBody PorosiUpdateDTO dto) {
+            @RequestBody ReviewDTO dto) {
 
-        Porosi updated = service.update(id, dto);
-
+        Review updated = service.update(id, dto);
         return updated != null
                 ? ResponseEntity.ok(updated)
                 : ResponseEntity.notFound().build();
@@ -60,7 +60,6 @@ public Deliveries create(@RequestBody DeliveriesDTO dto) {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         boolean deleted = service.delete(id);
-
         return deleted
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();

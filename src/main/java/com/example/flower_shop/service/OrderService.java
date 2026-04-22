@@ -1,6 +1,5 @@
 package com.example.flower_shop.service;
-
-import com.example.flower_shop.dto.dto.PorosiUpdateDTO;
+import com.example.flower_shop.dto.PorosiUpdateDTO;
 import com.example.flower_shop.model.Porosi;
 import com.example.flower_shop.repository.PorosiRepository;
 import org.springframework.beans.factory.annotation.Autowired;
