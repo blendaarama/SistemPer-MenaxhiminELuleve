@@ -1,5 +1,6 @@
 package com.example.flower_shop.dto;
 import lombok.Data;
+import java.util.List;
 
 @Data
 public class BouquetDTO {
@@ -10,4 +11,6 @@ public class BouquetDTO {
     private String madhesia;
     private String foto;
     private Boolean eshteAktiv;
+    private List<String> emratELuleve;
+    private List<Integer> flowerIds;
 }

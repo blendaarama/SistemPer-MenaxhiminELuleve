@@ -74,7 +74,7 @@ const FlowerCRUD = () => {
     return (
         <div className="container mt-4">
             <div className="card shadow p-4 mb-5 border-0">
-                <h3 className="mb-4 text-center" style={{fontFamily: 'serif'}}>🌷 Regjistrimi i Luleve (DTO Version)</h3>
+                <h3 className="mb-4 text-center" style={{fontFamily: 'serif'}}>Menaxhimi i Luleve</h3>
                 <form onSubmit={handleSubmit} className="row g-3">
                     <div className="col-md-4">
                         <label className="form-label fw-bold">Emërtimi</label>

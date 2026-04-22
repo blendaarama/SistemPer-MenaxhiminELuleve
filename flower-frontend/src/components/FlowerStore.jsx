@@ -33,7 +33,7 @@ const FlowerStore = () => {
         <div className="container mt-5">
             {}
             <div className="text-center mb-5 animate__animated animate__fadeIn">
-                <h1 style={{ fontFamily: 'serif', letterSpacing: '5px', fontWeight: 'bold' }}>ODE À LA ROSE</h1>
+                <h1 style={{ fontFamily: 'serif', letterSpacing: '5px', fontWeight: 'bold' }}> <i>Eternal Rose</i></h1>
                 <div className="d-flex justify-content-center gap-4 text-uppercase small mt-3 fw-semibold" style={{ letterSpacing: '1px' }}>
                     <span style={{cursor: 'pointer'}}>Shop</span>
                     <span style={{cursor: 'pointer'}}>Occasions</span>

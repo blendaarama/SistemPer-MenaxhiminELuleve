@@ -10,6 +10,8 @@ const OccasionCRUD = () => {
         dataNgjarjes: '',
         zbritjaPerqindje: ''
     });
+    
+    const today = new Date().toISOString().split('T')[0];
 
     useEffect(() => {
         loadOccasions();
@@ -30,6 +32,11 @@ const OccasionCRUD = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (form.dataNgjarjes < today) {
+            alert("Gabim: Nuk mund të caktoni një event në një datë që ka kaluar!");
+            return;
+        }
 
         const payload = {
             ...form,
@@ -76,7 +83,7 @@ const OccasionCRUD = () => {
     return (
         <div className="container mt-5">
             <div className="card shadow p-4 mb-5 bg-white rounded border-0">
-                <h2 className="text-center mb-4" style={{ fontFamily: 'serif' }}>~ Menaxhimi i Eventeve & Zbritjeve ~</h2>
+                <h2 className="text-center mb-4" style={{ fontFamily: 'serif' }}> Menaxhimi i Eventeve & Zbritjeve </h2>
                 <form onSubmit={handleSubmit} className="row g-3">
                     <div className="col-md-6">
                         <label className="form-label fw-bold">Emri i Eventit</label>
@@ -84,7 +91,16 @@ const OccasionCRUD = () => {
                     </div>
                     <div className="col-md-3">
                         <label className="form-label fw-bold">Data e Ngjarjes</label>
-                        <input type="date" className="form-control" name="dataNgjarjes" value={form.dataNgjarjes} onChange={handleInput} required />
+                        {}
+                        <input 
+                            type="date" 
+                            className="form-control" 
+                            name="dataNgjarjes" 
+                            min={today}
+                            value={form.dataNgjarjes} 
+                            onChange={handleInput} 
+                            required 
+                        />
                     </div>
                     <div className="col-md-3">
                         <label className="form-label fw-bold">Zbritja (%)</label>
@@ -103,6 +119,7 @@ const OccasionCRUD = () => {
                 </form>
             </div>
 
+            {}
             <div className="card shadow p-4 border-0">
                 <h4 className="mb-3" style={{ fontFamily: 'serif' }}>Lista e Eventeve Aktive</h4>
                 <div className="table-responsive">
