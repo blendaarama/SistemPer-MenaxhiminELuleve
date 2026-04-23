@@ -1,9 +1,7 @@
 package com.example.flower_shop.controller;
 
-import com.example.flower_shop.model.Deliveries;
 import com.example.flower_shop.model.Porosi;
 import com.example.flower_shop.service.OrderService;
-import com.example.flower_shop.dto.DeliveriesDTO;
 import com.example.flower_shop.dto.PorosiUpdateDTO;
 
 import org.springframework.http.ResponseEntity;
@@ -32,16 +30,17 @@ public class PorosiController {
     @GetMapping("/{id}")
     public ResponseEntity<Porosi> getById(@PathVariable Integer id) {
         Porosi porosi = service.getById(id);
+
         return porosi != null
                 ? ResponseEntity.ok(porosi)
                 : ResponseEntity.notFound().build();
     }
 
-    // CREATE
+    // CREATE (PA DTO PER TANI - SIMPLE VERSION)
     @PostMapping
-public Deliveries create(@RequestBody DeliveriesDTO dto) {
-    return service.create(dto);
-}
+    public Porosi create(@RequestBody Porosi porosi) {
+        return service.create(porosi);
+    }
 
     // UPDATE (ME DTO)
     @PutMapping("/{id}")
@@ -59,6 +58,7 @@ public Deliveries create(@RequestBody DeliveriesDTO dto) {
     // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
+
         boolean deleted = service.delete(id);
 
         return deleted
