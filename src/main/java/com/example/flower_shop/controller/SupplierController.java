@@ -2,14 +2,11 @@ package com.example.flower_shop.controller;
 
 import com.example.flower_shop.dto.SupplierDTO;
 import com.example.flower_shop.service.SupplierService;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/suppliers")
-@CrossOrigin(origins = "http://localhost:3000")
 public class SupplierController {
 
     private final SupplierService supplierService;
@@ -19,29 +16,22 @@ public class SupplierController {
     }
 
     @GetMapping
-    public List<SupplierDTO> getAllSuppliers() {
+    public List<SupplierDTO> getAll() {
         return supplierService.getAllSuppliers();
     }
 
-    @GetMapping("/{id}")
-    public SupplierDTO getSupplierById(@PathVariable Integer id) {
-        return supplierService.getSupplierById(id);
-    }
-
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public SupplierDTO addSupplier(@RequestBody SupplierDTO supplierDTO) {
-        return supplierService.addSupplier(supplierDTO);
-    }
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteSupplier(@PathVariable Integer id) {
-        supplierService.deleteSupplier(id);
+    public SupplierDTO add(@RequestBody SupplierDTO dto) {
+        return supplierService.addSupplier(dto);
     }
 
     @PutMapping("/{id}")
-    public SupplierDTO updateSupplier(@PathVariable Integer id, @RequestBody SupplierDTO supplierDTO) {
-        return supplierService.updateSupplier(id, supplierDTO);
+    public SupplierDTO update(@PathVariable Integer id, @RequestBody SupplierDTO dto) {
+        return supplierService.updateSupplier(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id) {
+        supplierService.deleteSupplier(id);
     }
 }
