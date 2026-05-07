@@ -1,48 +1,75 @@
 package com.example.flower_shop.controller;
 
 import com.example.flower_shop.model.User;
-import com.example.flower_shop.repository.UserRepository;
+import com.example.flower_shop.model.RefreshToken;
+import com.example.flower_shop.service.UserService;
 import com.example.flower_shop.service.JwtService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.flower_shop.service.RefreshTokenService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserService userService;
+    private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JwtService jwtService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public AuthController(UserService userService, 
+                          JwtService jwtService, 
+                          RefreshTokenService refreshTokenService, 
+                          PasswordEncoder passwordEncoder) {
+        this.userService = userService;
+        this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @PostMapping("/register")
-    public String register(@RequestBody User user) {
-
-        // encode password
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        userRepository.save(user);
-
-        return "User registered successfully";
+    public Map<String, String> register(@RequestBody User user) {
+        userService.registerNewUser(user);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "User registered successfully");
+        return response;
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody User user) {
+    public Map<String, String> login(@RequestBody User user) {
+        User dbUser = userService.getUserByEmail(user.getEmail());
 
-        User dbUser = userRepository.findByEmail(user.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // verify password
         if (!passwordEncoder.matches(user.getPassword(), dbUser.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new RuntimeException("Kredencialet e gabuara!");
         }
 
-        // JWT token
-        return jwtService.generateToken(dbUser.getEmail());
+        String accessToken = jwtService.generateToken(dbUser.getEmail());
+        
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(dbUser.getEmail());
+
+        Map<String, String> response = new HashMap<>();
+        response.put("accessToken", accessToken);
+        response.put("refreshToken", refreshToken.getToken());
+        response.put("email", dbUser.getEmail());
+        
+        return response;
+    }
+
+    @PostMapping("/refresh")
+    public Map<String, String> refresh(@RequestBody Map<String, String> request) {
+        String requestToken = request.get("refreshToken");
+
+        return refreshTokenService.findByToken(requestToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    String token = jwtService.generateToken(user.getEmail());
+                    Map<String, String> response = new HashMap<>();
+                    response.put("accessToken", token);
+                    response.put("refreshToken", requestToken);
+                    return response;
+                }).orElseThrow(() -> new RuntimeException("Refresh token nuk është në bazë të dhënave!"));
     }
 }
