@@ -1,31 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const FlowerStore = () => {
+const FlowerStore = ({ setView }) => {
     const [flowers, setFlowers] = useState([]);
     const [bouquets, setBouquets] = useState([]);
     const [occasions, setOccasions] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [flowersRes, bouquetsRes, occasionsRes] = await Promise.all([
-                    axios.get('http://localhost:8080/api/flowers'),
-                    axios.get('http://localhost:8080/api/bouquets'),
-                    axios.get('http://localhost:8080/api/occasions')
-                ]);
-                setFlowers(flowersRes.data);
-                setBouquets(bouquetsRes.data);
-                setOccasions(occasionsRes.data);
-            } catch (err) {
-                console.error("Gabim gjatë ngarkimit të dyqanit:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
+   useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const token = localStorage.getItem("token");
+
+            const [flowersRes, bouquetsRes, occasionsRes] = await Promise.all([
+                axios.get('http://localhost:8080/api/flowers', {
+                    headers: { Authorization: `Bearer ${token}` }
+                }),
+                axios.get('http://localhost:8080/api/bouquets', {
+                    headers: { Authorization: `Bearer ${token}` }
+                }),
+                axios.get('http://localhost:8080/api/occasions', {
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+            ]);
+
+            setFlowers(flowersRes.data);
+            setBouquets(bouquetsRes.data);
+            setOccasions(occasionsRes.data);
+
+        } catch (err) {
+            console.error("Gabim gjatë ngarkimit të dyqanit:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    fetchData();
+}, []);
 
     if (loading) return <div className="text-center mt-5"><div className="spinner-border text-warning"></div></div>;
 
@@ -69,7 +80,10 @@ const FlowerStore = () => {
                             <div className="card-body p-1">
                                 <h6 className="text-uppercase mb-1 fw-bold" style={{ fontSize: '0.85rem' }}>{b.emertimi}</h6>
                                 <p className="text-muted small">Nga <span className="fw-bold text-dark">{b.cmimi}€</span></p>
-                                <button className="btn btn-outline-dark btn-sm rounded-0 w-100 py-1" style={{fontSize: '0.7rem'}}>SHTO NË SHPORTË</button>
+                                <button 
+                                    onClick={() => setView('order')}
+                                      className="btn btn-outline-dark btn-sm rounded-0 w-100 py-1"
+                                        style={{fontSize: '0.7rem'}}>  SHTO NË SHPORTË</button>
                             </div>
                         </div>
                     </div>
