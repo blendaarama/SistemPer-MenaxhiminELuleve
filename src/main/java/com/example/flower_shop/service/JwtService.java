@@ -1,4 +1,6 @@
 package com.example.flower_shop.service;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -13,7 +15,8 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final String SECRET = "mySecretKeymySecretKeymySecretKey123456";
+    @Value("${jwt.secret}")
+private String SECRET;
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
@@ -33,9 +36,12 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public boolean validateToken(String token) {
-        return extractUsername(token) != null && !isTokenExpired(token);
-    }
+    public boolean validateToken(String token, UserDetails userDetails) {
+    final String username = extractUsername(token);
+
+    return username.equals(userDetails.getUsername())
+            && !isTokenExpired(token);
+}
 
     private boolean isTokenExpired(String token) {
         return extractClaim(token, Claims::getExpiration).before(new Date());
