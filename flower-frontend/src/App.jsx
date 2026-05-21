@@ -6,8 +6,6 @@ import BouquetCRUD from './components/BouquetCRUD';
 import OccasionCRUD from './components/OccasionCRUD';
 import SupplierCRUD from './components/SupplierCRUD';
 import OrderPage from './components/OrderPage';
-import Login from './components/Login';
-import PrivateRoute from './components/PrivateRoute';
 
 function App() {
   return (
