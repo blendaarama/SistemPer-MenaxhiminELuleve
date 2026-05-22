@@ -16,10 +16,6 @@ public class FlowerShopApplication {
         SpringApplication.run(FlowerShopApplication.class, args);
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public CommandLineRunner rregulloRoletFillestare(RoleRepository roleRepository) {

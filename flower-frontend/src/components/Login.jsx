@@ -48,75 +48,174 @@ const Login = ({ onLoginSuccess }) => {
     };
 
     return (
-        <div className="d-flex justify-content-center align-items-center min-vh-100" style={{ backgroundColor: '#f8f9fa' }}>
-            <div className="card border-0 shadow-lg p-4 p-md-5" style={{ width: '100%', maxWidth: '420px', borderRadius: '16px' }}>
+        <div 
+            className="d-flex justify-content-center align-items-center min-vh-100" 
+            style={{ 
+                backgroundColor: '#FAF8F5',
+                fontFamily: "system-ui, -apple-system, sans-serif",
+                padding: '20px'
+            }}
+        >
+            <div 
+                className="bg-white p-4 p-md-5" 
+                style={{ 
+                    width: '100%', 
+                    maxWidth: '440px', 
+                    borderRadius: '0px', // Këndet e mprehta
+                    border: '1px solid #E6E0D8',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.02)'
+                }}
+            >
                 
+                {/* LOGO & LOGO ICON VIBE */}
                 <div className="text-center mb-4">
-                    <h2 className="fw-bold text-dark m-0" style={{ letterSpacing: '-0.5px' }}>Kyçuni</h2>
-                    <p className="text-muted small mt-2">Mirësevini përsëri në Eternal Rose</p>
+                    <div style={{ fontSize: '28px', color: '#0E5A5B', marginBottom: '8px' }}>🌹</div>
+                    <h2 
+                        style={{ 
+                            fontFamily: 'Georgia, serif', 
+                            fontSize: '28px', 
+                            fontWeight: '400', 
+                            color: '#2B1A4A',
+                            margin: 0 
+                        }}
+                    >
+                        Welcome Back
+                    </h2>
+                    <p style={{ fontSize: '13px', color: 'rgba(31,31,31,0.6)', marginTop: '6px' }}>
+                        Sign in to your Eternal Rose account
+                    </p>
                 </div>
 
+                {/* ERROR PANEL */}
                 {error && (
-                    <div className="alert alert-danger d-flex align-items-center border-0 small py-2 mb-3" style={{ borderRadius: '8px' }} role="alert">
-                        <div>{error}</div>
+                    <div 
+                        className="alert d-flex align-items-center small py-2.5 mb-4" 
+                        style={{ 
+                            borderRadius: '0px', 
+                            backgroundColor: '#FFEAEA', 
+                            color: '#FF8E8E',
+                            border: '1px solid #FFD1D1'
+                        }} 
+                        role="alert"
+                    >
+                        <div style={{ fontWeight: '500' }}>{error}</div>
                     </div>
                 )}
 
                 <form onSubmit={handleSubmit}>
+                    {/* INPUT USERNAME */}
                     <div className="mb-3">
-                        <label className="form-label text-secondary small fw-semibold">Përdoruesi (Username)</label>
+                        <label 
+                            style={{ 
+                                fontSize: '11px', 
+                                fontWeight: '600', 
+                                textTransform: 'uppercase', 
+                                letterSpacing: '1px', 
+                                marginBottom: '8px', 
+                                display: 'block',
+                                color: 'rgba(31,31,31,0.7)' 
+                            }}
+                        >
+                            Email Address
+                        </label>
                         <input 
                             type="text" 
-                            className="form-control form-control-lg bg-light border-0" 
-                            placeholder="Shkruani username tuaj..."
+                            className="form-control form-control-lg text-dark px-3 py-2.5" 
+                            placeholder="name@example.com"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required 
-                            style={{ borderRadius: '8px', fontSize: '15px' }}
+                            style={{ 
+                                borderRadius: '0px', 
+                                fontSize: '14px',
+                                border: '1px solid #C4B9AF',
+                                backgroundColor: '#FFFFFF',
+                                boxShadow: 'none'
+                            }}
                         />
                     </div>
 
+                    {/* INPUT PASSWORD */}
                     <div className="mb-4">
-                        <label className="form-label text-secondary small fw-semibold">Fjalëkalimi (Password)</label>
+                        <label 
+                            style={{ 
+                                fontSize: '11px', 
+                                fontWeight: '600', 
+                                textTransform: 'uppercase', 
+                                letterSpacing: '1px', 
+                                marginBottom: '8px', 
+                                display: 'block',
+                                color: 'rgba(31,31,31,0.7)' 
+                            }}
+                        >
+                            Password
+                        </label>
                         <input 
                             type="password" 
-                            className="form-control form-control-lg bg-light border-0" 
+                            className="form-control form-control-lg text-dark px-3 py-2.5" 
                             placeholder="••••••••"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required 
-                            style={{ borderRadius: '8px', fontSize: '15px' }}
+                            style={{ 
+                                borderRadius: '0px', 
+                                fontSize: '14px',
+                                border: '1px solid #C4B9AF',
+                                backgroundColor: '#FFFFFF',
+                                boxShadow: 'none'
+                            }}
                         />
                     </div>
 
+                    {/* SUBMIT BUTTON */}
                     <button 
                         type="submit" 
-                        className="btn btn-dark btn-lg w-100 fw-bold border-0 text-white shadow-sm mb-3" 
+                        className="btn btn-lg w-100 text-white mb-3" 
                         disabled={loading}
                         style={{ 
-                            borderRadius: '8px', 
-                            fontSize: '16px', 
-                            backgroundColor: '#111',
-                            transition: 'all 0.2s ease'
+                            borderRadius: '0px', 
+                            fontSize: '12px', 
+                            fontWeight: '600',
+                            letterSpacing: '2px',
+                            textTransform: 'uppercase',
+                            backgroundColor: '#2B1A4A',
+                            border: 'none',
+                            padding: '14px 0',
+                            transition: 'background 0.2s ease',
+                            cursor: 'pointer'
                         }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0E5A5B'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2B1A4A'}
                     >
                         {loading ? (
                             <div className="d-flex align-items-center justify-content-center">
-                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                <span>Duke u procesuar...</span>
+                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" style={{ width: '14px', height: '14px' }}></span>
+                                <span>Verifying...</span>
                             </div>
-                        ) : 'Vazhdo'}
+                        ) : 'Sign In'}
                     </button>
 
-                    <div className="text-center">
-                        <span className="text-muted small">Nuk keni llogari? </span>
-                        <a href="#register" className="text-primary small fw-semibold text-decoration-none">Regjistrohu</a>
+                    {/* FOOTER LINK */}
+                    <div className="text-center mt-3" style={{ fontSize: '13px' }}>
+                        <span style={{ color: 'rgba(31,31,31,0.6)' }}>Don't have an account? </span>
+                        <a 
+                            href="#register" 
+                            style={{ 
+                                color: '#0E5A5B', 
+                                fontWeight: '600', 
+                                textDecoration: 'underline',
+                                textUnderlineOffset: '3px' 
+                            }}
+                        >
+                            Register
+                        </a>
                     </div>
                 </form>
 
-                <div className="text-center mt-5">
-                    <p className="text-muted m-0" style={{ fontSize: '12px' }}>
-                        Menaxhimi i Dyqanit të Luleve &copy; 2026
+                {/* BOTTOM FOOTER NOTICE */}
+                <div className="text-center mt-5" style={{ borderTop: '1px solid #E6E0D8', paddingTop: '20px' }}>
+                    <p style={{ fontSize: '11px', color: 'rgba(31,31,31,0.4)', margin: 0, letterSpacing: '0.5px' }}>
+                        Eternal Rose Store Operations &copy; 2026
                     </p>
                 </div>
                 
