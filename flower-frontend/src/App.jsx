@@ -17,7 +17,7 @@ import OrderDetails from './components/OrderDetails';
 import PaymentsCrud from './components/PaymentsCrud';
 import SupplyOrders from './components/SupplyOrders';
 import Login from './components/Login';
-import Register from './components/Register'; // SHTUAR: Importi i Register
+import Register from './components/Register';
 import PrivateRoute from './components/PrivateRoute';
 import CustomerCRUD from './components/CustomerCRUD';
 import DeliveriesCRUD from './components/DeliveriesCRUD';
@@ -26,7 +26,6 @@ import ReviewsCRUD from './components/ReviewsCRUD';
 function AppContent() {
   const location = useLocation();
   
-  // MODIFIKUAR: Fshehim Navbar dhe Footer edhe nese jemi ne login edhe nese jemi ne register
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
 
   return (
@@ -39,7 +38,9 @@ function AppContent() {
         <Routes>
           {/* PUBLIC */}
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} /> {/* SHTUAR: Rruga per Register */}
+          <Route path="/register" element={<Register />} />
+          
+          {/* HOME PAGE - Dyqani i luleve ku redirect-ohet perdoruesi */}
           <Route path="/" element={<FlowerStore />} />
 
           {/* FLOWERS */}

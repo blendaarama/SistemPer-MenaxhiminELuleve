@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Navbar = () => {
   const [search, setSearch] = useState("");
@@ -11,6 +12,21 @@ const Navbar = () => {
     navigate(`/search?query=${encodeURIComponent(search)}`);
   };
 
+  const handleLogout = async () => {
+    const email = localStorage.getItem('userEmail');
+    try {
+
+      await axios.post('http://localhost:8080/auth/logout', { email: email });
+    } catch (err) {
+      console.error("Logout error", err);
+    } finally {
+      
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('userEmail');
+      window.location.reload();
+    }
+  };
+
   return (
     <nav
       className="navbar navbar-expand-xl navbar-light sticky-top py-3"
@@ -19,8 +35,8 @@ const Navbar = () => {
         borderBottom: "1px solid #E6E0D8",
         margin: 0,
         padding: "14px 0",
-        width: "100vw",                     // Shtyhet në gjerësinë maksimale të ekranit
-        marginLeft: "calc(-50vw + 50%)",   // Zhduk "bardhësinë anash" duke u sinkronizuar me homepage
+        width: "100vw",
+        marginLeft: "calc(-50vw + 50%)",
         marginRight: "calc(-50vw + 50%)",
         boxSizing: "border-box",
         zIndex: 1050
@@ -28,12 +44,12 @@ const Navbar = () => {
     >
       <div className="container-fluid px-4 px-md-5" style={{ maxWidth: "1400px", margin: "0 auto" }}>
         
-        {/* BRAND (Logo si te fotoja që dërgove) */}
+        {/* BRAND */}
         <Link
           className="navbar-brand d-flex align-items-center gap-2 m-0"
           to="/"
           style={{
-            color: "#2C1A4A", // Ngjyra vjollcë e errët luksoze për markën
+            color: "#2C1A4A",
             fontSize: "1.6rem",
             fontWeight: "700",
             letterSpacing: "-0.5px",
@@ -43,7 +59,7 @@ const Navbar = () => {
           <span style={{ fontSize: "1.4rem", color: "#0E5A5B" }}></span> Eternal Rose
         </Link>
 
-        {/* TOGGLE BUTTON FOR MOBILE */}
+        {/* TOGGLE BUTTON */}
         <button 
           className="navbar-toggler border-0" 
           type="button" 
@@ -56,13 +72,9 @@ const Navbar = () => {
 
         <div className="collapse navbar-collapse" id="nav">
           
-          {/* CENTER: LARGE ECOMMERCE SEARCH BAR */}
+          {/* SEARCH BAR */}
           <div className="mx-auto my-3 my-xl-0 d-flex justify-content-center" style={{ width: "100%", maxWidth: "550px" }}>
-            <form
-              onSubmit={handleSearch}
-              className="d-flex w-100"
-              style={{ position: "relative" }}
-            >
+            <form onSubmit={handleSearch} className="d-flex w-100" style={{ position: "relative" }}>
               <input
                 className="form-control px-4 py-2.5"
                 type="search"
@@ -70,7 +82,7 @@ const Navbar = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 style={{
-                  borderRadius: "4px 0 0 4px", // Këndet e mprehta
+                  borderRadius: "4px 0 0 4px",
                   border: "1px solid #C4B9AF",
                   borderRight: "none",
                   fontSize: "14px",
@@ -106,7 +118,6 @@ const Navbar = () => {
           {/* RIGHT: ACCOUNT & CART SYSTEM */}
           <div className="d-flex align-items-center justify-content-center gap-4">
             
-            {/* HOME UTILITY LINK */}
             <Link 
               className="nav-link px-2 small fw-semibold text-uppercase" 
               style={{ fontSize: "12px", color: "#1F1F1F", letterSpacing: "1px" }} 
@@ -115,19 +126,31 @@ const Navbar = () => {
               Home
             </Link>
 
-            {/* LOGIN / SIGN IN */}
-            <Link
-              className="d-flex flex-column align-items-center text-decoration-none"
-              to="/login"
-              style={{ color: "#1F1F1F", transition: "color 0.2s" }}
-              onMouseEnter={(e) => e.currentTarget.style.color = "#0E5A5B"}
-              onMouseLeave={(e) => e.currentTarget.style.color = "#1F1F1F"}
-            >
-              <span style={{ fontSize: "16px" }}>👤</span>
-              <span style={{ fontSize: "11px", fontWeight: "500", marginTop: "2px" }}>Sign In</span>
-            </Link>
+            {/* LOGIN / LOGOUT DINAMIK */}
+            {localStorage.getItem('accessToken') ? (
+              <button
+                onClick={handleLogout}
+                className="d-flex flex-column align-items-center text-decoration-none border-0 bg-transparent"
+                style={{ color: "#1F1F1F", transition: "color 0.2s", cursor: "pointer" }}
+                onMouseEnter={(e) => e.currentTarget.style.color = "#0E5A5B"}
+                onMouseLeave={(e) => e.currentTarget.style.color = "#1F1F1F"}
+              >
+                <span style={{ fontSize: "16px" }}>🔓</span>
+                <span style={{ fontSize: "11px", fontWeight: "500", marginTop: "2px" }}>Logout</span>
+              </button>
+            ) : (
+              <Link
+                className="d-flex flex-column align-items-center text-decoration-none"
+                to="/login"
+                style={{ color: "#1F1F1F", transition: "color 0.2s" }}
+                onMouseEnter={(e) => e.currentTarget.style.color = "#0E5A5B"}
+                onMouseLeave={(e) => e.currentTarget.style.color = "#1F1F1F"}
+              >
+                <span style={{ fontSize: "16px" }}>👤</span>
+                <span style={{ fontSize: "11px", fontWeight: "500", marginTop: "2px" }}>Sign In</span>
+              </Link>
+            )}
 
-            {/* SHOPPING CART */}
             <Link
               className="d-flex flex-column align-items-center text-decoration-none"
               to="/order"
@@ -140,7 +163,6 @@ const Navbar = () => {
             </Link>
 
           </div>
-
         </div>
       </div>
     </nav>

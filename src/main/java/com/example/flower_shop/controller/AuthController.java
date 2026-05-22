@@ -1,23 +1,20 @@
 package com.example.flower_shop.controller;
 
-import com.example.flower_shop.dto.LoginRequest;
-import com.example.flower_shop.dto.LoginResponse;
-import com.example.flower_shop.dto.RegisterRequest;
-import com.example.flower_shop.model.User;
-import com.example.flower_shop.model.RefreshToken;
-import com.example.flower_shop.service.UserService;
-import com.example.flower_shop.service.JwtService;
-import com.example.flower_shop.service.RefreshTokenService;
+import com.example.flower_shop.dto.*;
+import com.example.flower_shop.model.*;
+import com.example.flower_shop.service.*;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.HashMap;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "http://localhost:3000")
+@RequiredArgsConstructor 
 public class AuthController {
 
     private final UserService userService;
@@ -25,31 +22,12 @@ public class AuthController {
     private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthController(UserService userService,
-                          JwtService jwtService,
-                          RefreshTokenService refreshTokenService,
-                          PasswordEncoder passwordEncoder) {
-        this.userService = userService;
-        this.jwtService = jwtService;
-        this.refreshTokenService = refreshTokenService;
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@Valid @RequestBody User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userService.registerNewUser(user);
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "User registered successfully");
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
-        User dbUser = userService.getUserByEmail(loginRequest.getEmail());
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        User dbUser = userService.getUserByEmail(request.getEmail());
 
-        if (dbUser == null || !passwordEncoder.matches(loginRequest.getPassword(), dbUser.getPassword())) {
-            return ResponseEntity.status(401).body(new LoginResponse(null, null, "Email ose fjalëkalim i pasaktë", null));
+        if (dbUser == null || !passwordEncoder.matches(request.getPassword(), dbUser.getPassword())) {
+            return ResponseEntity.status(401).body(Map.of("message", "Email ose fjalëkalim i pasaktë"));
         }
 
         String accessToken = jwtService.generateToken(dbUser.getEmail());
@@ -63,36 +41,36 @@ public class AuthController {
         ));
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<Map<String, String>> refresh(@RequestBody Map<String, String> request) {
-        String requestToken = request.get("refreshToken");
-
-        return refreshTokenService.findByToken(requestToken)
-                .map(refreshTokenService::verifyExpiration)
-                .map(RefreshToken::getUser)
-                .map(user -> {
-                    String token = jwtService.generateToken(user.getEmail());
-                    Map<String, String> response = new HashMap<>();
-                    response.put("accessToken", token);
-                    response.put("refreshToken", requestToken);
-                    return ResponseEntity.ok(response);
-                }).orElseThrow(() -> new RuntimeException("Refresh token not found"));
-    }
-
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         User user = new User();
-        user.setEmri(registerRequest.getName());
-        user.setMbiemri("");
-        user.setEmail(registerRequest.getEmail());
-        
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword())); 
+        user.setEmri(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setStatusi("ACTIVE");
 
         userService.registerNewUser(user);
-        
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "User registered successfully");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(Map.of("message", "User registered successfully"));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@RequestBody Map<String, String> request) {
+        return refreshTokenService.findByToken(request.get("refreshToken"))
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> ResponseEntity.ok(Map.of(
+                        "accessToken", jwtService.generateToken(user.getEmail()),
+                        "refreshToken", request.get("refreshToken")
+                )))
+                .orElse(ResponseEntity.status(403).build());
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        if (email != null) {
+            refreshTokenService.deleteByEmail(email);
+        }
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
 }

@@ -8,15 +8,18 @@ services:
     ports:
       - "3306:3306"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       timeout: 5s
       retries: 10
       interval: 5s
 
   flower_app:
     build: .
+    container_name: flower_shop-flower_app-1
+    ports:
+      - "8080:8080"
     depends_on:
       flower_db:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://flower_db:3306/flower_shop_db
+      SPRING_DATASOURCE_URL: jdbc:mysql://flower_db:3306/flower_shop_db?allowPublicKeyRetrieval=true&useSSL=false

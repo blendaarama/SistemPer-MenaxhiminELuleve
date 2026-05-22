@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Register = ({ onRegisterSuccess }) => {
+    const navigate = useNavigate();
+    
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -45,19 +47,29 @@ const Register = ({ onRegisterSuccess }) => {
 
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:8080/api/auth/register', {
+            const response = await axios.post('http://localhost:8080/auth/register', {
                 name: cleanName,
                 email: cleanEmail,
                 password: cleanPassword
             });
         
-            if (response.data && response.data.message) {
+            if (response.status === 200 || response.data) {
                 setSuccess('Regjistrimi u krye me sukses!');
+                
+                // Pastrimi i fushave te formularit
+                setName('');
+                setEmail('');
+                setPassword('');
+                setConfirmPassword('');
+
                 if (onRegisterSuccess) {
-                    setTimeout(() => {
-                        onRegisterSuccess();
-                    }, 1500);
+                    onRegisterSuccess();
                 }
+
+                // Redirect automatik te faqja login pas 2 sekondave
+                setTimeout(() => {
+                    navigate('/login');
+                }, 2000);
             }
         } catch (err) {
             console.error(err);
