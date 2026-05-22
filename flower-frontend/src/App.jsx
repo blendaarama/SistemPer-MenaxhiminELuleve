@@ -17,29 +17,29 @@ import OrderDetails from './components/OrderDetails';
 import PaymentsCrud from './components/PaymentsCrud';
 import SupplyOrders from './components/SupplyOrders';
 import Login from './components/Login';
+import Register from './components/Register'; // SHTUAR: Importi i Register
 import PrivateRoute from './components/PrivateRoute';
 import CustomerCRUD from './components/CustomerCRUD';
 import DeliveriesCRUD from './components/DeliveriesCRUD';
 import ReviewsCRUD from './components/ReviewsCRUD';
 
-// 1. Krijojmë komponentin e përmbajtjes që ka qasje te useLocation()
 function AppContent() {
   const location = useLocation();
   
-  // Kontrollojmë nëse përdoruesi është te faqja e login-it
-  const isLoginPage = location.pathname === '/login';
+  // MODIFIKUAR: Fshehim Navbar dhe Footer edhe nese jemi ne login edhe nese jemi ne register
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
 
   return (
     <div className="min-vh-100" style={{ backgroundColor: '#FAF8F5' }}>
 
-      {/* NAVBAR: Shfaqet vetëm nëse nuk jemi në Login */}
-      {!isLoginPage && <Navbar />}
+      {/* NAVBAR: Shfaqet vetem nese nuk jemi ne Login ose Register */}
+      {!isAuthPage && <Navbar />}
 
-      {/* MAIN CONTENT: Hoqëm klasat container që të mos krijojnë hapësirë të bardhë anash */}
       <main>
         <Routes>
           {/* PUBLIC */}
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} /> {/* SHTUAR: Rruga per Register */}
           <Route path="/" element={<FlowerStore />} />
 
           {/* FLOWERS */}
@@ -68,8 +68,8 @@ function AppContent() {
         </Routes>
       </main>
 
-      {/* FOOTER: Shfaqet vetëm nëse nuk jemi në Login */}
-      {!isLoginPage && (
+      {/* FOOTER: Shfaqet vetem nese nuk jemi ne Login ose Register */}
+      {!isAuthPage && (
         <footer className="text-center py-4 mt-5 text-muted small border-top bg-white">
           &copy; 2026 <strong>Eternal Rose</strong>
         </footer>
@@ -79,7 +79,6 @@ function AppContent() {
   );
 }
 
-// 2. Komponenti kryesor që thjesht mbështjell gjithçka me Router
 function App() {
   return (
     <Router>

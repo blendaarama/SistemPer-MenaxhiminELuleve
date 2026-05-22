@@ -2,6 +2,7 @@ package com.example.flower_shop.controller;
 
 import com.example.flower_shop.dto.LoginRequest;
 import com.example.flower_shop.dto.LoginResponse;
+import com.example.flower_shop.dto.RegisterRequest;
 import com.example.flower_shop.model.User;
 import com.example.flower_shop.model.RefreshToken;
 import com.example.flower_shop.service.UserService;
@@ -76,5 +77,22 @@ public class AuthController {
                     response.put("refreshToken", requestToken);
                     return ResponseEntity.ok(response);
                 }).orElseThrow(() -> new RuntimeException("Refresh token not found"));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegisterRequest registerRequest) {
+        User user = new User();
+        user.setEmri(registerRequest.getName());
+        user.setMbiemri("");
+        user.setEmail(registerRequest.getEmail());
+        
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword())); 
+        user.setStatusi("ACTIVE");
+
+        userService.registerNewUser(user);
+        
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "User registered successfully");
+        return ResponseEntity.ok(response);
     }
 }
