@@ -13,7 +13,6 @@ const initialState = {
 };
 
 const PaymentsCRUD = () => {
-
     const [payments, setPayments] = useState([]);
     const [form, setForm] = useState(initialState);
     const [loading, setLoading] = useState(false);
@@ -25,11 +24,13 @@ const PaymentsCRUD = () => {
 
     const load = async () => {
         setLoading(true);
+        setError("");
         try {
             const res = await axios.get(API_URL);
             setPayments(res.data);
         } catch (err) {
-            setError("Failed to load payments");
+            setError("Failed to load payments database registry.");
+            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -41,155 +42,214 @@ const PaymentsCRUD = () => {
 
     const save = async (e) => {
         e.preventDefault();
+        setError("");
+
+        const payload = {
+            id: form.id,
+            orderId: parseInt(form.orderId),
+            amount: parseFloat(form.amount),
+            method: form.method,
+            status: form.status,
+            paymentDate: form.paymentDate
+        };
 
         try {
             if (form.id) {
-                await axios.put(`${API_URL}/${form.id}`, form);
+                await axios.put(`${API_URL}/${form.id}`, payload);
             } else {
-                await axios.post(API_URL, form);
+                await axios.post(API_URL, payload);
             }
-
             setForm(initialState);
             load();
-
         } catch (err) {
-            setError("Failed to save payment");
+            setError("Failed to process and commit payment transaction settings.");
+            console.error(err);
         }
     };
 
     const edit = (p) => {
-        setForm(p);
+        setForm({
+            id: p.id,
+            orderId: p.orderId || p.order?.id || "",
+            amount: p.amount,
+            method: p.method || "CASH",
+            status: p.status || "PENDING",
+            paymentDate: p.paymentDate ? p.paymentDate.substring(0, 10) : ""
+        });
     };
 
     const remove = async (id) => {
-        const ok = window.confirm("Delete this payment?");
+        const ok = window.confirm("Are you sure you want to delete this payment record?");
         if (!ok) return;
 
-        await axios.delete(`${API_URL}/${id}`);
-        load();
+        try {
+            await axios.delete(`${API_URL}/${id}`);
+            load();
+        } catch (err) {
+            setError("Failed to execute database deletion on target transaction.");
+            console.error(err);
+        }
     };
 
     return (
-        <div className="container mt-4">
+        <div 
+            style={{ 
+                background: "#FAF8F5", 
+                minHeight: "100vh", 
+                padding: "40px 6%", 
+                fontFamily: "system-ui, -apple-system, sans-serif",
+                color: "#1F1F1F"
+            }}
+        >
+            <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+                
+                {/* HEADER */}
+                <div style={{ borderBottom: "1px solid #E6E0D8", paddingBottom: "20px", marginBottom: "40px" }}>
+                    <span style={{ fontSize: "11px", letterSpacing: "3px", color: "#0E5A5B", textTransform: "uppercase", fontWeight: "600" }}>
+                        Financial Ledger
+                    </span>
+                    <h2 style={{ fontFamily: "Georgia, serif", fontSize: "32px", fontWeight: "400", marginTop: "6px", color: "#2B1A4A" }}>
+                        Payments Audit Control
+                    </h2>
+                </div>
 
-            <h2>Payments</h2>
+                {/* ERROR ALERT BOX */}
+                {error && (
+                    <div className="alert py-2 mb-4" style={{ backgroundColor: '#FFEAEA', color: '#FF8E8E', border: '1px solid #FFD1D1', fontSize: '13px', borderRadius: "0px" }}>
+                        {error}
+                    </div>
+                )}
 
-            {error && <div className="alert alert-danger">{error}</div>}
+                {/* FORM CONTAINER */}
+                <div style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", padding: "30px", marginBottom: "40px" }}>
+                    <h4 style={{ fontSize: "16px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "20px", color: "#1F1F1F" }}>
+                        {form.id ? "Modify Transaction Records" : "Log New Inbound Payment"}
+                    </h4>
+                    
+                    <form onSubmit={save}>
+                        <div className="row">
+                            <div className="col-md-6 mb-3">
+                                <label style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", display: "block", color: "rgba(31,31,31,0.6)" }}>Associated Order ID</label>
+                                <input name="orderId" type="number" placeholder="e.g. 7041" className="form-control" value={form.orderId} onChange={handleChange} required
+                                    style={{ borderRadius: "0px", border: "1px solid #C4B9AF", padding: "12px", fontSize: "14px", backgroundColor: "#FAF8F5", boxShadow: "none" }} />
+                            </div>
 
-            {/* FORM */}
-            <form className="card p-3 mb-3" onSubmit={save}>
+                            <div className="col-md-6 mb-3">
+                                <label style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", display: "block", color: "rgba(31,31,31,0.6)" }}>Transaction Amount (€)</label>
+                                <input name="amount" type="number" step="0.01" placeholder="0.00" className="form-control" value={form.amount} onChange={handleChange} required
+                                    style={{ borderRadius: "0px", border: "1px solid #C4B9AF", padding: "12px", fontSize: "14px", backgroundColor: "#FAF8F5", boxShadow: "none" }} />
+                            </div>
+                        </div>
 
-                <input
-                    name="orderId"
-                    placeholder="Order ID"
-                    className="form-control mb-2"
-                    value={form.orderId}
-                    onChange={handleChange}
-                />
+                        <div className="row">
+                            <div className="col-md-4 mb-3">
+                                <label style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", display: "block", color: "rgba(31,31,31,0.6)" }}>Payment Method</label>
+                                <select name="method" className="form-control" value={form.method} onChange={handleChange} required
+                                    style={{ borderRadius: "0px", border: "1px solid #C4B9AF", padding: "12px", fontSize: "14px", backgroundColor: "#FAF8F5", boxShadow: "none" }}>
+                                    <option value="CASH">CASH</option>
+                                    <option value="CARD">CARD</option>
+                                </select>
+                            </div>
 
-                <input
-                    name="amount"
-                    placeholder="Amount"
-                    type="number"
-                    className="form-control mb-2"
-                    value={form.amount}
-                    onChange={handleChange}
-                />
+                            <div className="col-md-4 mb-3">
+                                <label style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", display: "block", color: "rgba(31,31,31,0.6)" }}>Clearance Status</label>
+                                <select name="status" className="form-control" value={form.status} onChange={handleChange} required
+                                    style={{ borderRadius: "0px", border: "1px solid #C4B9AF", padding: "12px", fontSize: "14px", backgroundColor: "#FAF8F5", boxShadow: "none" }}>
+                                    <option value="PENDING">PENDING</option>
+                                    <option value="PAID">PAID</option>
+                                    <option value="FAILED">FAILED</option>
+                                </select>
+                            </div>
 
-                <select
-                    name="method"
-                    className="form-control mb-2"
-                    value={form.method}
-                    onChange={handleChange}
-                >
-                    <option value="CASH">CASH</option>
-                    <option value="CARD">CARD</option>
-                </select>
+                            <div className="col-md-4 mb-3">
+                                <label style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", display: "block", color: "rgba(31,31,31,0.6)" }}>Processing Date</label>
+                                <input type="date" name="paymentDate" className="form-control" value={form.paymentDate} onChange={handleChange} required
+                                    style={{ borderRadius: "0px", border: "1px solid #C4B9AF", padding: "12px", fontSize: "14px", backgroundColor: "#FAF8F5", boxShadow: "none", cursor: "pointer" }} />
+                            </div>
+                        </div>
 
-                <select
-                    name="status"
-                    className="form-control mb-2"
-                    value={form.status}
-                    onChange={handleChange}
-                >
-                    <option value="PENDING">PENDING</option>
-                    <option value="PAID">PAID</option>
-                    <option value="FAILED">FAILED</option>
-                </select>
+                        <div style={{ marginTop: "20px" }}>
+                            <button type="submit" 
+                                style={{ background: "#0E5A5B", color: "#FFFFFF", border: "none", padding: "12px 30px", fontSize: "12px", fontWeight: "600", letterSpacing: "2px", textTransform: "uppercase", borderRadius: "0px", cursor: "pointer", marginRight: "12px", transition: "background 0.15s" }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = "#2B1A4A"} onMouseLeave={(e) => e.currentTarget.style.background = "#0E5A5B"}>
+                                {form.id ? "Update Transaction" : "Commit Payment"}
+                            </button>
 
-                <input
-                    type="date"
-                    name="paymentDate"
-                    className="form-control mb-2"
-                    value={form.paymentDate}
-                    onChange={handleChange}
-                />
+                            {form.id && (
+                                <button type="button" onClick={() => setForm(initialState)}
+                                    style={{ background: "transparent", color: "#1F1F1F", border: "1px solid #C4B9AF", padding: "11px 24px", fontSize: "12px", fontWeight: "600", letterSpacing: "2px", textTransform: "uppercase", borderRadius: "0px", cursor: "pointer", transition: "all 0.15s" }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#1F1F1F"; e.currentTarget.style.background = "rgba(0,0,0,0.02)"; }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#C4B9AF"; e.currentTarget.style.background = "transparent"; }}>
+                                    Cancel
+                                </button>
+                            )}
+                        </div>
+                    </form>
+                </div>
 
-                <button className="btn btn-primary">
-                    {form.id ? "Update Payment" : "Add Payment"}
-                </button>
-
-            </form>
-
-            {/* TABLE */}
-            {loading ? (
-                <p>Loading...</p>
-            ) : (
-                <div className="card p-3">
-
-                    <table className="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Order</th>
-                                <th>Amount</th>
-                                <th>Method</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {payments.length === 0 ? (
-                                <tr>
-                                    <td colSpan="7" className="text-center">
-                                        No payments found
-                                    </td>
+                {/* MATRIX REGISTRY LISTING */}
+                {loading ? (
+                    <div style={{ textAlign: "center", padding: "40px", color: "rgba(31,31,31,0.5)", fontSize: "14px", letterSpacing: "1px", textTransform: "uppercase" }}>Loading secure ledger...</div>
+                ) : (
+                    <div style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", overflowX: "auto" }}>
+                        <table className="table m-0" style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }}>
+                            <thead>
+                                <tr style={{ background: "#2B1A4A", color: "#FFFFFF", textAlign: "left" }}>
+                                    <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>Transaction ID</th>
+                                    <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>Order Code</th>
+                                    <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>Total Amount</th>
+                                    <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>Method</th>
+                                    <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>Clearance Status</th>
+                                    <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>Execution Date</th>
+                                    <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase", textAlign: "center" }}>Actions</th>
                                 </tr>
-                            ) : (
-                                payments.map((p) => (
-                                    <tr key={p.id}>
-                                        <td>{p.id}</td>
-                                        <td>{p.orderId}</td>
-                                        <td>{p.amount}</td>
-                                        <td>{p.method}</td>
-                                        <td>{p.status}</td>
-                                        <td>{p.paymentDate || "-"}</td>
-                                        <td>
-                                            <button
-                                                className="btn btn-warning btn-sm me-2"
-                                                onClick={() => edit(p)}
-                                            >
-                                                Edit
-                                            </button>
-
-                                            <button
-                                                className="btn btn-danger btn-sm"
-                                                onClick={() => remove(p.id)}
-                                            >
-                                                Delete
-                                            </button>
+                            </thead>
+                            <tbody>
+                                {payments.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="7" style={{ padding: "30px", textAlign: "center", color: "rgba(31,31,31,0.5)", fontStyle: "italic" }}>
+                                            No inbound payment statements recorded.
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
+                                ) : (
+                                    payments.map((p) => {
+                                        let statusColor = "#666666";
+                                        let statusBg = "#FAF8F5";
+                                        if (p.status === "PAID") { statusColor = "#0E5A5B"; statusBg = "#E8F5F5"; }
+                                        else if (p.status === "FAILED") { statusColor = "#FF8E8E"; statusBg = "#FFEAEA"; }
 
-                </div>
-            )}
+                                        return (
+                                            <tr key={p.id} style={{ borderBottom: "1px solid #E6E0D8" }}>
+                                                <td style={{ padding: "16px 20px", fontWeight: "600", color: "#0E5A5B" }}>#{p.id}</td>
+                                                <td style={{ padding: "16px 20px" }}>Order ID: {p.orderId || p.order?.id}</td>
+                                                <td style={{ padding: "16px 20px", fontWeight: "700" }}>{parseFloat(p.amount).toFixed(2)} €</td>
+                                                <td style={{ padding: "16px 20px", fontSize: "12px", letterSpacing: "0.5px", fontWeight: "600" }}>{p.method}</td>
+                                                <td style={{ padding: "16px 20px" }}>
+                                                    <span style={{ background: statusBg, color: statusColor, padding: "4px 10px", fontSize: "11px", fontWeight: "700", letterSpacing: "1px" }}>
+                                                        {p.status}
+                                                    </span>
+                                                </td>
+                                                <td style={{ padding: "16px 20px", fontSize: "13px" }}>{p.paymentDate ? p.paymentDate.substring(0, 10) : "-"}</td>
+                                                <td style={{ padding: "16px 20px", textAlign: "center" }}>
+                                                    <button onClick={() => edit(p)}
+                                                        style={{ background: "transparent", color: "#0E5A5B", border: "1px solid #0E5A5B", borderRadius: "0px", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase", padding: "6px 14px", marginRight: "8px", fontWeight: "600", cursor: "pointer" }}>
+                                                        Edit
+                                                    </button>
+                                                    <button onClick={() => remove(p.id)}
+                                                        style={{ background: "transparent", color: "#FF8E8E", border: "1px solid #FF8E8E", borderRadius: "0px", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase", padding: "6px 14px", fontWeight: "600", cursor: "pointer" }}>
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
 
+            </div>
         </div>
     );
 };

@@ -28,7 +28,7 @@ const BouquetFlowersCRUD = () => {
             const res = await axios.get(API_URL);
             setItems(res.data);
         } catch (err) {
-            console.error("Error loading bouquet-flowers:", err);
+            console.error("Error loading bouquet-flowers data:", err);
         }
     };
 
@@ -37,7 +37,7 @@ const BouquetFlowersCRUD = () => {
             const res = await axios.get(BOUQUET_API);
             setBouquets(res.data);
         } catch (err) {
-            console.error(err);
+            console.error("Error loading bouquets list:", err);
         }
     };
 
@@ -46,7 +46,7 @@ const BouquetFlowersCRUD = () => {
             const res = await axios.get(FLOWER_API);
             setFlowers(res.data);
         } catch (err) {
-            console.error(err);
+            console.error("Error loading flowers list:", err);
         }
     };
 
@@ -59,21 +59,28 @@ const BouquetFlowersCRUD = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Konstruktimi i payload-it që të përputhet me strukturën e Spring Boot (DTO ose Entity mapping)
+        const payload = {
+            bouquetId: parseInt(formData.bouquetId),
+            flowerId: parseInt(formData.flowerId),
+            quantity: parseInt(formData.quantity)
+        };
+
         try {
             if (formData.id === null) {
-                await axios.post(API_URL, formData);
+                await axios.post(API_URL, payload);
             } else {
-                await axios.put(`${API_URL}/${formData.id}`, formData);
+                await axios.put(`${API_URL}/${formData.id}`, payload);
             }
             resetForm();
             fetchAll();
         } catch (err) {
-            console.error("Save error:", err);
+            console.error("Database persistence error:", err);
         }
     };
 
     const handleEdit = (item) => {
-        // Sigurohemi që të mapohen ID-të saktë në formë nëse backend-i i kthen si objekte të lëndura
         setFormData({
             id: item.id,
             bouquetId: item.bouquetId || item.bouquet?.id || "",
@@ -83,12 +90,12 @@ const BouquetFlowersCRUD = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this link?")) return;
+        if (!window.confirm("Confirm deletion of this data entity link?")) return;
         try {
             await axios.delete(`${API_URL}/${id}`);
             fetchAll();
         } catch (err) {
-            console.error(err);
+            console.error("Database deletion error:", err);
         }
     };
 
@@ -113,7 +120,7 @@ const BouquetFlowersCRUD = () => {
         >
             <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
                 
-                {/* HEADER */}
+                {/* HEADER CONTROL */}
                 <div style={{ borderBottom: "1px solid #E6E0D8", paddingBottom: "20px", marginBottom: "40px" }}>
                     <span style={{ fontSize: "11px", letterSpacing: "3px", color: "#0E5A5B", textTransform: "uppercase", fontWeight: "600" }}>
                         Inventory & Management
@@ -123,7 +130,7 @@ const BouquetFlowersCRUD = () => {
                     </h2>
                 </div>
 
-                {/* FORM CONTAINER */}
+                {/* INTERACTIVE FORM DESK */}
                 <div style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", padding: "30px", marginBottom: "40px", borderRadius: "0px" }}>
                     <h4 style={{ fontSize: "16px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "20px", color: "#1F1F1F" }}>
                         {formData.id === null ? "Link New Flower to Bouquet" : "Modify Link Settings"}
@@ -131,7 +138,7 @@ const BouquetFlowersCRUD = () => {
                     
                     <form onSubmit={handleSubmit}>
                         <div className="row">
-                            {/* BOUQUET SELECT */}
+                            {/* BOUQUET INLINE CONTROLLER */}
                             <div className="col-md-4 mb-3">
                                 <label style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", display: "block", color: "rgba(31,31,31,0.6)" }}>
                                     Target Bouquet
@@ -153,7 +160,7 @@ const BouquetFlowersCRUD = () => {
                                 </select>
                             </div>
 
-                            {/* FLOWER SELECT */}
+                            {/* FLOWER INLINE CONTROLLER */}
                             <div className="col-md-4 mb-3">
                                 <label style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", display: "block", color: "rgba(31,31,31,0.6)" }}>
                                     Component Flower
@@ -175,7 +182,7 @@ const BouquetFlowersCRUD = () => {
                                 </select>
                             </div>
 
-                            {/* QUANTITY INPUT */}
+                            {/* QUANTITY CONTROL */}
                             <div className="col-md-4 mb-3">
                                 <label style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", display: "block", color: "rgba(31,31,31,0.6)" }}>
                                     Stem Quantity
@@ -193,7 +200,7 @@ const BouquetFlowersCRUD = () => {
                             </div>
                         </div>
 
-                        {/* BUTTONS SYSTEM */}
+                        {/* DATA SYSTEM TRIGGER SUBMITTERS */}
                         <div style={{ marginTop: "15px" }}>
                             <button 
                                 type="submit" 
@@ -209,7 +216,7 @@ const BouquetFlowersCRUD = () => {
                                     borderRadius: "0px",
                                     cursor: "pointer",
                                     marginRight: "12px",
-                                    transition: "background 0.2s"
+                                    transition: "background 0.15s"
                                 }}
                                 onMouseEnter={(e) => e.currentTarget.style.background = "#2B1A4A"}
                                 onMouseLeave={(e) => e.currentTarget.style.background = "#0E5A5B"}
@@ -231,7 +238,7 @@ const BouquetFlowersCRUD = () => {
                                     textTransform: "uppercase",
                                     borderRadius: "0px",
                                     cursor: "pointer",
-                                    transition: "all 0.2s"
+                                    transition: "all 0.15s"
                                 }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.borderColor = "#1F1F1F";
@@ -248,7 +255,7 @@ const BouquetFlowersCRUD = () => {
                     </form>
                 </div>
 
-                {/* TABLE CONTAINER */}
+                {/* DATA TABLE MATRIX */}
                 <div style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", overflowX: "auto" }}>
                     <table 
                         className="table m-0" 
@@ -277,7 +284,7 @@ const BouquetFlowersCRUD = () => {
                                 </tr>
                             ) : (
                                 items.map(item => (
-                                    <tr key={item.id} style={{ borderBottom: "1px solid #E6E0D8", transition: "background 0.2s" }}>
+                                    <tr key={item.id} style={{ borderBottom: "1px solid #E6E0D8" }}>
                                         <td style={{ padding: "16px 20px", fontWeight: "600", color: "#0E5A5B" }}>#{item.id}</td>
                                         <td style={{ padding: "16px 20px", fontFamily: "Georgia, serif", fontSize: "15px" }}>
                                             {item.bouquetName || item.bouquet?.emertimi || item.bouquet?.name || "Unknown Bouquet"}
@@ -301,7 +308,8 @@ const BouquetFlowersCRUD = () => {
                                                     textTransform: "uppercase",
                                                     padding: "6px 14px",
                                                     marginRight: "8px",
-                                                    fontWeight: "600"
+                                                    fontWeight: "600",
+                                                    cursor: "pointer"
                                                 }}
                                             >
                                                 Edit
@@ -319,7 +327,8 @@ const BouquetFlowersCRUD = () => {
                                                     letterSpacing: "1px",
                                                     textTransform: "uppercase",
                                                     padding: "6px 14px",
-                                                    fontWeight: "600"
+                                                    fontWeight: "600",
+                                                    cursor: "pointer"
                                                 }}
                                             >
                                                 Delete

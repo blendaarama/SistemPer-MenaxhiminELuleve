@@ -15,15 +15,14 @@ const Navbar = () => {
   const handleLogout = async () => {
     const email = localStorage.getItem('userEmail');
     try {
-
       await axios.post('http://localhost:8080/auth/logout', { email: email });
     } catch (err) {
       console.error("Logout error", err);
     } finally {
-      
       localStorage.removeItem('accessToken');
       localStorage.removeItem('userEmail');
-      window.location.reload();
+      localStorage.removeItem('role');
+      navigate('/login');
     }
   };
 
@@ -56,7 +55,7 @@ const Navbar = () => {
             fontFamily: "Georgia, serif",
           }}
         >
-          <span style={{ fontSize: "1.4rem", color: "#0E5A5B" }}></span> Eternal Rose
+          Eternal Rose
         </Link>
 
         {/* TOGGLE BUTTON */}
@@ -135,8 +134,7 @@ const Navbar = () => {
                 onMouseEnter={(e) => e.currentTarget.style.color = "#0E5A5B"}
                 onMouseLeave={(e) => e.currentTarget.style.color = "#1F1F1F"}
               >
-                <span style={{ fontSize: "16px" }}>🔓</span>
-                <span style={{ fontSize: "11px", fontWeight: "500", marginTop: "2px" }}>Logout</span>
+                <span style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px" }}>Logout</span>
               </button>
             ) : (
               <Link
@@ -146,20 +144,18 @@ const Navbar = () => {
                 onMouseEnter={(e) => e.currentTarget.style.color = "#0E5A5B"}
                 onMouseLeave={(e) => e.currentTarget.style.color = "#1F1F1F"}
               >
-                <span style={{ fontSize: "16px" }}>👤</span>
-                <span style={{ fontSize: "11px", fontWeight: "500", marginTop: "2px" }}>Sign In</span>
+                <span style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px" }}>Sign In</span>
               </Link>
             )}
 
             <Link
               className="d-flex flex-column align-items-center text-decoration-none"
               to="/order"
-              style={{ color: "#1F1F1F", transition: "color 0.2s", position: "relative" }}
+              style={{ color: "#1F1F1F", transition: "color 0.2s" }}
               onMouseEnter={(e) => e.currentTarget.style.color = "#0E5A5B"}
               onMouseLeave={(e) => e.currentTarget.style.color = "#1F1F1F"}
             >
-              <span style={{ fontSize: "16px" }}>🛒</span>
-              <span style={{ fontSize: "11px", fontWeight: "500", marginTop: "2px" }}>Cart (0)</span>
+              <span style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px" }}>Cart (0)</span>
             </Link>
 
           </div>
