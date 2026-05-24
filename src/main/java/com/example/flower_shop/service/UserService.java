@@ -19,21 +19,18 @@ public class UserService implements UserDetailsService {
     }
 
     public User getUserByEmail(String email) {
-    return userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-}
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 
-   @Override
-public UserDetails loadUserByUsername(String email)
-        throws UsernameNotFoundException {
+    @Override
+    public UserDetails loadUserByUsername(String email) {
+        User user = getUserByEmail(email);
 
-    User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-    return org.springframework.security.core.userdetails.User
-            .withUsername(user.getEmail())
-            .password(user.getPassword())
-            .authorities("USER")
-            .build();
-}
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getEmail())
+                .password(user.getPassword())
+                .authorities(user.getRole()) // 🔥 IMPORTANT
+                .build();
+    }
 }

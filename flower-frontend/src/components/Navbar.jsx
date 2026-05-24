@@ -12,19 +12,14 @@ const Navbar = () => {
     navigate(`/search?query=${encodeURIComponent(search)}`);
   };
 
-  const handleLogout = async () => {
-    const email = localStorage.getItem('userEmail');
-    try {
-      await axios.post('http://localhost:8080/auth/logout', { email: email });
-    } catch (err) {
-      console.error("Logout error", err);
-    } finally {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('userEmail');
-      localStorage.removeItem('role');
-      navigate('/login');
-    }
-  };
+  const handleLogout = () => {
+
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('userEmail');
+  localStorage.removeItem('role');
+
+  navigate('/login');
+};
 
   return (
     <nav

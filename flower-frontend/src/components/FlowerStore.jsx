@@ -6,7 +6,7 @@ const Homepage = () => {
   const [zipCode, setZipCode] = useState("");
   const [occasion, setOccasion] = useState("Birthday");
   
-  const isAdmin = localStorage.getItem("role") === "ADMIN";
+const isAdmin = localStorage.getItem("role") === "ADMIN";
 
   useEffect(() => {
     setIsVisible(true);
@@ -77,37 +77,21 @@ const Homepage = () => {
 
       {/* ADMIN CONSOLE ROUTING BAR */}
       {isAdmin && (
-        <div 
-          style={{ 
-            background: "#2B1A4A", 
-            padding: "14px 6%", 
-            display: "flex", 
-            justifyContent: "space-between", 
-            alignItems: "center",
-            width: "100%",
-            boxSizing: "border-box"
-          }}
-        >
-          <span style={{ color: "#FFFFFF", fontSize: "13px", fontWeight: "500", letterSpacing: "0.5px" }}>
-            Session Status: Authenticated Administrator Account
-          </span>
-          <Link 
-            to="/admin/dashboard" 
-            style={{ 
-              background: "#FFFFFF", 
-              color: "#2B1A4A", 
-              textDecoration: "none", 
-              padding: "8px 18px", 
-              fontSize: "11px", 
-              fontWeight: "600",
-              letterSpacing: "1px",
-              textTransform: "uppercase"
-            }}
-          >
-            Open Admin Dashboard
-          </Link>
-        </div>
-      )}
+  <Link to="/admin/dashboard">
+    <button style={{
+      position: "fixed",
+      top: "20px",
+      right: "20px",
+      background: "#2B1A4A",
+      color: "white",
+      padding: "10px 16px",
+      border: "none",
+      zIndex: 9999
+    }}>
+      Admin Dashboard
+    </button>
+  </Link>
+)}
 
       {/* 2. NAVIGATION BAR SYSTEM */}
       <div

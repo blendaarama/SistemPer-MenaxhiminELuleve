@@ -8,44 +8,30 @@ const Login = ({ onLoginSuccess }) => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
+    try {
+        const res = await axios.post("http://localhost:8080/auth/login", {
+            email,
+            password
+        });
 
-        try {
-            const response = await axios.post('http://localhost:8080/auth/login', {
-                email: email,
-                password: password
-            });
+        const { accessToken, email: userEmail, role } = res.data;
 
-            localStorage.setItem('accessToken', response.data.accessToken);
-            localStorage.setItem('userEmail', email); 
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("userEmail", userEmail);
+        localStorage.setItem("role", role);
 
-            if (email.toLowerCase() === 'blenda@gmail.com') {
-                localStorage.setItem('role', 'ADMIN');
-            } else {
-                localStorage.setItem('role', response.data.role || 'USER');
-            }
-
-            if (onLoginSuccess) onLoginSuccess(response.data);
-            navigate('/');
-            
-        } catch (err) {
-            if (err.response && err.response.data && err.response.data.message) {
-                setError(err.response.data.message);
-            } else if (!err.response) {
-                setError("Serveri nuk po përgjigjet. Kontrollo nëse backend-i është ndezur!");
-            } else {
-                setError("Kyqja dështoi! Provoni përsëri.");
-            }
-            console.error("Gabim në Login:", err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
+        navigate("/");
+    } catch (err) {
+        setError(err.response?.data?.message || "Login failed");
+    } finally {
+        setLoading(false);
+    }
+};
     return (
         <div className="d-flex justify-content-center align-items-center min-vh-100" style={{ backgroundColor: '#FAF8F5', padding: '20px' }}>
             <div className="bg-white p-4 p-md-5" style={{ width: '100%', maxWidth: '440px', border: '1px solid #E6E0D8', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
