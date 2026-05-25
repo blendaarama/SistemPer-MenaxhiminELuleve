@@ -169,7 +169,7 @@ const Homepage = () => {
           ))}
         </div>
         
-        {/* BUTONI SHTESË */}
+        {/* BUTONI I RREGULLUAR */}
         <button onClick={() => setShowReviewModal(true)} style={{ marginTop: "30px", background: "#0E5A5B", color: "white", border: "none", padding: "10px 20px", cursor: "pointer" }}>
           Leave A Review
         </button>
@@ -200,7 +200,7 @@ const Homepage = () => {
         </div>
       )}
 
-      {/* REVIEW MODAL SHTESË */}
+      {/* REVIEW MODAL */}
       {showReviewModal && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999, backdropFilter: "blur(4px)" }}>
           <div style={{ background: "#FFF", padding: "40px", width: "350px", borderRadius: "8px", boxShadow: "0 10px 30px rgba(0,0,0,0.2)" }}>
@@ -209,16 +209,27 @@ const Homepage = () => {
             <textarea placeholder="Komentoni këtu..." style={{ width: "100%", padding: "12px", height: "100px", marginBottom: "20px", border: "1px solid #ccc", borderRadius: "4px" }} onChange={(e) => setNewReview({...newReview, comment: e.target.value})} />
             <div style={{ display: "flex", gap: "10px" }}>
               <button onClick={() => setShowReviewModal(false)} style={{ flex: 1, padding: "12px", background: "transparent", border: "1px solid #333", cursor: "pointer" }}>Anulo</button>
-              <button onClick={() => { setShowReviewModal(false); alert("Faleminderit!"); }} style={{ flex: 1, padding: "12px", background: "#0E5A5B", color: "#FFF", border: "none", cursor: "pointer" }}>Dërgo</button>
+              <button 
+                onClick={() => {
+                  const existingReviews = JSON.parse(localStorage.getItem("reviews") || "[]");
+                  const newReviewEntry = { 
+                      id: Date.now(), 
+                      customerId: newReview.customerId || "Anonim", 
+                      comment: newReview.comment, 
+                      score: 5 
+                  };
+                  localStorage.setItem("reviews", JSON.stringify([...existingReviews, newReviewEntry]));
+                  setShowReviewModal(false);
+                  alert("Faleminderit për vlerësimin!");
+                }} 
+                style={{ flex: 1, padding: "12px", background: "#0E5A5B", color: "#FFF", border: "none", cursor: "pointer" }}
+              >
+                Dërgo
+              </button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Butoni i Review */}
-      <div style={{ textAlign: "center", paddingBottom: "50px" }}>
-        <button onClick={() => setShowReviewModal(true)} style={{ background: "#0E5A5B", color: "white", padding: "12px 25px", border: "none", cursor: "pointer" }}>Leave A Review</button>
-      </div>
     </div>
   );
 };
