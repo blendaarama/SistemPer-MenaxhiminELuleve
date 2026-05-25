@@ -19,11 +19,12 @@ const handleLogin = async (e) => {
             password
         });
 
-        const { accessToken, email: userEmail, role } = res.data;
+        const { accessToken, refreshToken, email: userEmail, role } = res.data;
 
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("userEmail", userEmail);
-        localStorage.setItem("role", role);
+localStorage.setItem("accessToken", accessToken);
+localStorage.setItem("refreshToken", refreshToken);
+localStorage.setItem("userEmail", userEmail);
+localStorage.setItem("role", role);
 
         navigate("/");
     } catch (err) {

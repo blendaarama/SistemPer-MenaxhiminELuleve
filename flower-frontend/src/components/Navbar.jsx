@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import { useCart } from "../context/CartContext.jsx";
 const Navbar = () => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const { cartItems } = useCart();
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -27,11 +28,7 @@ const Navbar = () => {
       style={{
         background: "#FFFFFF",
         borderBottom: "1px solid #E6E0D8",
-        margin: 0,
-        padding: "14px 0",
-        width: "100vw",
-        marginLeft: "calc(-50vw + 50%)",
-        marginRight: "calc(-50vw + 50%)",
+        width: "100%",
         boxSizing: "border-box",
         zIndex: 1050
       }}
@@ -143,15 +140,17 @@ const Navbar = () => {
               </Link>
             )}
 
-            <Link
-              className="d-flex flex-column align-items-center text-decoration-none"
-              to="/order"
-              style={{ color: "#1F1F1F", transition: "color 0.2s" }}
-              onMouseEnter={(e) => e.currentTarget.style.color = "#0E5A5B"}
-              onMouseLeave={(e) => e.currentTarget.style.color = "#1F1F1F"}
-            >
-              <span style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px" }}>Cart (0)</span>
-            </Link>
+           <Link
+  className="d-flex flex-column align-items-center text-decoration-none"
+  to="/order"
+  style={{ color: "#1F1F1F", transition: "color 0.2s" }}
+  onMouseEnter={(e) => e.currentTarget.style.color = "#0E5A5B"}
+  onMouseLeave={(e) => e.currentTarget.style.color = "#1F1F1F"}
+>
+  <span style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px" }}>
+    Cart ({cartItems.length})
+  </span>
+</Link>
 
           </div>
         </div>

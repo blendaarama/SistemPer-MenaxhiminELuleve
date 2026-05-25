@@ -1,227 +1,212 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/inventory";
-
-const initialState = {
-    id: null,
-    flowerId: "",
-    currentStock: "",
-    reservedStock: "",
-    minStockLevel: "",
-    lastUpdated: ""
-};
-
 const InventoryCRUD = () => {
-    const [items, setItems] = useState([]);
-    const [form, setForm] = useState(initialState);
+  const [inventory, setInventory] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-    useEffect(() => {
-        load();
-    }, []);
+  // Shteti për formën e regjistrimit të stokut
+  const [formData, setFormData] = useState({
+    flowerId: "",
+    physicalStock: "",
+    reservedOrders: "",
+    safetyLevel: "",
+    lastAuditDate: ""
+  });
 
-    const load = async () => {
-        try {
-            const res = await axios.get(API_URL);
-            setItems(res.data);
-        } catch (err) {
-            console.error("Error fetching inventory logs:", err);
-        }
+  const API_URL = "http://localhost:8080/api/inventory";
+
+  useEffect(() => {
+    fetchInventory();
+  }, []);
+
+  // 1. Leximi i të dhënave të magazinës (Backend -> LocalStorage)
+  const fetchInventory = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await axios.get(API_URL);
+      setInventory(res.data);
+    } catch (err) {
+      console.log("Inventory Backend jo aktiv. Gati kalimi në LocalStorage...");
+      const localInventory = JSON.parse(localStorage.getItem("inventory")) || [
+        { id: 1, flowerId: "101", flowerDescription: "Trëndafil i Kuq i Përjetshëm (Klasik)", physicalStock: 120, reservedOrders: 15, safetyLevel: 20, lastAuditDate: "2026-05-20" },
+        { id: 2, flowerId: "102", flowerDescription: "Kuti Orkide Blu Mbretërore", physicalStock: 45, reservedOrders: 8, safetyLevel: 10, lastAuditDate: "2026-05-22" },
+        { id: 3, flowerId: "103", flowerDescription: "Hortensie e Bardhë Kadife", physicalStock: 14, reservedOrders: 5, safetyLevel: 15, lastAuditDate: "2026-05-25" }
+      ];
+      setInventory(localInventory);
+      if (!localStorage.getItem("inventory")) {
+        localStorage.setItem("inventory", JSON.stringify(localInventory));
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 2. Ruajtja e një regjistrimi të ri në Stok
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.flowerId || !formData.physicalStock) {
+      setError("ID-ja Referuese e Lules dhe Stoku Fizik janë të detyrueshme.");
+      return;
+    }
+
+    let generatedDesc = "Produkt Floral Premium";
+    if (formData.flowerId === "104") generatedDesc = "Buqetë bozhure rozë pastel";
+    if (formData.flowerId === "105") generatedDesc = "Arranxhim me luledielli të artë";
+
+    const newLog = {
+      id: Date.now(),
+      flowerId: formData.flowerId,
+      flowerDescription: generatedDesc,
+      physicalStock: parseInt(formData.physicalStock) || 0,
+      reservedOrders: parseInt(formData.reservedOrders) || 0,
+      safetyLevel: parseInt(formData.safetyLevel) || 0,
+      lastAuditDate: formData.lastAuditDate || new Date().toISOString().split('T')[0]
     };
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+    try {
+      const res = await axios.post(API_URL, newLog);
+      setInventory([...inventory, res.data]);
+    } catch (err) {
+      console.log("Ruajtja në backend dështoi. Ruhet lokalisht...");
+      const localInventory = JSON.parse(localStorage.getItem("inventory")) || [];
+      const updated = [...localInventory, newLog];
+      localStorage.setItem("inventory", JSON.stringify(updated));
+      setInventory(updated);
+    }
 
-    const save = async (e) => {
-        e.preventDefault();
+    setFormData({ flowerId: "", physicalStock: "", reservedOrders: "", safetyLevel: "", lastAuditDate: "" });
+    setError("");
+  };
 
-        // Konstruktimi i saktë i payload-it me tipe të duhura të dhënash
-        const payload = {
-            id: form.id,
-            flowerId: parseInt(form.flowerId),
-            currentStock: parseInt(form.currentStock),
-            reservedStock: parseInt(form.reservedStock),
-            minStockLevel: parseInt(form.minStockLevel),
-            lastUpdated: form.lastUpdated
-        };
+  // 3. Fshirja e një regjistrimi
+  const handleDelete = async (id) => {
+    if (!window.confirm("A jeni të sigurt që dëshironi të hiqni këtë regjistrim nga magazina?")) return;
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      setInventory(inventory.filter(item => item.id !== id));
+    } catch (err) {
+      console.log("Fshirja në backend dështoi. Fshihet nga LocalStorage...");
+      const updated = inventory.filter(item => item.id !== id);
+      localStorage.setItem("inventory", JSON.stringify(updated));
+      setInventory(updated);
+    }
+  };
 
-        try {
-            if (form.id) {
-                await axios.put(`${API_URL}/${form.id}`, payload);
-            } else {
-                await axios.post(API_URL, payload);
-            }
-            setForm(initialState);
-            load();
-        } catch (err) {
-            console.error("Error updating inventory metrics:", err);
-        }
-    };
-
-    const edit = (i) => {
-        setForm({
-            id: i.id,
-            flowerId: i.flowerId || i.flower?.id || "",
-            currentStock: i.currentStock,
-            reservedStock: i.reservedStock,
-            minStockLevel: i.minStockLevel,
-            lastUpdated: i.lastUpdated ? i.lastUpdated.substring(0, 10) : "" // formatting e dates nese vjen si ISO string
-        });
-    };
-
-    const remove = async (id) => {
-        const ok = window.confirm("Are you sure you want to delete this inventory record?");
-        if (!ok) return;
-
-        try {
-            await axios.delete(`${API_URL}/${id}`);
-            load();
-        } catch (err) {
-            console.error("Error executing database delete operation:", err);
-        }
-    };
-
-    return (
-        <div 
-            style={{ 
-                background: "#FAF8F5", 
-                minHeight: "100vh", 
-                padding: "40px 6%", 
-                fontFamily: "system-ui, -apple-system, sans-serif",
-                color: "#1F1F1F"
-            }}
-        >
-            <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-                
-                {/* HEADER */}
-                <div style={{ borderBottom: "1px solid #E6E0D8", paddingBottom: "20px", marginBottom: "40px" }}>
-                    <span style={{ fontSize: "11px", letterSpacing: "3px", color: "#0E5A5B", textTransform: "uppercase", fontWeight: "600" }}>
-                        Core Logistics
-                    </span>
-                    <h2 style={{ fontFamily: "Georgia, serif", fontSize: "32px", fontWeight: "400", marginTop: "6px", color: "#2B1A4A" }}>
-                        Inventory Stock Levels
-                    </h2>
-                </div>
-
-                {/* FORM CONTROLLER */}
-                <div style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", padding: "30px", marginBottom: "40px" }}>
-                    <h4 style={{ fontSize: "16px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "20px", color: "#1F1F1F" }}>
-                        {form.id ? "Modify Inventory Record" : "Log New Inventory Stock"}
-                    </h4>
-                    
-                    <form onSubmit={save}>
-                        <div className="row">
-                            <div className="col-md-4 mb-3">
-                                <label style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", display: "block", color: "rgba(31,31,31,0.6)" }}>Flower Reference ID</label>
-                                <input name="flowerId" type="number" placeholder="e.g. 104" className="form-control" value={form.flowerId} onChange={handleChange} required
-                                    style={{ borderRadius: "0px", border: "1px solid #C4B9AF", padding: "12px", fontSize: "14px", backgroundColor: "#FAF8F5", boxShadow: "none" }} />
-                            </div>
-
-                            <div className="col-md-4 mb-3">
-                                <label style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", display: "block", color: "rgba(31,31,31,0.6)" }}>Current Physical Stock</label>
-                                <input name="currentStock" type="number" placeholder="Units in warehouse" className="form-control" value={form.currentStock} onChange={handleChange} required
-                                    style={{ borderRadius: "0px", border: "1px solid #C4B9AF", padding: "12px", fontSize: "14px", backgroundColor: "#FAF8F5", boxShadow: "none" }} />
-                            </div>
-
-                            <div className="col-md-4 mb-3">
-                                <label style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", display: "block", color: "rgba(31,31,31,0.6)" }}>Reserved for Orders</label>
-                                <input name="reservedStock" type="number" placeholder="Allocated units" className="form-control" value={form.reservedStock} onChange={handleChange} required
-                                    style={{ borderRadius: "0px", border: "1px solid #C4B9AF", padding: "12px", fontSize: "14px", backgroundColor: "#FAF8F5", boxShadow: "none" }} />
-                            </div>
-                        </div>
-
-                        <div className="row">
-                            <div className="col-md-6 mb-3">
-                                <label style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", display: "block", color: "rgba(31,31,31,0.6)" }}>Minimum Safety Level</label>
-                                <input name="minStockLevel" type="number" placeholder="Threshold for alerts" className="form-control" value={form.minStockLevel} onChange={handleChange} required
-                                    style={{ borderRadius: "0px", border: "1px solid #C4B9AF", padding: "12px", fontSize: "14px", backgroundColor: "#FAF8F5", boxShadow: "none" }} />
-                            </div>
-
-                            <div className="col-md-6 mb-3">
-                                <label style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", display: "block", color: "rgba(31,31,31,0.6)" }}>Last Audit Date</label>
-                                <input type="date" name="lastUpdated" className="form-control" value={form.lastUpdated} onChange={handleChange} required
-                                    style={{ borderRadius: "0px", border: "1px solid #C4B9AF", padding: "12px", fontSize: "14px", backgroundColor: "#FAF8F5", boxShadow: "none", cursor: "pointer" }} />
-                            </div>
-                        </div>
-
-                        <div style={{ marginTop: "20px" }}>
-                            <button type="submit" 
-                                style={{ background: "#0E5A5B", color: "#FFFFFF", border: "none", padding: "12px 30px", fontSize: "12px", fontWeight: "600", letterSpacing: "2px", textTransform: "uppercase", borderRadius: "0px", cursor: "pointer", marginRight: "12px", transition: "background 0.15s" }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = "#2B1A4A"} onMouseLeave={(e) => e.currentTarget.style.background = "#0E5A5B"}>
-                                {form.id ? "Update Log" : "Commit Stock"}
-                            </button>
-
-                            {form.id && (
-                                <button type="button" onClick={() => setForm(initialState)}
-                                    style={{ background: "transparent", color: "#1F1F1F", border: "1px solid #C4B9AF", padding: "11px 24px", fontSize: "12px", fontWeight: "600", letterSpacing: "2px", textTransform: "uppercase", borderRadius: "0px", cursor: "pointer", transition: "all 0.15s" }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#1F1F1F"; e.currentTarget.style.background = "rgba(0,0,0,0.02)"; }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#C4B9AF"; e.currentTarget.style.background = "transparent"; }}>
-                                    Cancel
-                                </button>
-                            )}
-                        </div>
-                    </form>
-                </div>
-
-                {/* MATRIX GRID TABLE */}
-                <div style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", overflowX: "auto" }}>
-                    <table className="table m-0" style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }}>
-                        <thead>
-                            <tr style={{ background: "#2B1A4A", color: "#FFFFFF", textAlign: "left" }}>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>ID</th>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>Flower Description</th>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>On Hand</th>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>Reserved</th>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>Safety Min</th>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>Audit Date</th>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase", textAlign: "center" }}>Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {items.length === 0 ? (
-                                <tr>
-                                    <td colSpan="7" style={{ padding: "30px", textAlign: "center", color: "rgba(31,31,31,0.5)", fontStyle: "italic" }}>
-                                        No inventory tracking entities documented.
-                                    </td>
-                                </tr>
-                            ) : (
-                                items.map(i => {
-                                    const isCritical = i.currentStock <= i.minStockLevel;
-                                    return (
-                                        <tr key={i.id} style={{ borderBottom: "1px solid #E6E0D8", backgroundColor: isCritical ? "#FFFDF9" : "transparent" }}>
-                                            <td style={{ padding: "16px 20px", fontWeight: "600", color: "#0E5A5B" }}>#{i.id}</td>
-                                            <td style={{ padding: "16px 20px", fontFamily: "Georgia, serif", fontSize: "15px" }}>
-                                                {i.flowerName || i.flower?.emertimi || i.flower?.name || `Flower ID: ${i.flowerId}`}
-                                            </td>
-                                            <td style={{ padding: "16px 20px", fontWeight: "600", color: isCritical ? "#FF8E8E" : "#1F1F1F" }}>
-                                                {i.currentStock} units {isCritical && "(Low Stock)"}
-                                            </td>
-                                            <td style={{ padding: "16px 20px", color: "#666666" }}>{i.reservedStock} units</td>
-                                            <td style={{ padding: "16px 20px", color: "#888888" }}>{i.minStockLevel} units</td>
-                                            <td style={{ padding: "16px 20px", fontSize: "13px" }}>{i.lastUpdated ? i.lastUpdated.substring(0, 10) : "N/A"}</td>
-                                            <td style={{ padding: "16px 20px", textAlign: "center" }}>
-                                                <button onClick={() => edit(i)}
-                                                    style={{ background: "transparent", color: "#0E5A5B", border: "1px solid #0E5A5B", borderRadius: "0px", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase", padding: "6px 14px", marginRight: "8px", fontWeight: "600", cursor: "pointer" }}>
-                                                    Edit
-                                                </button>
-                                                <button onClick={() => remove(i.id)}
-                                                    style={{ background: "transparent", color: "#FF8E8E", border: "1px solid #FF8E8E", borderRadius: "0px", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase", padding: "6px 14px", fontWeight: "600", cursor: "pointer" }}>
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    );
-                                })
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-
-            </div>
+  return (
+    <div style={{ background: "#FAF8F5", minHeight: "100vh", padding: "40px 6%", fontFamily: "system-ui, -apple-system, sans-serif", color: "#1F1F1F" }}>
+      <div style={{ maxWidth: "1300px", margin: "0 auto" }}>
+        
+        {/* HEADER */}
+        <div style={{ borderBottom: "1px solid #E6E0D8", paddingBottom: "20px", marginBottom: "40px" }}>
+          <span style={{ fontSize: "11px", letterSpacing: "3px", color: "#0E5A5B", textTransform: "uppercase", fontWeight: "600" }}>Logjistika</span>
+          <h2 style={{ fontFamily: "Georgia, serif", fontSize: "32px", fontWeight: "400", marginTop: "6px", color: "#2B1A4A" }}>Regjistri i Magazinës (Stoku)</h2>
         </div>
-    );
+
+        {error && (
+          <div style={{ backgroundColor: '#FFEAEA', color: '#FF8E8E', border: '1px solid #FFD1D1', padding: "12px", fontSize: '13px', marginBottom: "20px" }}>
+            {error}
+          </div>
+        )}
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 2.2fr", gap: "40px", alignItems: "start" }}>
+          
+          {/* FORM - LOG NEW INVENTORY STOCK */}
+          <div style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", padding: "30px" }}>
+            <h3 style={{ fontSize: "13px", fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", marginBottom: "25px", borderBottom: "2px solid #2B1A4A", paddingBottom: "8px", color: "#2B1A4A" }}>
+              Përditëso Gjendjen e Magazinës
+            </h3>
+            <form onSubmit={handleSubmit}>
+              <div style={{ marginBottom: "15px" }}>
+                <label style={{ display: "block", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", marginBottom: "6px", color: "rgba(31,31,31,0.6)" }}>ID Referuese e Lules</label>
+                <input type="text" value={formData.flowerId} onChange={(e) => setFormData({...formData, flowerId: e.target.value})} placeholder="Psh. 104" style={{ width: "100%", padding: "10px", border: "1px solid #C4B9AF", background: "#FAF8F5" }} />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px", marginBottom: "15px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", marginBottom: "6px", color: "rgba(31,31,31,0.6)" }}>Stoku Fizik Aktual</label>
+                  <input type="number" value={formData.physicalStock} onChange={(e) => setFormData({...formData, physicalStock: e.target.value})} placeholder="Njësi në magazinë" style={{ width: "100%", padding: "10px", border: "1px solid #C4B9AF", background: "#FAF8F5" }} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", marginBottom: "6px", color: "rgba(31,31,31,0.6)" }}>Të Rezervuara për Porosi</label>
+                  <input type="number" value={formData.reservedOrders} onChange={(e) => setFormData({...formData, reservedOrders: e.target.value})} placeholder="Njësi të alokuara" style={{ width: "100%", padding: "10px", border: "1px solid #C4B9AF", background: "#FAF8F5" }} />
+                </div>
+              </div>
+
+              <div style={{ marginBottom: "15px" }}>
+                <label style={{ display: "block", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", marginBottom: "6px", color: "rgba(31,31,31,0.6)" }}>Niveli Minimal i Sigurisë</label>
+                <input type="number" value={formData.safetyLevel} onChange={(e) => setFormData({...formData, safetyLevel: e.target.value})} placeholder="Limiti për alarm" style={{ width: "100%", padding: "10px", border: "1px solid #C4B9AF", background: "#FAF8F5" }} />
+              </div>
+
+              <div style={{ marginBottom: "25px" }}>
+                <label style={{ display: "block", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", marginBottom: "6px", color: "rgba(31,31,31,0.6)" }}>Data e Auditit të Fundit</label>
+                <input type="date" value={formData.lastAuditDate} onChange={(e) => setFormData({...formData, lastAuditDate: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #C4B9AF", background: "#FAF8F5", color: "#1F1F1F" }} />
+              </div>
+
+              <button type="submit" style={{ width: "100%", background: "#2B1A4A", color: "#FFF", padding: "12px", border: "none", fontWeight: "600", letterSpacing: "1px", textTransform: "uppercase", cursor: "pointer" }}>
+                Regjistro në Stok
+              </button>
+            </form>
+          </div>
+
+          {/* TABLE - INVENTORY LOG MATRIX */}
+          <div style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", overflowX: "auto" }}>
+            {loading ? (
+              <div style={{ padding: "40px", textAlign: "center", color: "rgba(31,31,31,0.5)" }}>Duke sinkronizuar magazinën...</div>
+            ) : (
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13.5px" }}>
+                <thead>
+                  <tr style={{ background: "#2B1A4A", color: "#FFFFFF", textAlign: "left" }}>
+                    <th style={{ padding: "16px 15px", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px" }}>ID</th>
+                    <th style={{ padding: "16px 15px", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px" }}>Përshkrimi i Lules</th>
+                    <th style={{ padding: "16px 15px", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px", textAlign: "center" }}>Gjendja</th>
+                    <th style={{ padding: "16px 15px", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px", textAlign: "center" }}>Rezervuar</th>
+                    <th style={{ padding: "16px 15px", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px", textAlign: "center" }}>Min Sigurie</th>
+                    <th style={{ padding: "16px 15px", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px" }}>Datë Auditi</th>
+                    <th style={{ padding: "16px 15px", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px", textAlign: "center" }}>Veprime</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {inventory.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" style={{ padding: "40px", textAlign: "center", color: "rgba(31,31,31,0.5)", fontStyle: "italic" }}>
+                        Nuk ka asnjë regjistrim të stokut në magazinë.
+                      </td>
+                    </tr>
+                  ) : (
+                    inventory.map((item) => {
+                      const isLowStock = item.physicalStock <= item.safetyLevel;
+                      return (
+                        <tr key={item.id} style={{ borderBottom: "1px solid #E6E0D8", background: isLowStock ? "#FFF9F9" : "transparent" }}>
+                          <td style={{ padding: "16px 15px", fontWeight: "600", color: "#0E5A5B" }}>#{item.flowerId}</td>
+                          <td style={{ padding: "16px 15px", fontWeight: "600", color: "#2B1A4A" }}>{item.flowerDescription}</td>
+                          <td style={{ padding: "16px 15px", textAlign: "center", fontWeight: "700", color: isLowStock ? "#C62828" : "#1F1F1F" }}>
+                            {item.physicalStock}
+                            {isLowStock && <span style={{ display: "block", fontSize: "9px", color: "#C62828", fontWeight: "700" }}>STOK I ULËT</span>}
+                          </td>
+                          <td style={{ padding: "16px 15px", textAlign: "center", color: "rgba(31,31,31,0.6)" }}>{item.reservedOrders}</td>
+                          <td style={{ padding: "16px 15px", textAlign: "center" }}>{item.safetyLevel}</td>
+                          <td style={{ padding: "16px 15px", fontSize: "12.5px", color: "rgba(31,31,31,0.6)" }}>{item.lastAuditDate}</td>
+                          <td style={{ padding: "16px 15px", textAlign: "center" }}>
+                            <button onClick={() => handleDelete(item.id)} style={{ background: "transparent", color: "#FF8E8E", border: "1px solid #FF8E8E", padding: "4px 8px", fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}>
+                              Fshij
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default InventoryCRUD;

@@ -1,260 +1,191 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/categories";
+const CategoriesCRUD = () => {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-const initialState = {
-    id: null,
+  // Shteti për formën e krijimit
+  const [formData, setFormData] = useState({
     name: "",
     description: ""
-};
+  });
 
-const CategoriesCRUD = () => {
-    const [data, setData] = useState([]);
-    const [form, setForm] = useState(initialState);
+  const API_URL = "http://localhost:8080/api/categories";
 
-    useEffect(() => {
-        load();
-    }, []);
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
-    const load = async () => {
-        try {
-            const res = await axios.get(API_URL);
-            setData(res.data);
-        } catch (err) {
-            console.error("Error fetching categories:", err);
-        }
+  // 1. Leximi i kategorive (Backend -> LocalStorage)
+  const fetchCategories = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await axios.get(API_URL);
+      setCategories(res.data);
+    } catch (err) {
+      console.log("Categories Backend jo aktiv. Po kalojmë në LocalStorage...");
+      const localCategories = JSON.parse(localStorage.getItem("categories")) || [
+        { id: 1, name: "Trëndafila të Përjetshëm", description: "Lule të përjetshme që zgjasin me vite pa u tharë." },
+        { id: 2, name: "Buqeta Lulesh", description: "Arranxhime të ndryshme me lule të freskëta dhe elegante." },
+        { id: 3, name: "Kuti Luksoze", description: "Lule ekskluzive të vendosura në kuti kadifeje ose druri." }
+      ];
+      setCategories(localCategories);
+      if (!localStorage.getItem("categories")) {
+        localStorage.setItem("categories", JSON.stringify(localCategories));
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 2. Krijimi i një kategorie të re
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name) {
+      setError("Emri i kategorisë është i detyrueshëm.");
+      return;
+    }
+
+    const newCategory = {
+      id: Date.now(),
+      ...formData
     };
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
+    try {
+      const res = await axios.post(API_URL, newCategory);
+      setCategories([...categories, res.data]);
+    } catch (err) {
+      console.log("Ruajtja në backend dështoi. Ruhet në LocalStorage...");
+      const localCategories = JSON.parse(localStorage.getItem("categories")) || [];
+      const updated = [...localCategories, newCategory];
+      localStorage.setItem("categories", JSON.stringify(updated));
+      setCategories(updated);
+    }
 
-    const save = async (e) => {
-        e.preventDefault();
-        try {
-            if (form.id) {
-                await axios.put(`${API_URL}/${form.id}`, form);
-            } else {
-                await axios.post(API_URL, form);
-            }
-            setForm(initialState);
-            load();
-        } catch (err) {
-            console.error("Error saving category:", err);
-        }
-    };
+    setFormData({ name: "", description: "" });
+    setError("");
+  };
 
-    const edit = (c) => setForm(c);
+  // 3. Fshirja e një kategorie
+  const handleDelete = async (id) => {
+    if (!window.confirm("A jeni të sigurt që dëshironi të fshini këtë kategori?")) return;
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      setCategories(categories.filter(c => c.id !== id));
+    } catch (err) {
+      console.log("Fshirja në backend dështoi. Fshihet nga LocalStorage...");
+      const updated = categories.filter(c => c.id !== id);
+      localStorage.setItem("categories", JSON.stringify(updated));
+      setCategories(updated);
+    }
+  };
 
-    const remove = async (id) => {
-        const ok = window.confirm("Are you sure you want to delete this category?");
-        if (!ok) return;
-
-        try {
-            await axios.delete(`${API_URL}/${id}`);
-            load();
-        } catch (err) {
-            console.error("Error deleting category:", err);
-        }
-    };
-
-    return (
-        <div 
-            style={{ 
-                background: "#FAF8F5", 
-                minHeight: "100vh", 
-                padding: "40px 6%", 
-                fontFamily: "system-ui, -apple-system, sans-serif",
-                color: "#1F1F1F"
-            }}
-        >
-            <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-                
-                {/* HEADER */}
-                <div style={{ borderBottom: "1px solid #E6E0D8", paddingBottom: "20px", marginBottom: "40px" }}>
-                    <span style={{ fontSize: "11px", letterSpacing: "3px", color: "#0E5A5B", textTransform: "uppercase", fontWeight: "600" }}>
-                        Store Structure
-                    </span>
-                    <h2 style={{ fontFamily: "Georgia, serif", fontSize: "32px", fontWeight: "400", marginTop: "6px", color: "#2B1A4A" }}>
-                        Categories Directory
-                    </h2>
-                </div>
-
-                {/* FORM CONTAINER */}
-                <div style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", padding: "30px", marginBottom: "40px" }}>
-                    <h4 style={{ fontSize: "16px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "20px", color: "#1F1F1F" }}>
-                        {form.id ? "Modify Category Metadata" : "Create New Category Entry"}
-                    </h4>
-                    
-                    <form onSubmit={save}>
-                        <div className="mb-3">
-                            <label style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", display: "block", color: "rgba(31,31,31,0.6)" }}>
-                                Category Name
-                            </label>
-                            <input
-                                name="name"
-                                placeholder="Enter category name"
-                                className="form-control"
-                                value={form.name}
-                                onChange={handleChange}
-                                required
-                                style={{ borderRadius: "0px", border: "1px solid #C4B9AF", padding: "12px", fontSize: "14px", backgroundColor: "#FAF8F5", boxShadow: "none" }}
-                            />
-                        </div>
-
-                        <div className="mb-3">
-                            <label style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", display: "block", color: "rgba(31,31,31,0.6)" }}>
-                                Description / Scope
-                            </label>
-                            <textarea
-                                name="description"
-                                placeholder="Describe the purpose or items under this category"
-                                className="form-control"
-                                rows="3"
-                                value={form.description}
-                                onChange={handleChange}
-                                required
-                                style={{ borderRadius: "0px", border: "1px solid #C4B9AF", padding: "12px", fontSize: "14px", backgroundColor: "#FAF8F5", boxShadow: "none" }}
-                            />
-                        </div>
-
-                        {/* BUTTONS SYSTEM */}
-                        <div style={{ marginTop: "20px" }}>
-                            <button 
-                                type="submit" 
-                                style={{
-                                    background: "#0E5A5B",
-                                    color: "#FFFFFF",
-                                    border: "none",
-                                    padding: "12px 30px",
-                                    fontSize: "12px",
-                                    fontWeight: "600",
-                                    letterSpacing: "2px",
-                                    textTransform: "uppercase",
-                                    borderRadius: "0px",
-                                    cursor: "pointer",
-                                    marginRight: "12px",
-                                    transition: "background 0.15s"
-                                }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = "#2B1A4A"}
-                                onMouseLeave={(e) => e.currentTarget.style.background = "#0E5A5B"}
-                            >
-                                {form.id ? "Update Category" : "Save Category"}
-                            </button>
-
-                            {form.id && (
-                                <button 
-                                    type="button" 
-                                    onClick={() => setForm(initialState)}
-                                    style={{
-                                        background: "transparent",
-                                        color: "#1F1F1F",
-                                        border: "1px solid #C4B9AF",
-                                        padding: "11px 24px",
-                                        fontSize: "12px",
-                                        fontWeight: "600",
-                                        letterSpacing: "2px",
-                                        textTransform: "uppercase",
-                                        borderRadius: "0px",
-                                        cursor: "pointer",
-                                        transition: "all 0.15s"
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.borderColor = "#1F1F1F";
-                                        e.currentTarget.style.background = "rgba(0,0,0,0.02)";
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.borderColor = "#C4B9AF";
-                                        e.currentTarget.style.background = "transparent";
-                                    }}
-                                >
-                                    Cancel
-                                </button>
-                            )}
-                        </div>
-                    </form>
-                </div>
-
-                {/* TABLE CONTAINER */}
-                <div style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", overflowX: "auto" }}>
-                    <table 
-                        className="table m-0" 
-                        style={{ 
-                            width: "100%", 
-                            borderCollapse: "collapse", 
-                            fontSize: "14px"
-                        }}
-                    >
-                        <thead>
-                            <tr style={{ background: "#2B1A4A", color: "#FFFFFF", textAlign: "left" }}>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase", width: "10%" }}>ID</th>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase", width: "25%" }}>Name</th>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase", width: "45%" }}>Description</th>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase", textAlign: "center", width: "20%" }}>Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {data.length === 0 ? (
-                                <tr>
-                                    <td colSpan="4" style={{ padding: "30px", textAlign: "center", color: "rgba(31,31,31,0.5)", fontStyle: "italic" }}>
-                                        No categories found in the system database.
-                                    </td>
-                                </tr>
-                            ) : (
-                                data.map(c => (
-                                    <tr key={c.id} style={{ borderBottom: "1px solid #E6E0D8" }}>
-                                        <td style={{ padding: "16px 20px", fontWeight: "600", color: "#0E5A5B" }}>#{c.id}</td>
-                                        <td style={{ padding: "16px 20px", fontFamily: "Georgia, serif", fontSize: "15px", fontWeight: "600" }}>{c.name}</td>
-                                        <td style={{ padding: "16px 20px", color: "#555555", lineHeight: "1.5" }}>{c.description}</td>
-                                        <td style={{ padding: "16px 20px", textAlign: "center" }}>
-                                            <button
-                                                onClick={() => edit(c)}
-                                                style={{
-                                                    background: "transparent",
-                                                    color: "#0E5A5B",
-                                                    border: "1px solid #0E5A5B",
-                                                    borderRadius: "0px",
-                                                    fontSize: "11px",
-                                                    letterSpacing: "1px",
-                                                    textTransform: "uppercase",
-                                                    padding: "6px 14px",
-                                                    marginRight: "8px",
-                                                    fontWeight: "600",
-                                                    cursor: "pointer"
-                                                }}
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() => remove(c.id)}
-                                                style={{
-                                                    background: "transparent",
-                                                    color: "#FF8E8E",
-                                                    border: "1px solid #FF8E8E",
-                                                    borderRadius: "0px",
-                                                    fontSize: "11px",
-                                                    letterSpacing: "1px",
-                                                    textTransform: "uppercase",
-                                                    padding: "6px 14px",
-                                                    fontWeight: "600",
-                                                    cursor: "pointer"
-                                                }}
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-
-            </div>
+  return (
+    <div style={{ background: "#FAF8F5", minHeight: "100vh", padding: "40px 6%", fontFamily: "system-ui, -apple-system, sans-serif", color: "#1F1F1F" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        
+        {/* HEADER */}
+        <div style={{ borderBottom: "1px solid #E6E0D8", paddingBottom: "20px", marginBottom: "40px" }}>
+          <span style={{ fontSize: "11px", letterSpacing: "3px", color: "#0E5A5B", textTransform: "uppercase", fontWeight: "600" }}>
+            Struktura e Dyqanit
+          </span>
+          <h2 style={{ fontFamily: "Georgia, serif", fontSize: "32px", fontWeight: "400", marginTop: "6px", color: "#2B1A4A" }}>
+            Kategoritë e Produkteve
+          </h2>
         </div>
-    );
+
+        {error && (
+          <div style={{ backgroundColor: '#FFEAEA', color: '#FF8E8E', border: '1px solid #FFD1D1', padding: "12px", fontSize: '13px', marginBottom: "20px" }}>
+            {error}
+          </div>
+        )}
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "40px", alignItems: "start" }}>
+          
+          {/* FORM - CREATE NEW CATEGORY */}
+          <div style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", padding: "30px" }}>
+            <h3 style={{ fontSize: "13px", fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", marginBottom: "25px", borderBottom: "2px solid #2B1A4A", paddingBottom: "8px", color: "#2B1A4A" }}>
+              Regjistro Kategori të Re
+            </h3>
+            <form onSubmit={handleSubmit}>
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{ display: "block", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", marginBottom: "6px", color: "rgba(31,31,31,0.6)" }}>Emri i Kategorisë</label>
+                <input 
+                  type="text" 
+                  value={formData.name} 
+                  onChange={(e) => setFormData({...formData, name: e.target.value})} 
+                  placeholder="Shkruaj emrin e kategorisë" 
+                  style={{ width: "100%", padding: "10px", border: "1px solid #C4B9AF", background: "#FAF8F5" }} 
+                />
+              </div>
+
+              <div style={{ marginBottom: "25px" }}>
+                <label style={{ display: "block", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", marginBottom: "6px", color: "rgba(31,31,31,0.6)" }}>Përshkrimi / Fushëveprimi</label>
+                <textarea 
+                  rows="4"
+                  value={formData.description} 
+                  onChange={(e) => setFormData({...formData, description: e.target.value})} 
+                  placeholder="Përshkruaj qëllimin ose llojet e luleve në këtë kategori..." 
+                  style={{ width: "100%", padding: "10px", border: "1px solid #C4B9AF", background: "#FAF8F5", fontFamily: "inherit", resize: "none" }} 
+                />
+              </div>
+
+              <button type="submit" style={{ width: "100%", background: "#2B1A4A", color: "#FFF", padding: "12px", border: "none", fontWeight: "600", letterSpacing: "1px", textTransform: "uppercase", cursor: "pointer" }}>
+                Ruaj Kategorinë
+              </button>
+            </form>
+          </div>
+
+          {/* TABLE - LIST OF CATEGORIES */}
+          <div style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", overflowX: "auto" }}>
+            {loading ? (
+              <div style={{ padding: "40px", textAlign: "center", color: "rgba(31,31,31,0.5)" }}>Duke sinkronizuar strukturën...</div>
+            ) : (
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }}>
+                <thead>
+                  <tr style={{ background: "#2B1A4A", color: "#FFFFFF", textAlign: "left" }}>
+                    <th style={{ padding: "16px 20px", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px", width: "80px" }}>ID</th>
+                    <th style={{ padding: "16px 20px", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px" }}>Emri i Kategorisë</th>
+                    <th style={{ padding: "16px 20px", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px" }}>Përshkrimi</th>
+                    <th style={{ padding: "16px 20px", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px", textAlign: "center", width: "100px" }}>Veprime</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {categories.length === 0 ? (
+                    <tr>
+                      <td colSpan="4" style={{ padding: "40px", textAlign: "center", color: "rgba(31,31,31,0.5)", fontStyle: "italic" }}>
+                        Nuk ka asnjë kategori të regjistruar në sistem.
+                      </td>
+                    </tr>
+                  ) : (
+                    categories.map((cat) => (
+                      <tr key={cat.id} style={{ borderBottom: "1px solid #E6E0D8" }}>
+                        <td style={{ padding: "16px 20px", fontWeight: "600", color: "#0E5A5B" }}>#{cat.id.toString().slice(-4)}</td>
+                        <td style={{ padding: "16px 20px", fontWeight: "600", color: "#2B1A4A" }}>{cat.name}</td>
+                        <td style={{ padding: "16px 20px", fontFamily: "Georgia, serif", fontSize: "13.5px", color: "rgba(31,31,31,0.7)" }}>{cat.description || "Nuk ka përshkrim."}</td>
+                        <td style={{ padding: "16px 20px", textAlign: "center" }}>
+                          <button 
+                            onClick={() => handleDelete(cat.id)} 
+                            style={{ background: "transparent", color: "#FF8E8E", border: "1px solid #FF8E8E", padding: "4px 10px", fontSize: "11px", textTransform: "uppercase", cursor: "pointer" }}
+                          >
+                            Fshij
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default CategoriesCRUD;

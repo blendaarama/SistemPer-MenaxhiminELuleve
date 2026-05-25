@@ -5,6 +5,8 @@ const BouquetFlowersCRUD = () => {
     const [items, setItems] = useState([]);
     const [bouquets, setBouquets] = useState([]);
     const [flowers, setFlowers] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     const [formData, setFormData] = useState({
         id: null,
@@ -18,35 +20,36 @@ const BouquetFlowersCRUD = () => {
     const FLOWER_API = "http://localhost:8080/api/flowers";
 
     useEffect(() => {
-        fetchAll();
-        fetchBouquets();
-        fetchFlowers();
+        loadInitialData();
     }, []);
+
+    const loadInitialData = async () => {
+        setLoading(true);
+        setError("");
+        try {
+            // Ekzekutojmë të gjitha kërkesat paralel për performancë më të mirë
+            const [resItems, resBouquets, resFlowers] = await Promise.all([
+                axios.get(API_URL),
+                axios.get(BOUQUET_API),
+                axios.get(FLOWER_API)
+            ]);
+            setItems(resItems.data);
+            setBouquets(resBouquets.data);
+            setFlowers(resFlowers.data);
+        } catch (err) {
+            setError("Failed to synchronize component inventory data with the cloud registry.");
+            console.error("Error loading initialization vectors:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const fetchAll = async () => {
         try {
             const res = await axios.get(API_URL);
             setItems(res.data);
         } catch (err) {
-            console.error("Error loading bouquet-flowers data:", err);
-        }
-    };
-
-    const fetchBouquets = async () => {
-        try {
-            const res = await axios.get(BOUQUET_API);
-            setBouquets(res.data);
-        } catch (err) {
-            console.error("Error loading bouquets list:", err);
-        }
-    };
-
-    const fetchFlowers = async () => {
-        try {
-            const res = await axios.get(FLOWER_API);
-            setFlowers(res.data);
-        } catch (err) {
-            console.error("Error loading flowers list:", err);
+            console.error("Error reloading composition records:", err);
         }
     };
 
@@ -59,12 +62,16 @@ const BouquetFlowersCRUD = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError("");
 
-        // Konstruktimi i payload-it që të përputhet me strukturën e Spring Boot (DTO ose Entity mapping)
+        // Përshtatja e payload-it për backend (i dërgojmë si ID direkte)
+        // Nëse Spring Boot pret objekte të plota si { bouquet: { id: X }, flower: { id: Y } },
+        // ndryshojeni strukturën e këtij objekti sipas nevojës.
         const payload = {
-            bouquetId: parseInt(formData.bouquetId),
-            flowerId: parseInt(formData.flowerId),
-            quantity: parseInt(formData.quantity)
+            id: formData.id,
+            bouquetId: parseInt(formData.bouquetId, 10),
+            flowerId: parseInt(formData.flowerId, 10),
+            quantity: parseInt(formData.quantity, 10)
         };
 
         try {
@@ -76,6 +83,7 @@ const BouquetFlowersCRUD = () => {
             resetForm();
             fetchAll();
         } catch (err) {
+            setError("Failed to persist data link entity. Verify database constraints.");
             console.error("Database persistence error:", err);
         }
     };
@@ -83,18 +91,21 @@ const BouquetFlowersCRUD = () => {
     const handleEdit = (item) => {
         setFormData({
             id: item.id,
-            bouquetId: item.bouquetId || item.bouquet?.id || "",
-            flowerId: item.flowerId || item.flower?.id || "",
+            // Mbështet si emërtimet në anglisht, ashtu edhe ato në shqip nga Spring Boot
+            bouquetId: item.bouquetId || item.bouquet?.id || item.buqeta?.id || "",
+            flowerId: item.flowerId || item.flower?.id || item.lulja?.id || "",
             quantity: item.quantity
         });
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Confirm deletion of this data entity link?")) return;
+        if (!window.confirm("Confirm permanent deletion of this floral composition entity link?")) return;
+        setError("");
         try {
             await axios.delete(`${API_URL}/${id}`);
             fetchAll();
         } catch (err) {
+            setError("Failed to execute deletion command on target link vector.");
             console.error("Database deletion error:", err);
         }
     };
@@ -129,6 +140,13 @@ const BouquetFlowersCRUD = () => {
                         Bouquet Flowers Construction
                     </h2>
                 </div>
+
+                {/* ERROR ALERT BOX */}
+                {error && (
+                    <div className="alert py-2 mb-4" style={{ backgroundColor: '#FFEAEA', color: '#FF8E8E', border: '1px solid #FFD1D1', fontSize: '13px', borderRadius: "0px" }}>
+                        {error}
+                    </div>
+                )}
 
                 {/* INTERACTIVE FORM DESK */}
                 <div style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", padding: "30px", marginBottom: "40px", borderRadius: "0px" }}>
@@ -256,91 +274,96 @@ const BouquetFlowersCRUD = () => {
                 </div>
 
                 {/* DATA TABLE MATRIX */}
-                <div style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", overflowX: "auto" }}>
-                    <table 
-                        className="table m-0" 
-                        style={{ 
-                            width: "100%", 
-                            borderCollapse: "collapse", 
-                            fontSize: "14px"
-                        }}
-                    >
-                        <thead>
-                            <tr style={{ background: "#2B1A4A", color: "#FFFFFF", textAlign: "left" }}>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>ID</th>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>Bouquet Name</th>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>Flower Type</th>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase" }}>Quantity</th>
-                                <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase", textAlign: "center" }}>Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {items.length === 0 ? (
-                                <tr>
-                                    <td colSpan="5" style={{ padding: "30px", textAlign: "center", color: "rgba(31,31,31,0.5)", fontStyle: "italic" }}>
-                                        No linked data available in database.
-                                    </td>
+                {loading ? (
+                    <div style={{ textAlign: "center", padding: "40px", color: "rgba(31,31,31,0.5)", fontSize: "14px", letterSpacing: "1px", textTransform: "uppercase" }}>Mapping structural floral compositions...</div>
+                ) : (
+                    <div style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", overflowX: "auto" }}>
+                        <table 
+                            className="table m-0" 
+                            style={{ 
+                                width: "100%", 
+                                borderCollapse: "collapse", 
+                                fontSize: "14px"
+                            }}
+                        >
+                            <thead>
+                                <tr style={{ background: "#2B1A4A", color: "#FFFFFF", textAlign: "left" }}>
+                                    <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase", width: "10%" }}>ID</th>
+                                    <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase", width: "35%" }}>Bouquet Name</th>
+                                    <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase", width: "25%" }}>Flower Type</th>
+                                    <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase", width: "15%" }}>Quantity</th>
+                                    <th style={{ padding: "16px 20px", fontWeight: "500", letterSpacing: "1px", fontSize: "11px", textTransform: "uppercase", textAlign: "center", width: "15%" }}>Actions</th>
                                 </tr>
-                            ) : (
-                                items.map(item => (
-                                    <tr key={item.id} style={{ borderBottom: "1px solid #E6E0D8" }}>
-                                        <td style={{ padding: "16px 20px", fontWeight: "600", color: "#0E5A5B" }}>#{item.id}</td>
-                                        <td style={{ padding: "16px 20px", fontFamily: "Georgia, serif", fontSize: "15px" }}>
-                                            {item.bouquetName || item.bouquet?.emertimi || item.bouquet?.name || "Unknown Bouquet"}
-                                        </td>
-                                        <td style={{ padding: "16px 20px", color: "#4A4A4A" }}>
-                                            {item.flowerName || item.flower?.emertimi || item.flower?.name || "Unknown Flower"}
-                                        </td>
-                                        <td style={{ padding: "16px 20px", fontWeight: "700" }}>{item.quantity} Stems</td>
+                            </thead>
 
-                                        <td style={{ padding: "16px 20px", textAlign: "center" }}>
-                                            <button
-                                                className="btn btn-sm"
-                                                onClick={() => handleEdit(item)}
-                                                style={{
-                                                    background: "transparent",
-                                                    color: "#0E5A5B",
-                                                    border: "1px solid #0E5A5B",
-                                                    borderRadius: "0px",
-                                                    fontSize: "11px",
-                                                    letterSpacing: "1px",
-                                                    textTransform: "uppercase",
-                                                    padding: "6px 14px",
-                                                    marginRight: "8px",
-                                                    fontWeight: "600",
-                                                    cursor: "pointer"
-                                                }}
-                                            >
-                                                Edit
-                                            </button>
-
-                                            <button
-                                                className="btn btn-sm"
-                                                onClick={() => handleDelete(item.id)}
-                                                style={{
-                                                    background: "transparent",
-                                                    color: "#FF8E8E",
-                                                    border: "1px solid #FF8E8E",
-                                                    borderRadius: "0px",
-                                                    fontSize: "11px",
-                                                    letterSpacing: "1px",
-                                                    textTransform: "uppercase",
-                                                    padding: "6px 14px",
-                                                    fontWeight: "600",
-                                                    cursor: "pointer"
-                                                }}
-                                            >
-                                                Delete
-                                            </button>
+                            <tbody>
+                                {items.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="5" style={{ padding: "30px", textAlign: "center", color: "rgba(31,31,31,0.5)", fontStyle: "italic" }}>
+                                            No linked data available in database.
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                ) : (
+                                    items.map(item => (
+                                        <tr key={item.id} style={{ borderBottom: "1px solid #E6E0D8" }}>
+                                            <td style={{ padding: "16px 20px", fontWeight: "600", color: "#0E5A5B" }}>#{item.id}</td>
+                                            <td style={{ padding: "16px 20px", fontFamily: "Georgia, serif", fontSize: "15px", fontWeight: "600", color: "#2B1A4A" }}>
+                                                {item.bouquetName || item.bouquet?.emertimi || item.bouquet?.name || item.buqeta?.emertimi || "Unknown Bouquet"}
+                                            </td>
+                                            <td style={{ padding: "16px 20px", color: "#4A4A4A", fontWeight: "500" }}>
+                                                {item.flowerName || item.flower?.emertimi || item.flower?.name || item.lulja?.emertimi || "Unknown Flower"}
+                                            </td>
+                                            <td style={{ padding: "16px 20px" }}>
+                                                <span style={{ background: "#FAF8F5", color: "#1F1F1F", padding: "4px 10px", fontSize: "12px", fontWeight: "700", border: "1px solid #E6E0D8" }}>
+                                                    {item.quantity} Stems
+                                                </span>
+                                            </td>
 
+                                            <td style={{ padding: "16px 20px", textAlign: "center" }}>
+                                                <button
+                                                    onClick={() => handleEdit(item)}
+                                                    style={{
+                                                        background: "transparent",
+                                                        color: "#0E5A5B",
+                                                        border: "1px solid #0E5A5B",
+                                                        borderRadius: "0px",
+                                                        fontSize: "11px",
+                                                        letterSpacing: "1px",
+                                                        textTransform: "uppercase",
+                                                        padding: "6px 14px",
+                                                        marginRight: "8px",
+                                                        fontWeight: "600",
+                                                        cursor: "pointer"
+                                                    }}
+                                                >
+                                                    Edit
+                                                </button>
+
+                                                <button
+                                                    onClick={() => handleDelete(item.id)}
+                                                    style={{
+                                                        background: "transparent",
+                                                        color: "#FF8E8E",
+                                                        border: "1px solid #FF8E8E",
+                                                        borderRadius: "0px",
+                                                        fontSize: "11px",
+                                                        letterSpacing: "1px",
+                                                        textTransform: "uppercase",
+                                                        padding: "6px 14px",
+                                                        fontWeight: "600",
+                                                        cursor: "pointer"
+                                                    }}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
         </div>
     );

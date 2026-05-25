@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "react";
 
 const API_URL = "http://localhost:8080/api/supply-orders";
 
@@ -43,12 +43,12 @@ const SupplyOrdersCRUD = () => {
         e.preventDefault();
         setError("");
 
-        // Konstruktimi i payload-it me parsers numerikë për Spring Boot
+        // Konstruktimi i saktë i payload-it për të parandaluar gabimet 400 Bad Request në Spring Boot
         const payload = {
             id: form.id,
-            supplierId: parseInt(form.supplierId),
-            flowerId: parseInt(form.flowerId),
-            quantity: parseInt(form.quantity),
+            supplierId: parseInt(form.supplierId, 10),
+            flowerId: parseInt(form.flowerId, 10),
+            quantity: parseInt(form.quantity, 10),
             status: form.status
         };
 
@@ -61,16 +61,17 @@ const SupplyOrdersCRUD = () => {
             setForm(initialState);
             fetchData();
         } catch (err) {
-            setError("Failed to commit supply order data properties.");
+            setError("Failed to commit supply order data properties. Check if IDs exist in Database.");
             console.error(err);
         }
     };
 
     const handleEdit = (item) => {
+        // Nxirret ID-ja e saktë qoftë nëse vjen si numër, qoftë si objekt i plotë nga Hibernate
         setForm({
             id: item.id,
-            supplierId: item.supplierId || item.supplier?.id || "",
-            flowerId: item.flowerId || item.flower?.id || "",
+            supplierId: item.supplierId || (item.supplier && item.supplier.id) || "",
+            flowerId: item.flowerId || (item.flower && item.flower.id) || "",
             quantity: item.quantity || "",
             status: item.status || "PENDING"
         });
@@ -90,25 +91,13 @@ const SupplyOrdersCRUD = () => {
     };
 
     return (
-        <div 
-            style={{ 
-                background: "#FAF8F5", 
-                minHeight: "100vh", 
-                padding: "40px 6%", 
-                fontFamily: "system-ui, -apple-system, sans-serif",
-                color: "#1F1F1F"
-            }}
-        >
+        <div style={{ background: "#FAF8F5", minHeight: "100vh", padding: "40px 6%", fontFamily: "system-ui, -apple-system, sans-serif", color: "#1F1F1F" }}>
             <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
                 
                 {/* HEADER */}
                 <div style={{ borderBottom: "1px solid #E6E0D8", paddingBottom: "20px", marginBottom: "40px" }}>
-                    <span style={{ fontSize: "11px", letterSpacing: "3px", color: "#0E5A5B", textTransform: "uppercase", fontWeight: "600" }}>
-                        Procurement Logistics
-                    </span>
-                    <h2 style={{ fontFamily: "Georgia, serif", fontSize: "32px", fontWeight: "400", marginTop: "6px", color: "#2B1A4A" }}>
-                        Supply Orders Management
-                    </h2>
+                    <span style={{ fontSize: "11px", letterSpacing: "3px", color: "#0E5A5B", textTransform: "uppercase", fontWeight: "600" }}>Procurement Logistics</span>
+                    <h2 style={{ fontFamily: "Georgia, serif", fontSize: "32px", fontWeight: "400", marginTop: "6px", color: "#2B1A4A" }}>Supply Orders Management</h2>
                 </div>
 
                 {/* ERROR ALERT BOX */}
@@ -159,16 +148,13 @@ const SupplyOrdersCRUD = () => {
 
                         <div style={{ marginTop: "20px" }}>
                             <button type="submit" 
-                                style={{ background: "#0E5A5B", color: "#FFFFFF", border: "none", padding: "12px 30px", fontSize: "12px", fontWeight: "600", letterSpacing: "2px", textTransform: "uppercase", borderRadius: "0px", cursor: "pointer", marginRight: "12px", transition: "background 0.15s" }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = "#2B1A4A"} onMouseLeave={(e) => e.currentTarget.style.background = "#0E5A5B"}>
+                                style={{ background: "#0E5A5B", color: "#FFFFFF", border: "none", padding: "12px 30px", fontSize: "12px", fontWeight: "600", letterSpacing: "2px", textTransform: "uppercase", borderRadius: "0px", cursor: "pointer", marginRight: "12px" }}>
                                 {form.id ? "Update Request" : "Commit Supply Request"}
                             </button>
 
                             {form.id && (
                                 <button type="button" onClick={() => setForm(initialState)}
-                                    style={{ background: "transparent", color: "#1F1F1F", border: "1px solid #C4B9AF", padding: "11px 24px", fontSize: "12px", fontWeight: "600", letterSpacing: "2px", textTransform: "uppercase", borderRadius: "0px", cursor: "pointer", transition: "all 0.15s" }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#1F1F1F"; e.currentTarget.style.background = "rgba(0,0,0,0.02)"; }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#C4B9AF"; e.currentTarget.style.background = "transparent"; }}>
+                                    style={{ background: "transparent", color: "#1F1F1F", border: "1px solid #C4B9AF", padding: "11px 24px", fontSize: "12px", fontWeight: "600", letterSpacing: "2px", textTransform: "uppercase", borderRadius: "0px", cursor: "pointer" }}>
                                     Cancel
                                 </button>
                             )}
@@ -195,9 +181,7 @@ const SupplyOrdersCRUD = () => {
                             <tbody>
                                 {data.length === 0 ? (
                                     <tr>
-                                        <td colSpan="6" style={{ padding: "30px", textAlign: "center", color: "rgba(31,31,31,0.5)", fontStyle: "italic" }}>
-                                            No registered supply orders documented.
-                                        </td>
+                                        <td colSpan="6" style={{ padding: "30px", textAlign: "center", color: "rgba(31,31,31,0.5)", fontStyle: "italic" }}>No registered supply orders documented.</td>
                                     </tr>
                                 ) : (
                                     data.map((x) => {
@@ -210,26 +194,18 @@ const SupplyOrdersCRUD = () => {
                                             <tr key={x.id} style={{ borderBottom: "1px solid #E6E0D8" }}>
                                                 <td style={{ padding: "16px 20px", fontWeight: "600", color: "#0E5A5B" }}>#{x.id}</td>
                                                 <td style={{ padding: "16px 20px", fontWeight: "500" }}>
-                                                    {x.supplierName || x.supplier?.emertimi || `Supplier ID: #${x.supplierId}`}
+                                                    {x.supplier?.emertimi || x.supplierName || `Supplier ID: #${x.supplierId || (x.supplier && x.supplier.id)}`}
                                                 </td>
                                                 <td style={{ padding: "16px 20px", fontFamily: "Georgia, serif", fontSize: "15px" }}>
-                                                    {x.flowerName || x.flower?.emertimi || `Flower ID: #${x.flowerId}`}
+                                                    {x.flower?.emertimi || x.flowerName || `Flower ID: #${x.flowerId || (x.flower && x.flower.id)}`}
                                                 </td>
                                                 <td style={{ padding: "16px 20px", fontWeight: "600" }}>{x.quantity} units</td>
                                                 <td style={{ padding: "16px 20px" }}>
-                                                    <span style={{ background: statusBg, color: statusColor, padding: "4px 10px", fontSize: "11px", fontWeight: "700", letterSpacing: "1px" }}>
-                                                        {x.status}
-                                                    </span>
+                                                    <span style={{ background: statusBg, color: statusColor, padding: "4px 10px", fontSize: "11px", fontWeight: "700", letterSpacing: "1px" }}>{x.status}</span>
                                                 </td>
                                                 <td style={{ padding: "16px 20px", textAlign: "center" }}>
-                                                    <button onClick={() => handleEdit(x)}
-                                                        style={{ background: "transparent", color: "#0E5A5B", border: "1px solid #0E5A5B", borderRadius: "0px", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase", padding: "6px 14px", marginRight: "8px", fontWeight: "600", cursor: "pointer" }}>
-                                                        Edit
-                                                    </button>
-                                                    <button onClick={() => handleDelete(x.id)}
-                                                        style={{ background: "transparent", color: "#FF8E8E", border: "1px solid #FF8E8E", borderRadius: "0px", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase", padding: "6px 14px", fontWeight: "600", cursor: "pointer" }}>
-                                                        Delete
-                                                    </button>
+                                                    <button onClick={() => handleEdit(x)} style={{ background: "transparent", color: "#0E5A5B", border: "1px solid #0E5A5B", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase", padding: "6px 14px", marginRight: "8px", fontWeight: "600", cursor: "pointer" }}>Edit</button>
+                                                    <button onClick={() => handleDelete(x.id)} style={{ background: "transparent", color: "#FF8E8E", border: "1px solid #FF8E8E", fontSize: "11px", letterSpacing: "1px", textTransform: "uppercase", padding: "6px 14px", fontWeight: "600", cursor: "pointer" }}>Delete</button>
                                                 </td>
                                             </tr>
                                         );
@@ -239,7 +215,6 @@ const SupplyOrdersCRUD = () => {
                         </table>
                     </div>
                 )}
-
             </div>
         </div>
     );

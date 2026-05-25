@@ -1,12 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext.jsx";
 
 const Homepage = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [zipCode, setZipCode] = useState("");
   const [occasion, setOccasion] = useState("Birthday");
-  
-const isAdmin = localStorage.getItem("role") === "ADMIN";
+  const { addToCart } = useCart();
+  const isAdmin = localStorage.getItem("role") === "ADMIN";
+
+  // --- SHTETET E REJA PËR POP-UP ---
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [showPopup, setShowPopup] = useState(false);
+
+  // --- SHTETET PËR REVIEW ---
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [newReview, setNewReview] = useState({ customerId: "", comment: "" });
 
   useEffect(() => {
     setIsVisible(true);
@@ -24,216 +34,190 @@ const isAdmin = localStorage.getItem("role") === "ADMIN";
   ];
 
   const deals = [
-    { title: "DEAL OF THE WEEK", label: "UP TO 40% OFF", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400" },
-    { title: "OUR BEST VALUE", label: "May Bouquet of the Month", img: "https://images.unsplash.com/photo-1561181286-d3fee7d55364?q=80&w=400" },
-    { title: "PLANT & GARDEN SALE", label: "UP TO 30% OFF", img: "https://images.unsplash.com/photo-1597848212624-a19eb35e2651?q=80&w=400" },
-    { title: "THE BIG DISNEY SALE", label: "Up to 40% Off Disney", img: "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=400" }
+    { id: 1, title: "DEAL OF THE WEEK", label: "UP TO 40% OFF", price: 39.99, img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400" },
+    { id: 2, title: "OUR BEST VALUE", label: "May Bouquet of the Month", price: 49.99, img: "https://images.unsplash.com/photo-1561181286-d3fee7d55364?q=80&w=400" },
+    { id: 3, title: "PLANT & GARDEN SALE", label: "UP TO 30% OFF", price: 29.99, img: "https://images.unsplash.com/photo-1597848212624-a19eb35e2651?q=80&w=400" },
+    { id: 4, title: "THE BIG DISNEY SALE", label: "Up to 40% Off Disney", price: 59.99, img: "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=400" }
   ];
 
   const testimonials = [
     { name: "Pamela", title: "Beautiful", text: "\"I bought these for my Nana's birthday she said they were amazingly beautiful!\"" },
     { name: "Michelle", title: "Best Flowers", text: "\"These flowers are beautiful and just as vibrant as the picture. One of the most beautiful bouquets!\"" },
     { name: "Betty", title: "Very Happy!", text: "\"I love how the recipient can plant the roses and enjoy them for a long time. Smells great!\"" },
-    { name: "Brian", title: "Sweet Anniversary", text: "\"The strawberries arrived on time and were fantastic as always. Definitely made it sweeter!\"" }
+    { name: "Brian", title: "Sweet Anniversary", text: "\"The strawberries arrived on time and were fantastic as always. The chocolate coating made it sweeter!\"" }
   ];
 
   const handleSearchGift = (e) => {
     e.preventDefault();
-    console.log(`Searching gifts for: ${occasion} in ZIP: ${zipCode}`);
+  };
+
+  const openQuantityPopup = (product) => {
+    setSelectedProduct(product);
+    setQuantity(1);
+    setShowPopup(true);
+  };
+
+  const handleConfirmAdd = () => {
+    for (let i = 0; i < quantity; i++) {
+      addToCart(selectedProduct);
+    }
+    setShowPopup(false);
   };
 
   return (
-    <div
-      style={{
-        fontFamily: "system-ui, -apple-system, sans-serif",
-        background: "#FAF8F5",
-        color: "#1F1F1F",
-        minHeight: "100vh",
-        width: "100vw",
-        marginLeft: "calc(-50vw + 50%)",
-        marginRight: "calc(-50vw + 50%)",
-        boxSizing: "border-box",
-        padding: 0,
-        overflowX: "hidden",
-        opacity: isVisible ? 1 : 0,
-        transition: "opacity 0.4s ease-out"
-      }}
-    >
-      {/* 1. TOP BANNER STRIP */}
-      <div
-        style={{
-          background: "#110D1A",
-          color: "#FAF8F5",
-          fontSize: "11px",
-          letterSpacing: "2px",
-          padding: "12px 0",
-          textAlign: "center",
-          textTransform: "uppercase",
-          width: "100%"
-        }}
-      >
-        Same-Day Delivery Available • Freshness Guaranteed • Premium Quality Standards
+    <div style={{ fontFamily: "system-ui, sans-serif", background: "#FAF8F5", color: "#1F1F1F", minHeight: "100vh", width: "100%", overflowX: "hidden", opacity: isVisible ? 1 : 0, transition: "opacity 0.4s ease-out", position: "relative" }}>
+      
+      {/* TOP BANNER STRIP */}
+      <div style={{ background: "#110D1A", color: "#FAF8F5", fontSize: "11px", letterSpacing: "2px", padding: "12px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+        <div style={{ flex: 1, textAlign: "center", textTransform: "uppercase" }}>
+          Same-Day Delivery Available • Freshness Guaranteed • Premium Quality Standards
+        </div>
+        {isAdmin && (
+          <Link to="/admin/dashboard" style={{ textDecoration: "none" }}>
+            <button style={{ background: "#0E5A5B", color: "white", padding: "6px 14px", border: "none", cursor: "pointer", fontSize: "11px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", borderRadius: "2px", transition: "background 0.2s" }}>
+              Admin Dashboard
+            </button>
+          </Link>
+        )}
       </div>
 
-      {/* ADMIN CONSOLE ROUTING BAR */}
-      {isAdmin && (
-  <Link to="/admin/dashboard">
-    <button style={{
-      position: "fixed",
-      top: "20px",
-      right: "20px",
-      background: "#2B1A4A",
-      color: "white",
-      padding: "10px 16px",
-      border: "none",
-      zIndex: 9999
-    }}>
-      Admin Dashboard
-    </button>
-  </Link>
-)}
-
-      {/* 2. NAVIGATION BAR SYSTEM */}
-      <div
-        style={{
-          display: "flex",
-          gap: "32px",
-          justifyContent: "center",
-          padding: "16px 0",
-          borderBottom: "1px solid #E6E0D8",
-          background: "#FFFFFF",
-          width: "100%"
-        }}
-      >
+      {/* QUICK SHOP QUICK NAV */}
+      <div style={{ display: "flex", gap: "32px", justifyContent: "center", padding: "16px 0", borderBottom: "1px solid #E6E0D8", background: "#FFFFFF" }}>
         {quickShop.map((item) => (
-          <div
-            key={item}
-            style={{
-              fontSize: "13px",
-              fontWeight: "500",
-              letterSpacing: "0.5px",
-              color: "rgba(31,31,31,0.75)",
-              cursor: "pointer",
-              transition: "color 0.15s ease"
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#0E5A5B")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(31,31,31,0.75)")}
-          >
-            {item}
-          </div>
+          <div key={item} style={{ fontSize: "13px", fontWeight: "500", color: "rgba(31,31,31,0.75)", cursor: "pointer" }}>{item}</div>
         ))}
       </div>
 
-      {/* 3. SEARCH UTILITY WIDGET */}
-      <div
-        style={{
-          background: "#0E5A5B", 
-          color: "#FFFFFF",
-          padding: "24px 0",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: "24px",
-          width: "100%",
-          flexWrap: "wrap"
-        }}
-      >
-        <div style={{ fontSize: "20px", fontWeight: "500", letterSpacing: "0.5px" }}>
-          Find the Perfect Gift
-        </div>
-        <form onSubmit={handleSearchGift} style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
-          <input
-            type="text"
-            placeholder="Delivery ZIP Code"
-            value={zipCode}
-            onChange={(e) => setZipCode(e.target.value)}
-            style={{ padding: "10px 16px", border: "1px solid #FFFFFF", fontSize: "14px", width: "180px", outline: "none" }}
-          />
-          <select
-            value={occasion}
-            onChange={(e) => setOccasion(e.target.value)}
-            style={{ padding: "10px 16px", border: "1px solid #FFFFFF", fontSize: "14px", background: "#FFFFFF", color: "#1F1F1F", width: "180px", outline: "none", cursor: "pointer" }}
-          >
+      {/* SEARCH UTILITY WIDGET */}
+      <div style={{ background: "#0E5A5B", color: "#FFFFFF", padding: "24px 0", display: "flex", justifyContent: "center", alignItems: "center", gap: "24px", flexWrap: "wrap" }}>
+        <div style={{ fontSize: "20px", fontWeight: "500" }}>Find the Perfect Gift</div>
+        <form onSubmit={handleSearchGift} style={{ display: "flex", gap: "12px" }}>
+          <input type="text" placeholder="Delivery ZIP Code" value={zipCode} onChange={(e) => setZipCode(e.target.value)} style={{ padding: "10px 16px", border: "1px solid #FFFFFF" }} />
+          <select value={occasion} onChange={(e) => setOccasion(e.target.value)} style={{ padding: "10px 16px", background: "#FFFFFF" }}>
             <option value="Birthday">Birthday</option>
             <option value="Anniversary">Anniversary</option>
-            <option value="Sympathy">Sympathy</option>
-            <option value="Just Because">Just Because</option>
           </select>
-          <button
-            type="submit"
-            style={{ background: "#110D1A", color: "#FFFFFF", border: "none", padding: "11px 28px", fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", cursor: "pointer", transition: "background 0.15s" }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "#2B1A4A"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "#110D1A"}
-          >
-            Search Catalogue
-          </button>
+          <button type="submit" style={{ background: "#110D1A", color: "#FFFFFF", border: "none", padding: "11px 28px" }}>Search</button>
         </form>
       </div>
 
-      {/* 4. MAIN HERO SELECTION */}
-      <section style={{ display: "flex", background: "#F5F0EB", alignItems: "center", width: "100%", flexWrap: "wrap" }}>
-        <div style={{ flex: "1 1 50%", minWidth: "300px" }}>
-          <img src="https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=900" alt="Summer Collection" style={{ width: "100%", height: "460px", objectFit: "cover", display: "block" }} />
-        </div>
+      {/* HERO */}
+      <section style={{ display: "flex", background: "#F5F0EB", alignItems: "center", flexWrap: "wrap" }}>
+        <div style={{ flex: "1 1 50%" }}><img src="https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=900" alt="Summer" style={{ width: "100%", height: "460px", objectFit: "cover" }} /></div>
         <div style={{ flex: "1 1 50%", padding: "60px 5%", textAlign: "center" }}>
-          <div style={{ fontFamily: "Georgia, serif", fontSize: "32px", color: "#110D1A", marginBottom: "8px" }}>Summer In Bloom Sale</div>
-          <div style={{ fontFamily: "Georgia, serif", fontSize: "64px", fontWeight: "700", color: "#110D1A", margin: "0 0 16px 0" }}>Save 20%</div>
-          <p style={{ fontSize: "16px", color: "#555555", marginBottom: "28px" }}>Curated seasonal arrangements with premium floral selections.</p>
-          <Link to="/" style={{ fontSize: "13px", fontWeight: "600", color: "#110D1A", textDecoration: "none", letterSpacing: "1px", textTransform: "uppercase", borderBottom: "2px solid #110D1A", paddingBottom: "4px" }}>
-            Explore Collection
-          </Link>
+          <div style={{ fontFamily: "Georgia, serif", fontSize: "32px" }}>Summer In Bloom Sale</div>
+          <div style={{ fontFamily: "Georgia, serif", fontSize: "64px", fontWeight: "700" }}>Save 20%</div>
         </div>
       </section>
 
-      {/* 5. DIRECTORY CATEGORIES */}
-      <section style={{ padding: "50px 6%", textAlign: "center", background: "#FFFFFF", width: "100%", boxSizing: "border-box" }}>
-        <div style={{ display: "flex", gap: "40px", justifyContent: "center", overflowX: "auto", paddingBottom: "10px" }}>
+      {/* CATEGORIES */}
+      <section style={{ padding: "50px 6%", textAlign: "center", background: "#FFFFFF" }}>
+        <div style={{ display: "flex", gap: "40px", justifyContent: "center", overflowX: "auto" }}>
           {circularCategories.map((cat) => (
-            <div key={cat.name} style={{ flex: "0 0 130px", textAlign: "center", cursor: "pointer" }}>
-              <div style={{ width: "120px", height: "120px", borderRadius: "50%", overflow: "hidden", border: "1px solid #E6E0D8", marginBottom: "12px", margin: "0 auto 12px auto" }}>
-                <img src={cat.img} alt={cat.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              </div>
-              <div style={{ fontSize: "13px", fontWeight: "600", color: "#110D1A" }}>{cat.name}</div>
+            <div key={cat.name} style={{ flex: "0 0 130px" }}>
+              <div style={{ width: "120px", height: "120px", borderRadius: "50%", overflow: "hidden", margin: "0 auto 12px auto" }}><img src={cat.img} alt={cat.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+              <div style={{ fontSize: "13px", fontWeight: "600" }}>{cat.name}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 6. GRID SYSTEMS: SEASON DEALS */}
-      <section style={{ padding: "60px 6%", background: "#FAF8F5", width: "100%", boxSizing: "border-box" }}>
+      {/* PRODUCT GRID SECTION */}
+      <section style={{ padding: "60px 6%", background: "#FAF8F5" }}>
         <h2 style={{ fontFamily: "Georgia, serif", fontSize: "28px", textAlign: "center", marginBottom: "40px", fontWeight: "500", color: "#110D1A" }}>Seasonal Pricing Tiers</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "24px", maxWidth: "1300px", margin: "0 auto" }}>
-          {deals.map((deal, idx) => (
-            <div key={idx} style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", borderRadius: "0px", overflow: "hidden", textAlign: "center", cursor: "pointer" }}>
+          {deals.map((deal) => (
+            <div key={deal.id} style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", textAlign: "center" }}>
               <div style={{ padding: "20px 14px" }}>
                 <div style={{ fontSize: "11px", fontWeight: "600", letterSpacing: "1px", color: "#888888", marginBottom: "4px" }}>{deal.title}</div>
                 <div style={{ fontFamily: "Georgia, serif", fontSize: "20px", fontWeight: "600", color: "#0E5A5B", marginBottom: "12px" }}>{deal.label}</div>
               </div>
-              <div style={{ height: "240px", overflow: "hidden" }}>
-                <img src={deal.img} alt={deal.title} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.25s ease-out" }} onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.02)"} onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}/>
+              <div style={{ height: "240px", overflow: "hidden" }}><img src={deal.img} alt={deal.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+              <div style={{ padding: "20px" }}>
+                <div style={{ marginBottom: "10px", fontWeight: "600" }}>${deal.price}</div>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openQuantityPopup(deal);
+                  }}
+                  style={{ background: "#2B1A4A", color: "white", border: "none", padding: "10px 18px", cursor: "pointer", width: "100%", fontSize: "12px", textTransform: "uppercase", letterSpacing: "1px" }}
+                >
+                  Add To Cart
+                </button>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 7. REVIEWS & TESTIMONIALS DATA */}
-      <section style={{ padding: "60px 6%", background: "#FFFFFF", borderTop: "1px solid #E6E0D8", width: "100%", boxSizing: "border-box" }}>
-        <h2 style={{ fontFamily: "Georgia, serif", fontSize: "26px", textAlign: "center", marginBottom: "40px", fontWeight: "500", color: "#110D1A" }}>Verified Client Feedback</h2>
+      {/* REVIEWS / TESTIMONIALS */}
+      <section style={{ padding: "60px 6%", background: "#FFFFFF", borderTop: "1px solid #E6E0D8", textAlign: "center" }}>
+        <h2 style={{ fontFamily: "Georgia, serif", fontSize: "28px", marginBottom: "40px", fontWeight: "500", color: "#110D1A" }}>
+          Verified Client Feedback
+        </h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "40px", maxWidth: "1300px", margin: "0 auto" }}>
           {testimonials.map((t, idx) => (
             <div key={idx} style={{ textAlign: "center", padding: "0 10px" }}>
-              <div style={{ fontSize: "15px", fontWeight: "700", color: "#110D1A", marginBottom: "8px" }}>{t.title}</div>
-              <p style={{ fontSize: "14px", color: "#555555", lineHeight: "1.6", fontStyle: "italic", minHeight: "70px", margin: 0 }}>{t.text}</p>
-              <div style={{ fontSize: "12px", fontWeight: "600", marginTop: "14px", color: "#888888", textTransform: "uppercase", letterSpacing: "0.5px" }}>— {t.name}</div>
+              <div style={{ fontSize: "15px", fontWeight: "700", color: "#110D1A", marginBottom: "10px" }}>
+                {t.title}
+              </div>
+              <p style={{ fontSize: "14px", color: "#555555", fontStyle: "italic", lineHeight: "1.6", margin: "0 0 8px 0" }}>
+                {t.text}
+              </p>
             </div>
           ))}
         </div>
+        
+        {/* BUTONI SHTESË */}
+        <button onClick={() => setShowReviewModal(true)} style={{ marginTop: "30px", background: "#0E5A5B", color: "white", border: "none", padding: "10px 20px", cursor: "pointer" }}>
+          Leave A Review
+        </button>
       </section>
 
-      {/* ACTION INTERACTION FIXED TRIGGER */}
-      <div style={{ position: "fixed", bottom: "24px", right: "24px", background: "#110D1A", color: "#FAF8F5", padding: "12px 24px", borderRadius: "0px", fontSize: "11px", fontWeight: "600", letterSpacing: "1px", textTransform: "uppercase", cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", zIndex: 2000 }}>
-        Checkout Process
+      {/* QUANTITY POPUP */}
+      {showPopup && selectedProduct && (
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(17, 13, 26, 0.6)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999, backdropFilter: "blur(4px)" }}>
+          <div style={{ background: "#FFFFFF", padding: "30px", maxWidth: "400px", width: "90%", textAlign: "center", border: "1px solid #E6E0D8", boxShadow: "0 10px 25px rgba(0,0,0,0.2)" }}>
+            <h3 style={{ fontFamily: "Georgia, serif", color: "#2B1A4A", margin: "0 0 10px 0" }}>Zgjedh Sasinë</h3>
+            <p style={{ fontSize: "14px", color: "#555555", marginBottom: "20px" }}>Sa paketa të <strong>{selectedProduct.label}</strong> dëshironi të shtoni në shportë?</p>
+            
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "15px", marginBottom: "25px" }}>
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} style={{ background: "#E6E0D8", border: "none", width: "35px", height: "35px", fontSize: "20px", cursor: "pointer", fontWeight: "bold" }}>-</button>
+              <span style={{ fontSize: "18px", fontWeight: "600", width: "30px" }}>{quantity}</span>
+              <button onClick={() => setQuantity(quantity + 1)} style={{ background: "#E6E0D8", border: "none", width: "35px", height: "35px", fontSize: "20px", cursor: "pointer", fontWeight: "bold" }}>+</button>
+            </div>
+
+            <div style={{ fontSize: "16px", fontWeight: "600", color: "#0E5A5B", marginBottom: "20px" }}>
+              Preçi Total: ${(selectedProduct.price * quantity).toFixed(2)}
+            </div>
+
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button onClick={() => setShowPopup(false)} style={{ flex: 1, background: "transparent", border: "1px solid #777", padding: "10px", cursor: "pointer", fontSize: "12px", textTransform: "uppercase" }}>Anulo</button>
+              <button onClick={handleConfirmAdd} style={{ flex: 1, background: "#2B1A4A", color: "white", border: "none", padding: "10px", cursor: "pointer", fontSize: "12px", textTransform: "uppercase", fontWeight: "600" }}>Shto në Shportë</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* REVIEW MODAL SHTESË */}
+      {showReviewModal && (
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999, backdropFilter: "blur(4px)" }}>
+          <div style={{ background: "#FFF", padding: "40px", width: "350px", borderRadius: "8px", boxShadow: "0 10px 30px rgba(0,0,0,0.2)" }}>
+            <h3 style={{ fontFamily: "Georgia, serif", color: "#2B1A4A", fontSize: "22px", marginBottom: "20px" }}>Lini Vlerësimin</h3>
+            <input placeholder="Emri" style={{ width: "100%", padding: "12px", marginBottom: "15px", border: "1px solid #ccc", borderRadius: "4px" }} onChange={(e) => setNewReview({...newReview, customerId: e.target.value})} />
+            <textarea placeholder="Komentoni këtu..." style={{ width: "100%", padding: "12px", height: "100px", marginBottom: "20px", border: "1px solid #ccc", borderRadius: "4px" }} onChange={(e) => setNewReview({...newReview, comment: e.target.value})} />
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button onClick={() => setShowReviewModal(false)} style={{ flex: 1, padding: "12px", background: "transparent", border: "1px solid #333", cursor: "pointer" }}>Anulo</button>
+              <button onClick={() => { setShowReviewModal(false); alert("Faleminderit!"); }} style={{ flex: 1, padding: "12px", background: "#0E5A5B", color: "#FFF", border: "none", cursor: "pointer" }}>Dërgo</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Butoni i Review */}
+      <div style={{ textAlign: "center", paddingBottom: "50px" }}>
+        <button onClick={() => setShowReviewModal(true)} style={{ background: "#0E5A5B", color: "white", padding: "12px 25px", border: "none", cursor: "pointer" }}>Leave A Review</button>
       </div>
     </div>
   );
