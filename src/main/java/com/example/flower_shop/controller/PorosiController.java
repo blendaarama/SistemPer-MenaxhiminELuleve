@@ -65,4 +65,11 @@ public class PorosiController {
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }
+
+    // SEARCH ENDPOINT
+    @GetMapping("/search")
+    public ResponseEntity<List<Porosi>> search(@RequestParam String query) {
+        List<Porosi> results = service.searchByQuery(query);
+        return ResponseEntity.ok(results);
+    }
 }

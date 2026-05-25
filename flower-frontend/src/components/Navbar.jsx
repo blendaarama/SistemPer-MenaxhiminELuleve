@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useCart } from "../context/CartContext.jsx";
+
 const Navbar = () => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
@@ -10,17 +11,16 @@ const Navbar = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (!search.trim()) return;
+    // Navigimi te faqja e rezultateve me parametrin e kërkimit
     navigate(`/search?query=${encodeURIComponent(search)}`);
   };
 
   const handleLogout = () => {
-
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('userEmail');
-  localStorage.removeItem('role');
-
-  navigate('/login');
-};
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('role');
+    navigate('/login');
+  };
 
   return (
     <nav
@@ -63,7 +63,7 @@ const Navbar = () => {
 
         <div className="collapse navbar-collapse" id="nav">
           
-          {/* SEARCH BAR */}
+          {/* SEARCH BAR - I FUNKSIONALIZUAR */}
           <div className="mx-auto my-3 my-xl-0 d-flex justify-content-center" style={{ width: "100%", maxWidth: "550px" }}>
             <form onSubmit={handleSearch} className="d-flex w-100" style={{ position: "relative" }}>
               <input
@@ -141,16 +141,16 @@ const Navbar = () => {
             )}
 
            <Link
-  className="d-flex flex-column align-items-center text-decoration-none"
-  to="/order"
-  style={{ color: "#1F1F1F", transition: "color 0.2s" }}
-  onMouseEnter={(e) => e.currentTarget.style.color = "#0E5A5B"}
-  onMouseLeave={(e) => e.currentTarget.style.color = "#1F1F1F"}
->
-  <span style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px" }}>
-    Cart ({cartItems.length})
-  </span>
-</Link>
+              className="d-flex flex-column align-items-center text-decoration-none"
+              to="/order"
+              style={{ color: "#1F1F1F", transition: "color 0.2s" }}
+              onMouseEnter={(e) => e.currentTarget.style.color = "#0E5A5B"}
+              onMouseLeave={(e) => e.currentTarget.style.color = "#1F1F1F"}
+            >
+              <span style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px" }}>
+                Cart ({cartItems.length})
+              </span>
+            </Link>
 
           </div>
         </div>

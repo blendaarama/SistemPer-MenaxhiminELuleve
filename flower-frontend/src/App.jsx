@@ -6,8 +6,8 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Navbar from "./components/Navbar";
 import FlowerStore from "./components/FlowerStore";
-import OrderCRUD from "./components/OrderCRUD"; // Qendra menaxhuese e Adminit
-
+import OrderCRUD from "./components/OrderCRUD"; 
+import SearchResults from "./pages/SearchResults"; 
 // ADMIN
 import AdminDashboard from "./components/AdminDashboard";
 
@@ -254,7 +254,7 @@ function AppContent() {
           <Route path="/reviews" element={<PrivateRoute adminOnly={true}><ReviewsCRUD /></PrivateRoute>} />
           <Route path="/categories" element={<PrivateRoute adminOnly={true}><CategoriesCRUD /></PrivateRoute>} />
           <Route path="/inventory" element={<PrivateRoute adminOnly={true}><InventoryCRUD /></PrivateRoute>} />
-          
+          <Route path="/search" element={<SearchResults />} />
           {/* Rruga kryesore e integrimit të panelit kontrollues */}
           <Route path="/admin/orders-registry" element={<PrivateRoute adminOnly={true}><OrderCRUD /></PrivateRoute>} />
 
