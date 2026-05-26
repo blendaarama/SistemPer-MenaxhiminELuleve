@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
+import axios from "axios"; // E shtuar
 
 const Homepage = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -9,7 +10,8 @@ const Homepage = () => {
   const { addToCart } = useCart();
   const isAdmin = localStorage.getItem("role") === "ADMIN";
 
-  // --- SHTETET E REJA PËR POP-UP ---
+  // --- SHTETET PËR PRODUKTET DHE POP-UP ---
+  const [deals, setDeals] = useState([]); // E ndryshuar nga konstante në state
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [showPopup, setShowPopup] = useState(false);
@@ -20,6 +22,10 @@ const Homepage = () => {
 
   useEffect(() => {
     setIsVisible(true);
+    // Marrja e të dhënave nga backend-i yt
+    axios.get("http://localhost:8080/api/products/all")
+      .then(res => setDeals(res.data))
+      .catch(err => console.error("Gabim në lidhje me backend:", err));
   }, []);
 
   const quickShop = ["Birthday", "Anniversary", "Romance", "Sympathy", "Same Day", "Best Sellers"];
@@ -31,13 +37,6 @@ const Homepage = () => {
     { name: "Flowers", img: "https://images.unsplash.com/photo-1520763185298-1b434c919102?q=80&w=300" },
     { name: "Plants", img: "https://images.unsplash.com/photo-1463936575829-25148e1db1b8?q=80&w=300" },
     { name: "Gifts", img: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=300" }
-  ];
-
-  const deals = [
-    { id: 1, title: "DEAL OF THE WEEK", label: "UP TO 40% OFF", price: 39.99, img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400" },
-    { id: 2, title: "OUR BEST VALUE", label: "May Bouquet of the Month", price: 49.99, img: "https://images.unsplash.com/photo-1561181286-d3fee7d55364?q=80&w=400" },
-    { id: 3, title: "PLANT & GARDEN SALE", label: "UP TO 30% OFF", price: 29.99, img: "https://images.unsplash.com/photo-1597848212624-a19eb35e2651?q=80&w=400" },
-    { id: 4, title: "THE BIG DISNEY SALE", label: "Up to 40% Off Disney", price: 59.99, img: "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=400" }
   ];
 
   const testimonials = [
@@ -160,10 +159,10 @@ const Homepage = () => {
           {deals.map((deal) => (
             <div key={deal.id} style={{ background: "#FFFFFF", border: "1px solid #E6E0D8", textAlign: "center" }}>
               <div style={{ padding: "20px 14px" }}>
-                <div style={{ fontSize: "11px", fontWeight: "600", letterSpacing: "1px", color: "#888888", marginBottom: "4px" }}>{deal.title}</div>
-                <div style={{ fontFamily: "Georgia, serif", fontSize: "20px", fontWeight: "600", color: "#0E5A5B", marginBottom: "12px" }}>{deal.label}</div>
+                <div style={{ fontSize: "11px", fontWeight: "600", letterSpacing: "1px", color: "#888888", marginBottom: "4px" }}>{deal.name}</div>
+                <div style={{ fontFamily: "Georgia, serif", fontSize: "20px", fontWeight: "600", color: "#0E5A5B", marginBottom: "12px" }}>{deal.description}</div>
               </div>
-              <div style={{ height: "240px", overflow: "hidden" }}><img src={deal.img} alt={deal.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+              <div style={{ height: "240px", overflow: "hidden" }}><img src={deal.imageUrl} alt={deal.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
               <div style={{ padding: "20px" }}>
                 <div style={{ marginBottom: "10px", fontWeight: "600" }}>${deal.price}</div>
                 <button
@@ -199,8 +198,6 @@ const Homepage = () => {
             </div>
           ))}
         </div>
-        
-        {/* BUTONI I RREGULLUAR */}
         <button onClick={() => setShowReviewModal(true)} style={{ marginTop: "30px", background: "#0E5A5B", color: "white", border: "none", padding: "10px 20px", cursor: "pointer" }}>
           Leave A Review
         </button>
@@ -211,18 +208,15 @@ const Homepage = () => {
         <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(17, 13, 26, 0.6)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999, backdropFilter: "blur(4px)" }}>
           <div style={{ background: "#FFFFFF", padding: "30px", maxWidth: "400px", width: "90%", textAlign: "center", border: "1px solid #E6E0D8", boxShadow: "0 10px 25px rgba(0,0,0,0.2)" }}>
             <h3 style={{ fontFamily: "Georgia, serif", color: "#2B1A4A", margin: "0 0 10px 0" }}>Zgjedh Sasinë</h3>
-            <p style={{ fontSize: "14px", color: "#555555", marginBottom: "20px" }}>Sa paketa të <strong>{selectedProduct.label}</strong> dëshironi të shtoni në shportë?</p>
-            
+            <p style={{ fontSize: "14px", color: "#555555", marginBottom: "20px" }}>Sa paketa të <strong>{selectedProduct.name}</strong> dëshironi të shtoni?</p>
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "15px", marginBottom: "25px" }}>
               <button onClick={() => setQuantity(Math.max(1, quantity - 1))} style={{ background: "#E6E0D8", border: "none", width: "35px", height: "35px", fontSize: "20px", cursor: "pointer", fontWeight: "bold" }}>-</button>
               <span style={{ fontSize: "18px", fontWeight: "600", width: "30px" }}>{quantity}</span>
               <button onClick={() => setQuantity(quantity + 1)} style={{ background: "#E6E0D8", border: "none", width: "35px", height: "35px", fontSize: "20px", cursor: "pointer", fontWeight: "bold" }}>+</button>
             </div>
-
             <div style={{ fontSize: "16px", fontWeight: "600", color: "#0E5A5B", marginBottom: "20px" }}>
               Preçi Total: ${(selectedProduct.price * quantity).toFixed(2)}
             </div>
-
             <div style={{ display: "flex", gap: "10px" }}>
               <button onClick={() => setShowPopup(false)} style={{ flex: 1, background: "transparent", border: "1px solid #777", padding: "10px", cursor: "pointer", fontSize: "12px", textTransform: "uppercase" }}>Anulo</button>
               <button onClick={handleConfirmAdd} style={{ flex: 1, background: "#2B1A4A", color: "white", border: "none", padding: "10px", cursor: "pointer", fontSize: "12px", textTransform: "uppercase", fontWeight: "600" }}>Shto në Shportë</button>
@@ -243,12 +237,7 @@ const Homepage = () => {
               <button 
                 onClick={() => {
                   const existingReviews = JSON.parse(localStorage.getItem("reviews") || "[]");
-                  const newReviewEntry = { 
-                      id: Date.now(), 
-                      customerId: newReview.customerId || "Anonim", 
-                      comment: newReview.comment, 
-                      score: 5 
-                  };
+                  const newReviewEntry = { id: Date.now(), customerId: newReview.customerId || "Anonim", comment: newReview.comment, score: 5 };
                   localStorage.setItem("reviews", JSON.stringify([...existingReviews, newReviewEntry]));
                   setShowReviewModal(false);
                   alert("Faleminderit për vlerësimin!");

@@ -2,27 +2,25 @@ package com.example.flower_shop.config;
 
 import com.example.flower_shop.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-
+import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
 @Configuration
+@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -33,43 +31,36 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
-
-            .cors(cors ->
-                cors.configurationSource(corsConfigurationSource())
-            )
-
+            // Aktivizo CORS në nivel të Spring Security
+            .cors(Customizer.withDefaults())
+            
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
             .authorizeHttpRequests(auth -> auth
-
-                // AUTH ENDPOINTS
+                // Lejo të gjitha kërkesat OPTIONS (CORS pre-flight)
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                
                 .requestMatchers("/auth/**").permitAll()
-
-                // PUBLIC GET ENDPOINTS
                 .requestMatchers(
                         "/",
                         "/api/flowers/**",
-                        "/api/occasions/**"
+                        "/api/occasions/**",
+                        "/api/products/**"
                 ).permitAll()
-
-                // ADMIN ONLY
                 .requestMatchers(
                         "/api/customers/**",
                         "/api/suppliers/**",
                         "/api/supply-orders/**",
                         "/api/deliveries/**"
                 ).hasAuthority("ADMIN")
-
-                // USER + ADMIN
                 .requestMatchers(
                         "/api/porosi/**",
                         "/api/order-details/**",
                         "/api/bouquet-flowers/**",
                         "/api/reviews/**"
                 ).hasAnyAuthority("USER", "ADMIN")
-
                 .anyRequest().authenticated()
             )
 
@@ -83,31 +74,14 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-
         CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowedOrigins(List.of(
-                "http://localhost:3000",
-                "http://localhost:5173"
-        ));
-
-        config.setAllowedMethods(List.of(
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "OPTIONS"
-        ));
-
-        config.setAllowedHeaders(List.of("*"));
-
+        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
         config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
-
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-
         return source;
     }
 

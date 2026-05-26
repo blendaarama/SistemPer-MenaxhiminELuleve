@@ -30,6 +30,14 @@ public class JwtFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        // 1. ANASHKALO KONTROLLIN PËR ENDPOINT-ET PUBLIKE
+        String path = request.getRequestURI();
+        if (path.startsWith("/api/products") || path.startsWith("/auth/") || path.equals("/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 2. KONTROLLI I OPTIONS (CORS)
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
             return;
