@@ -82,11 +82,42 @@ const Homepage = () => {
       </div>
 
       {/* QUICK SHOP QUICK NAV */}
-      <div style={{ display: "flex", gap: "32px", justifyContent: "center", padding: "16px 0", borderBottom: "1px solid #E6E0D8", background: "#FFFFFF" }}>
-        {quickShop.map((item) => (
-          <div key={item} style={{ fontSize: "13px", fontWeight: "500", color: "rgba(31,31,31,0.75)", cursor: "pointer" }}>{item}</div>
-        ))}
-      </div>
+      <div style={{ 
+  display: "flex", 
+  gap: "60px",               /* Kjo rrit hapësirën midis linkeve */
+  justifyContent: "center", 
+  padding: "20px 0",         /* Pak më shumë padding lart e poshtë */
+  borderBottom: "1px solid #E6E0D8", 
+  background: "#FFFFFF" 
+}}>
+  <Link to="/user/flowers" style={{ 
+    fontSize: "14px",        /* Font pak më i madh */
+    fontWeight: "700",       /* Font më i trashë (bold) */
+    color: "#1F1F1F", 
+    textDecoration: "none",
+    letterSpacing: "0.5px"   /* Pak hapësirë midis shkronjave */
+  }}>
+    Flowers
+  </Link>
+  <Link to="/user/bouquets" style={{ 
+    fontSize: "14px", 
+    fontWeight: "700", 
+    color: "#1F1F1F", 
+    textDecoration: "none",
+    letterSpacing: "0.5px"
+  }}>
+    Bouquets
+  </Link>
+  <Link to="/user/occasions" style={{ 
+    fontSize: "14px", 
+    fontWeight: "700", 
+    color: "#1F1F1F", 
+    textDecoration: "none",
+    letterSpacing: "0.5px"
+  }}>
+    Occasions
+  </Link>
+</div>
 
       {/* SEARCH UTILITY WIDGET */}
       <div style={{ background: "#0E5A5B", color: "#FFFFFF", padding: "24px 0", display: "flex", justifyContent: "center", alignItems: "center", gap: "24px", flexWrap: "wrap" }}>

@@ -1,5 +1,14 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Link } from "react-router-dom";
+import { FaEnvelope, FaInstagram, FaPhoneAlt } from 'react-icons/fa';
+import AboutUs from './components/AboutUs.jsx';
+
+
+import Flowers from './components/Flowers';
+import Bouquets from './components/Bouquets';
+import Occasions from './components/Occasions';
+import Reviews from './components/Reviews';
+
 
 // PUBLIC
 import Login from "./components/Login";
@@ -238,6 +247,13 @@ function AppContent() {
           {/* PUBLIC CLIENT SIDE ROUTES */}
           <Route path="/order" element={<PrivateRoute><CartPageComponent /></PrivateRoute>} />
 
+          {/*USER MANAGEMENT ROUTES*/}
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/user/flowers" element={<Flowers />} />
+          <Route path="/user/bouquets" element={<Bouquets />} />
+          <Route path="/user/occasions" element={<Occasions />} />
+          <Route path="/user/reviews" element={<Reviews />} />
+
           {/* ADMIN MANAGEMENT (CRUD) ROUTES */}
           <Route path="/flowers" element={<PrivateRoute adminOnly={true}><FlowerCRUD /></PrivateRoute>} />
           <Route path="/bouquet-flowers" element={<PrivateRoute adminOnly={true}><BouquetFlowersCRUD /></PrivateRoute>} />
@@ -258,9 +274,73 @@ function AppContent() {
           {/* Rruga kryesore e integrimit të panelit kontrollues */}
           <Route path="/admin/orders-registry" element={<PrivateRoute adminOnly={true}><OrderCRUD /></PrivateRoute>} />
 
+  
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
+      {/* FOOTER-I I RI */}
+      {!isAuthPage && (
+       <footer style={{ 
+  background: "#2B1A4A", 
+  color: "white", 
+  padding: "40px 5%",
+  display: "flex", 
+  justifyContent: "space-between", 
+  alignItems: "flex-start", 
+  marginTop: "40px", 
+  flexWrap: "wrap", 
+  gap: "40px"
+}}>
+  
+  {/* Ana e majtë - About Us */}
+  <div style={{ flex: "1 1 400px" }}> 
+    <h3 style={{ color: "#white", marginBottom: "15px", fontSize: "18px" ,fontWeight: "bold"}}>About Us</h3>
+    <p style={{ 
+      fontSize: "14px",
+      lineHeight: "1.6",
+      marginBottom: "20px", 
+      textAlign: "justify"
+    }}>
+      Eternal Rose është lider në aranzhimin e luleve. Ne sjellim freski dhe elegancë në çdo moment tuajin. 
+      Dëshironi të dini më shumë rreth filozofisë sonë të krijimit të buqetave unike? 
+      Jemi të përkushtuar për të ofruar kualitetin më të lartë dhe dizajnët më moderne në treg.
+    </p>
+    <Link to="/about" style={{ 
+      display: "inline-block", padding: "8px 25px", background: "#0E5A5B", 
+      color: "white", textDecoration: "none", borderRadius: "5px", fontSize: "13px", fontWeight: "bold" 
+    }}>
+      Learn More
+    </Link>
+  </div>
+
+  {/* Ana e djathtë - Contact Us */}
+  <div style={{ flex: "1 1 400px" }}> 
+    <h3 style={{ color: "#0E5A5B", marginBottom: "15px", fontSize: "18px", fontWeight: "bold"}}>Contact Us</h3>
+    <p style={{ 
+      fontSize: "14px", 
+      marginBottom: "15px", 
+      lineHeight: "1.6" 
+    }}>
+      Jemi këtu për t'ju ndihmuar me çdo pyetje apo nevojë për dekorim. Na kontaktoni për çdo porosi ose paqartësi.
+    </p>
+    
+    <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "13px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <FaEnvelope color="#0E5A5B" /> 
+        <a href="mailto:eternalrose@gmail.com" style={{ color: "white", textDecoration: "none" }}>eternalrose@gmail.com</a>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <FaInstagram color="#0E5A5B" /> 
+        <span>@EternalRose</span>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <FaPhoneAlt color="#0E5A5B" /> 
+        <span>+383 44 453 821</span>
+      </div>
+    </div>
+  </div>
+</footer>
+      )}
     </div>
   );
 }
