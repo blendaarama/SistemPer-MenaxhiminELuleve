@@ -315,7 +315,7 @@ function AppContent() {
 
   {/* Ana e djathtë - Contact Us */}
   <div style={{ flex: "1 1 400px" }}> 
-    <h3 style={{ color: "#0E5A5B", marginBottom: "15px", fontSize: "18px", fontWeight: "bold"}}>Contact Us</h3>
+    <h3 style={{ color: "#white", marginBottom: "15px", fontSize: "18px" ,fontWeight: "bold"}}>Contact Us</h3>
     <p style={{ 
       fontSize: "14px", 
       marginBottom: "15px", 

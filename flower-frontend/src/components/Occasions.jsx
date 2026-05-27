@@ -7,7 +7,6 @@ const Occasions = () => {
   const images = [
     '/images/valentineDays.webp',
     '/images/mothersDay.avif',
-    '/images/grandOpening.jpg',
     '/images/wedding.jpg'
   ];
 
