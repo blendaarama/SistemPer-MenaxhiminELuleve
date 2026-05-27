@@ -10,9 +10,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:5173"
+})
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -26,40 +31,53 @@ public class AuthController {
 
         User dbUser = userService.getUserByEmail(request.getEmail());
 
-        if (dbUser == null || !passwordEncoder.matches(request.getPassword(), dbUser.getPassword())) {
+        if (dbUser == null) {
             return ResponseEntity.status(401)
-                    .body(Map.of("message", "Email ose password gabim"));
+                    .body(Map.of("message", "User nuk ekziston"));
         }
 
-       String accessToken =
-        jwtService.generateToken(
+        if (!passwordEncoder.matches(request.getPassword(), dbUser.getPassword())) {
+            return ResponseEntity.status(401)
+                    .body(Map.of("message", "Password gabim"));
+        }
+
+        String accessToken = jwtService.generateToken(
                 dbUser.getEmail(),
                 dbUser.getRole()
         );
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(dbUser.getEmail());
 
-        return ResponseEntity.ok(new LoginResponse(
-                accessToken,
-                refreshToken.getToken(),
-                "Login success",
-                dbUser.getEmail(),
-                dbUser.getRole()
-        ));
+        RefreshToken refreshToken =
+                refreshTokenService.createRefreshToken(dbUser.getEmail());
+
+        return ResponseEntity.ok(
+                new LoginResponse(
+                        accessToken,
+                        refreshToken.getToken(),
+                        "Login success",
+                        dbUser.getEmail(),
+                        dbUser.getRole()
+                )
+        );
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(
-        @Valid @RequestBody RegisterRequest request) {
+            @Valid @RequestBody RegisterRequest request) {
 
         User user = new User();
+
         user.setEmri(request.getName());
         user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(
+                passwordEncoder.encode(request.getPassword())
+        );
 
-        user.setRole("USER"); // 🔥 DEFAULT ROLE
+        user.setRole("USER");
 
         userService.registerNewUser(user);
 
-        return ResponseEntity.ok(Map.of("message", "User created"));
+        return ResponseEntity.ok(
+                Map.of("message", "User created")
+        );
     }
 }

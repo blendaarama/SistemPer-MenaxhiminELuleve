@@ -8,6 +8,6 @@ import java.util.List; // MOS HARRO KËTË IMPORT!
 @Repository
 public interface PorosiRepository extends JpaRepository<Porosi, Integer> {
     
-    List<Porosi> findByStatusContainingIgnoreCase(String query);
+   List<Porosi> findByStatusiContainingIgnoreCase(String statusi);
     
 } 

@@ -9,7 +9,7 @@ const SearchResults = () => {
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/products/search?q=${query}`);
+        const response = await axios.get(`http://localhost:8080/api/products/search?q=${query}`);
         setResults(response.data);
       } catch (error) {
         console.error("Gabim gjatë kërkimit:", error);
