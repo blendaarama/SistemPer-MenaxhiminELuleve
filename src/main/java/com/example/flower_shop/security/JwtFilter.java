@@ -30,14 +30,12 @@ public class JwtFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        // 1. ANASHKALO KONTROLLIN PËR ENDPOINT-ET PUBLIKE
         String path = request.getRequestURI();
         if (path.startsWith("/api/products") || path.startsWith("/auth/") || path.equals("/")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 2. KONTROLLI I OPTIONS (CORS)
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
             return;
@@ -52,13 +50,22 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String jwt = authHeader.substring(7);
 
-        // 🔥 FIX: mos crash nëse token është invalid
         if (jwt.isBlank() || jwt.split("\\.").length != 3) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String username = jwtService.extractUsername(jwt);
+        String username = null;
+
+        try {
+
+            username = jwtService.extractUsername(jwt);
+
+        } catch (Exception e) {
+
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (username != null &&
                 SecurityContextHolder.getContext().getAuthentication() == null) {

@@ -10,25 +10,46 @@ const Login = ({ onLoginSuccess }) => {
     const [loading, setLoading] = useState(false);
 const handleLogin = async (e) => {
     e.preventDefault();
+
     setLoading(true);
     setError('');
 
     try {
-        const res = await axios.post("http://localhost:8080/auth/login", {
-            email,
-            password
-        });
 
-        const { accessToken, refreshToken, email: userEmail, role } = res.data;
+        localStorage.clear();
 
-localStorage.setItem("accessToken", accessToken);
-localStorage.setItem("refreshToken", refreshToken);
-localStorage.setItem("userEmail", userEmail);
-localStorage.setItem("role", role);
+        const res = await axios.post(
+            "http://localhost:8080/auth/login",
+            {
+                email,
+                password
+            }
+        );
 
-        navigate("/");
+        const {
+            accessToken,
+            refreshToken,
+            email: userEmail,
+            role
+        } = res.data;
+
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("userEmail", userEmail);
+        localStorage.setItem("role", role);
+
+        if (role === "ADMIN") {
+            navigate("/admin/dashboard");
+        } else {
+            navigate("/");
+        }
+
     } catch (err) {
-        setError(err.response?.data?.message || "Login failed");
+
+        setError(
+            err.response?.data?.message || "Login failed"
+        );
+
     } finally {
         setLoading(false);
     }
