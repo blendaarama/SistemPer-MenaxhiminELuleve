@@ -16,7 +16,8 @@ const AdminDashboard = () => {
     { title: "Payments & Invoices", desc: "Faturat dhe transaksionet.", path: "/payments", tag: "Financials" },
     { title: "Suppliers Portal", desc: "Menaxhimi i furnitorëve.", path: "/suppliers", tag: "Supply Chain" },
     { title: "Deliveries Hub", desc: "Monitorimi i dërgesave.", path: "/deliveries", tag: "Distribution" },
-    { title: "Client Reviews", desc: "Moderimi i feedback-ut.", path: "/reviews", tag: "Moderation" }
+    { title: "Client Reviews", desc: "Moderimi i feedback-ut.", path: "/reviews", tag: "Moderation" },
+    { title: "Occasions", desc: "Menaxho rastet dhe ngjarjet speciale.", path: "/occasions", tag: "Event Management" }
   ];
 
   useEffect(() => {
