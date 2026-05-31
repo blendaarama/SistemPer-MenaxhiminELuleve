@@ -1,6 +1,5 @@
-
-import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
 import axios from "axios";
 
@@ -93,43 +92,54 @@ const Homepage = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // FILTER PRODUCTS
-  const filteredDeals = useMemo(() => {
-    return deals.filter((product) => {
-      if (!occasion) return true;
+  const filteredDeals = useMemo(() =>
+    deals.filter(p => !occasion || p.occasion?.toLowerCase() === occasion.toLowerCase()),
+    [deals, occasion]
+  );
 
-      return (
-        product.occasion?.toLowerCase() ===
-        occasion.toLowerCase()
-      );
-    });
-  }, [deals, occasion]);
+  /* handlers */
+  const openQuantityPopup = p => { setSelectedProduct(p); setQuantity(1); setShowPopup(true); };
+  const handleConfirmAdd  = () => { addToCart(selectedProduct, quantity); setShowPopup(false); };
+  const scrollToTop       = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  const circularCategories = [
-    {
-      name: "Birthday",
-      img: "https://images.unsplash.com/photo-1533616688419-b7a585564566?q=80&w=300",
-    },
-    {
-      name: "Sympathy",
-      img: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=300",
-    },
-    {
-      name: "Occasions",
-      img: "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=300",
-    },
-    {
-      name: "Flowers",
-      img: "https://images.unsplash.com/photo-1520763185298-1b434c919102?q=80&w=300",
-    },
-    {
-      name: "Plants",
-      img: "https://images.unsplash.com/photo-1463936575829-25148e1db1b8?q=80&w=300",
-    },
-    {
-      name: "Gifts",
-      img: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=300",
-    },
+  /* ── unified search handler (used by both search bars) */
+  const handleSearch = e => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) return;
+    navigate(`/search?query=${encodeURIComponent(q)}`);
+  };
+
+  const handleNewsletterSubmit = e => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setEmailSent(true);
+    setEmail("");
+  };
+
+  const handleSubmitReview = () => {
+    if (!newReview.comment.trim()) return;
+    const entry = {
+      id: Date.now(),
+      customerId: newReview.customerId.trim() || "Anonymous",
+      comment: newReview.comment,
+      score: 5,
+    };
+    const updated = [...reviews, entry];
+    localStorage.setItem("reviews", JSON.stringify(updated));
+    setReviews(updated);
+    setNewReview({ customerId: "", comment: "" });
+    setShowReviewModal(false);
+  };
+
+  /* data */
+  const categories = [
+    { name: "Birthday",  img: "https://images.unsplash.com/photo-1533616688419-b7a585564566?q=80&w=300" },
+    { name: "Sympathy",  img: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=300" },
+    { name: "Occasions", img: "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=300" },
+    { name: "Flowers",   img: "https://images.unsplash.com/photo-1520763185298-1b434c919102?q=80&w=300" },
+    { name: "Plants",    img: "https://images.unsplash.com/photo-1463936575829-25148e1db1b8?q=80&w=300" },
+    { name: "Gifts",     img: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=300" },
   ];
 
   const testimonials = [
