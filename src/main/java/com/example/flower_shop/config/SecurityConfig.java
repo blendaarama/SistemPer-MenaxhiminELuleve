@@ -29,7 +29,6 @@ public class SecurityConfig {
 public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
         .csrf(csrf -> csrf.disable())
-        // Lidhje eksplicite me konfigurimin e CORS
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         
         .sessionManagement(session ->
@@ -37,7 +36,6 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         )
 
             .authorizeHttpRequests(auth -> auth
-                // Lejo të gjitha kërkesat OPTIONS (CORS pre-flight)
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 
                 .requestMatchers("/auth/**").permitAll()
@@ -45,7 +43,8 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                         "/",
                         "/api/flowers/**",
                         "/api/occasions/**",
-                        "/api/products/**"
+                        "/api/products/**",
+                        "/api/bouquets/**"
                 ).permitAll()
                 .requestMatchers(
                         "/api/customers/**",
@@ -56,7 +55,6 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 .requestMatchers(
                         "/api/porosi/**",
                         "/api/order-details/**",
-                        "/api/bouquet-flowers/**",
                         "/api/reviews/**"
                 ).hasAnyAuthority("USER", "ADMIN")
                 .anyRequest().authenticated()
@@ -76,7 +74,7 @@ public CorsConfigurationSource corsConfigurationSource() {
     config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:3001", "http://localhost:5173"));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     config.setExposedHeaders(List.of("*"));
-    // Lejo të gjithë header-at
+ 
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true);
 

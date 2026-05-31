@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
@@ -52,7 +51,6 @@ const Homepage = () => {
     fetchProducts();
   }, []);
 
-  // FILTER PRODUCTS
   const filteredDeals = useMemo(() => {
     return deals.filter((product) => {
       if (!occasion) return true;

@@ -8,7 +8,7 @@ const AdminDashboard = () => {
 
   const cards = [
     { title: "Flowers Stock", desc: "Menaxho lulet, stoket dhe çmimet.", path: "/flowers", tag: "Core Inventory" },
-    { title: "Bouquet Flowers", desc: "Ndërtimi i buqetave.", path: "/bouquet-flowers", tag: "Composition" },
+    { title: "Bouquet Flowers", desc: "Ndërtimi i buqetave.", path: "/bouquets", tag: "Composition" },
     { title: "Orders Registry", desc: "Menaxho porositë e klientëve.", path: "/admin/orders-registry", tag: "Sales Control" },
     { title: "Customers Matrix", desc: "Menaxho profilet e klientëve.", path: "/customers", tag: "CRM Accounts" },
     { title: "Categories", desc: "Kategorizimi i produkteve.", path: "/categories", tag: "Store Structure" },
@@ -54,8 +54,16 @@ const AdminDashboard = () => {
 
         {/* QUICK ACTIONS */}
         <div style={{ display: "flex", gap: "10px", marginBottom: "40px" }}>
-          <Link to="/flowers/add" style={{ padding: "10px 20px", background: "#2B1A4A", color: "#FFF", textDecoration: "none", fontSize: "12px", fontWeight: "600" }}>+ SHTO LULE</Link>
-          <Link to="/orders/new" style={{ padding: "10px 20px", background: "#0E5A5B", color: "#FFF", textDecoration: "none", fontSize: "12px", fontWeight: "600" }}>+ POROSI E RE</Link>
+        <Link to="/flowers" style={{padding: "10px 20px", background: "#2B1A4A", color: "#FFF", textDecoration: "none", fontSize: "12px", fontWeight: "600",transition: "opacity 0.2s"}}
+          onMouseOver={(e) => e.target.style.opacity = "0.9"}
+          onMouseOut={(e) => e.target.style.opacity = "1"}>
+            + SHTO LULE
+        </Link>
+        <Link to="/orders" style={{ padding: "10px 20px", background: "#0E5A5B", color: "#FFF", textDecoration: "none", fontSize: "12px", fontWeight: "600",transition: "opacity 0.2s"}}
+          onMouseOver={(e) => e.target.style.opacity = "0.9"}
+          onMouseOut={(e) => e.target.style.opacity = "1"}>
+            + POROSI E RE
+        </Link>
         </div>
 
         {/* STATS */}

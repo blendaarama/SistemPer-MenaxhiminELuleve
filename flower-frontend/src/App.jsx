@@ -22,7 +22,7 @@ import AdminDashboard from "./components/AdminDashboard";
 
 // CRUD
 import FlowerCRUD from "./components/FlowerCRUD";
-import BouquetFlowersCRUD from "./components/BouquetFlowersCRUD";
+import BouquetCRUD from "./components/BouquetCRUD.jsx";
 import OccasionCRUD from "./components/OccasionCRUD";
 import SupplierCRUD from "./components/SupplierCRUD";
 import OrderPage from "./components/OrderPage"; 
@@ -38,7 +38,6 @@ import ReviewsCRUD from "./components/ReviewsCRUD";
 import PrivateRoute from "./components/PrivateRoute";
 import { useCart } from "./context/CartContext.jsx"; 
 
-// === KOMPONENTI I SHPORTËS ME FORMEN E PAGESËS ===
 const CartPageComponent = () => {
   const { cartItems, removeFromCart, clearCart } = useCart();
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -256,12 +255,12 @@ function AppContent() {
 
           {/* ADMIN MANAGEMENT (CRUD) ROUTES */}
           <Route path="/flowers" element={<PrivateRoute adminOnly={true}><FlowerCRUD /></PrivateRoute>} />
-          <Route path="/bouquet-flowers" element={<PrivateRoute adminOnly={true}><BouquetFlowersCRUD /></PrivateRoute>} />
+          <Route path="/bouquets" element={<PrivateRoute adminOnly={true}><BouquetCRUD /> </PrivateRoute>} />
           <Route path="/occasions" element={<PrivateRoute adminOnly={true}><OccasionCRUD /></PrivateRoute>} />
           <Route path="/suppliers" element={<PrivateRoute adminOnly={true}><SupplierCRUD /></PrivateRoute>} />
           
           {/* RREGULLUAR KËTU: Kjo hap regjistrin menaxhues të porosive për adminin pa u përplasur me shportën */}
-          <Route path="/admin/orders" element={<PrivateRoute adminOnly={true}><OrderPage /></PrivateRoute>} />
+          <Route path="/orders" element={<PrivateRoute adminOnly={true}><OrderPage /></PrivateRoute>} />
           <Route path="/order-details" element={<PrivateRoute adminOnly={true}><OrderDetails /></PrivateRoute>} />
           <Route path="/payments" element={<PrivateRoute adminOnly={true}><PaymentsCrud /></PrivateRoute>} />
           <Route path="/supply-orders" element={<PrivateRoute adminOnly={true}><SupplyOrders /></PrivateRoute>} />
