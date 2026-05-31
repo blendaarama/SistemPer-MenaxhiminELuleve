@@ -270,11 +270,6 @@ const Homepage = () => {
                 Sign In
               </button>
             </Link>
-            <Link to="/order" style={{ textDecoration: "none" }}>
-              <button className="btn-teal" style={{ background: C.teal, color: "#fff", border: "none", padding: "8px 18px", borderRadius: "6px", fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: FONT, transition: "background 0.2s" }}>
-                🛒 Cart
-              </button>
-            </Link>
           </div>
         </nav>
         {isSticky && <div style={{ height: "64px" }} />}
