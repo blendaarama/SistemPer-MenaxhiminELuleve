@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useCart } from "../context/CartContext.jsx";
 
 const Navbar = () => {
@@ -10,17 +9,20 @@ const Navbar = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (!search.trim()) return;
-    // Navigimi te faqja e rezultateve me parametrin e kërkimit
-    navigate(`/search?query=${encodeURIComponent(search)}`);
+    const q = search.trim();
+    if (!q) return;
+    navigate(`/search?query=${encodeURIComponent(q)}`);
+    setSearch("");
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('role');
-    navigate('/login');
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("role");
+    navigate("/login");
   };
+
+  const isLoggedIn = Boolean(localStorage.getItem("accessToken"));
 
   return (
     <nav
@@ -30,11 +32,13 @@ const Navbar = () => {
         borderBottom: "1px solid #E6E0D8",
         width: "100%",
         boxSizing: "border-box",
-        zIndex: 1050
+        zIndex: 1050,
       }}
     >
-      <div className="container-fluid px-4 px-md-5" style={{ maxWidth: "1400px", margin: "0 auto" }}>
-        
+      <div
+        className="container-fluid px-4 px-md-5"
+        style={{ maxWidth: "1400px", margin: "0 auto" }}
+      >
         {/* BRAND */}
         <Link
           className="navbar-brand d-flex align-items-center gap-2 m-0"
@@ -45,29 +49,36 @@ const Navbar = () => {
             fontWeight: "700",
             letterSpacing: "-0.5px",
             fontFamily: "Georgia, serif",
+            textDecoration: "none",
           }}
         >
           Eternal Rose
         </Link>
 
-        {/* TOGGLE BUTTON */}
-        <button 
-          className="navbar-toggler border-0" 
-          type="button" 
-          data-bs-toggle="collapse" 
+        {/* MOBILE TOGGLE */}
+        <button
+          className="navbar-toggler border-0"
+          type="button"
+          data-bs-toggle="collapse"
           data-bs-target="#nav"
           style={{ boxShadow: "none" }}
         >
-          <span className="navbar-toggler-icon"></span>
+          <span className="navbar-toggler-icon" />
         </button>
 
         <div className="collapse navbar-collapse" id="nav">
-          
-          {/* SEARCH BAR - I FUNKSIONALIZUAR */}
-          <div className="mx-auto my-3 my-xl-0 d-flex justify-content-center" style={{ width: "100%", maxWidth: "550px" }}>
-            <form onSubmit={handleSearch} className="d-flex w-100" style={{ position: "relative" }}>
+          {/* SEARCH BAR */}
+          <div
+            className="mx-auto my-3 my-xl-0 d-flex justify-content-center"
+            style={{ width: "100%", maxWidth: "550px" }}
+          >
+            <form
+              onSubmit={handleSearch}
+              className="d-flex w-100"
+              style={{ position: "relative" }}
+            >
               <input
-                className="form-control px-4 py-2.5"
+                className="form-control px-4"
                 type="search"
                 placeholder="What are you looking for?"
                 value={search}
@@ -80,7 +91,9 @@ const Navbar = () => {
                   boxShadow: "none",
                   backgroundColor: "#FAF8F5",
                   color: "#1F1F1F",
-                  width: "100%"
+                  width: "100%",
+                  padding: "10px 16px",
+                  outline: "none",
                 }}
               />
               <button
@@ -96,62 +109,83 @@ const Navbar = () => {
                   letterSpacing: "1px",
                   textTransform: "uppercase",
                   cursor: "pointer",
-                  transition: "background 0.2s"
+                  transition: "background 0.2s",
+                  whiteSpace: "nowrap",
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = "#0E5A5B"}
-                onMouseLeave={(e) => e.currentTarget.style.background = "#2B1A4A"}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#0E5A5B")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "#2B1A4A")}
               >
                 Search
               </button>
             </form>
           </div>
 
-          {/* RIGHT: ACCOUNT & CART SYSTEM */}
-          <div className="d-flex align-items-center justify-content-center gap-4">
-            
-            <Link 
-              className="nav-link px-2 small fw-semibold text-uppercase" 
-              style={{ fontSize: "12px", color: "#1F1F1F", letterSpacing: "1px" }} 
+          {/* RIGHT: ACCOUNT & CART */}
+          <div className="d-flex align-items-center justify-content-center gap-4 flex-wrap">
+            <Link
+              className="nav-link px-2 small fw-semibold text-uppercase"
+              style={{ fontSize: "12px", color: "#1F1F1F", letterSpacing: "1px", textDecoration: "none" }}
               to="/"
             >
               Home
             </Link>
 
-            {/* LOGIN / LOGOUT DINAMIK */}
-            {localStorage.getItem('accessToken') ? (
+            {/* LOGIN / LOGOUT */}
+            {isLoggedIn ? (
               <button
                 onClick={handleLogout}
-                className="d-flex flex-column align-items-center text-decoration-none border-0 bg-transparent"
-                style={{ color: "#1F1F1F", transition: "color 0.2s", cursor: "pointer" }}
-                onMouseEnter={(e) => e.currentTarget.style.color = "#0E5A5B"}
-                onMouseLeave={(e) => e.currentTarget.style.color = "#1F1F1F"}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "#1F1F1F",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  padding: 0,
+                  transition: "color 0.2s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#0E5A5B")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#1F1F1F")}
               >
-                <span style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px" }}>Logout</span>
+                Logout
               </button>
             ) : (
               <Link
-                className="d-flex flex-column align-items-center text-decoration-none"
                 to="/login"
-                style={{ color: "#1F1F1F", transition: "color 0.2s" }}
-                onMouseEnter={(e) => e.currentTarget.style.color = "#0E5A5B"}
-                onMouseLeave={(e) => e.currentTarget.style.color = "#1F1F1F"}
+                style={{
+                  color: "#1F1F1F",
+                  textDecoration: "none",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  transition: "color 0.2s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#0E5A5B")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#1F1F1F")}
               >
-                <span style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px" }}>Sign In</span>
+                Sign In
               </Link>
             )}
 
-           <Link
-              className="d-flex flex-column align-items-center text-decoration-none"
+            <Link
               to="/order"
-              style={{ color: "#1F1F1F", transition: "color 0.2s" }}
-              onMouseEnter={(e) => e.currentTarget.style.color = "#0E5A5B"}
-              onMouseLeave={(e) => e.currentTarget.style.color = "#1F1F1F"}
+              style={{
+                color: "#1F1F1F",
+                textDecoration: "none",
+                fontSize: "12px",
+                fontWeight: "600",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+                transition: "color 0.2s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#0E5A5B")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#1F1F1F")}
             >
-              <span style={{ fontSize: "12px", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px" }}>
-                Cart ({cartItems.length})
-              </span>
+              Cart ({cartItems.length})
             </Link>
-
           </div>
         </div>
       </div>
