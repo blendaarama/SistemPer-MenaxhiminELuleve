@@ -22,7 +22,6 @@ const BouquetCRUD = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    // Shtoje këtë nëse ke nevojë për token
     const config = { headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` } };
 
     useEffect(() => {
@@ -112,11 +111,17 @@ const BouquetCRUD = () => {
                                 </select>
                             </div>
                             <div className="col-md-4 mb-3">
-                                <label style={{ fontSize: "12px", fontWeight: "600", color: "rgba(31,31,31,0.6)" }}>LULET (Shtyp Ctrl për shumë)</label>
-                                <select multiple className="form-control" value={form.flowerIds} onChange={(e) => setForm({...form, flowerIds: Array.from(e.target.selectedOptions).map(o => Number(o.value))})} style={{ height: "42px", borderRadius: "0px", background: "#FAF8F5" }}>
-                                    {flowers.map(f => <option key={f.id} value={f.id}>{f.emertimi}</option>)}
-                                </select>
+                                <label style={{ fontSize: "12px", fontWeight: "600", color: "rgba(31,31,31,0.6)" }}>URL E FOTOS</label>
+                                <input className="form-control" name="foto" value={form.foto} onChange={handleInput} placeholder="https://..." style={{ borderRadius: "0px", background: "#FAF8F5" }} />
                             </div>
+                        </div>
+
+                        {/* Modifikimi për selektimin e luleve */}
+                        <div className="mb-4">
+                            <label style={{ fontSize: "12px", fontWeight: "600", color: "rgba(31,31,31,0.6)" }}>LULET (Shtyp Ctrl/Cmd për të zgjedhur shumë)</label>
+                            <select multiple className="form-control" size={5} value={form.flowerIds || []} onChange={(e) => setForm({...form, flowerIds: Array.from(e.target.selectedOptions).map(o => Number(o.value))})} style={{ borderRadius: "0px", background: "#FAF8F5" }}>
+                                {flowers.map(f => <option key={f.id} value={f.id}>{f.emertimi}</option>)}
+                            </select>
                         </div>
 
                         <button type="submit" style={{ background: "#0E5A5B", color: "#FFF", border: "none", padding: "12px 30px", marginTop: "10px" }}>
@@ -125,19 +130,22 @@ const BouquetCRUD = () => {
                     </form>
                 </div>
 
-                <div style={{ background: "#FFF", border: "1px solid #E6E0D8" }}>
+                <div style={{ background: "#FFF", border: "1px solid #E6E0D8", overflowX: "auto" }}>
                     <table className="table m-0">
                         <thead>
                             <tr style={{ background: "#2B1A4A", color: "#FFF" }}>
-                                <th>Emërtimi</th><th>Çmimi</th><th>Madhësia</th><th>Veprime</th>
+                                <th>Emërtimi</th><th>Përshkrimi</th><th>Çmimi</th><th>Madhësia</th><th>Statusi</th><th>Foto</th><th>Veprime</th>
                             </tr>
                         </thead>
                         <tbody>
                             {bouquets.map(b => (
                                 <tr key={b.id}>
                                     <td>{b.emertimi}</td>
+                                    <td>{b.pershkrimi}</td>
                                     <td>{b.cmimi} €</td>
                                     <td>{b.madhesia}</td>
+                                    <td>{b.eshteAktiv ? "Aktiv" : "Jo Aktiv"}</td>
+                                    <td>{b.foto ? <img src={b.foto} alt="buqeta" style={{width: "50px"}}/> : "N/A"}</td>
                                     <td>
                                         <button className="btn btn-sm btn-outline-primary me-2" onClick={() => setForm(b)}>Edit</button>
                                         <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(b.id)}>Fshi</button>

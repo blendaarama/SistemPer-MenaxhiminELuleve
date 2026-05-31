@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const FONT_URL =
@@ -19,7 +19,6 @@ const C = {
 const FONT  = "'DM Sans', system-ui, sans-serif";
 const SERIF = "'Cormorant Garamond', Georgia, serif";
 
-/* small reusable stat block */
 const Stat = ({ value, label }) => (
   <div style={{ textAlign: "center", padding: "24px 32px" }}>
     <div style={{ fontFamily: SERIF, fontSize: "42px", fontWeight: "700", color: C.teal, lineHeight: 1 }}>{value}</div>
@@ -27,7 +26,6 @@ const Stat = ({ value, label }) => (
   </div>
 );
 
-/* team member card */
 const TeamCard = ({ name, role, emoji }) => (
   <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "32px 24px", textAlign: "center", transition: "transform 0.25s, box-shadow 0.25s" }}
     onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 20px 48px rgba(0,0,0,0.08)"; }}
@@ -41,7 +39,6 @@ const TeamCard = ({ name, role, emoji }) => (
   </div>
 );
 
-/* value card */
 const ValueCard = ({ icon, title, desc }) => (
   <div style={{ display: "flex", gap: "16px", alignItems: "flex-start", padding: "24px", background: C.white, border: `1px solid ${C.border}`, borderRadius: "12px" }}>
     <div style={{ fontSize: "28px", lineHeight: 1, flexShrink: 0 }}>{icon}</div>
@@ -53,6 +50,10 @@ const ValueCard = ({ icon, title, desc }) => (
 );
 
 const AboutUs = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <>
       {/* Google Fonts */}
@@ -71,14 +72,14 @@ const AboutUs = () => {
 
       <div style={{ fontFamily: FONT, background: C.cream, color: C.text, minHeight: "100vh" }}>
 
-        {/* ── NAV ──────────────────────────────────────────── */}
+        {/*NAV*/}
         <nav style={{ background: C.teal, padding: "0 6%", height: "60px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <Link to="/" style={{ fontFamily: SERIF, fontSize: "20px", fontWeight: "700", color: "#fff", textDecoration: "none", letterSpacing: "-0.3px" }}>
             Eternal Rose
           </Link>
 
           <div style={{ display: "flex", gap: "28px", alignItems: "center" }}>
-            <Link to="/"                className="about-nav-link">Home</Link>
+            <Link to="/"               className="about-nav-link">Home</Link>
             <Link to="/user/flowers"    className="about-nav-link">Flowers</Link>
             <Link to="/user/bouquets"   className="about-nav-link">Bouquets</Link>
             <Link to="/user/occasions"  className="about-nav-link">Occasions</Link>
@@ -94,9 +95,9 @@ const AboutUs = () => {
           </Link>
         </nav>
 
-        {/* ── HERO ─────────────────────────────────────────── */}
+        {/* HERO*/}
         <section style={{ background: `linear-gradient(135deg, ${C.dark} 0%, ${C.teal} 100%)`, padding: "80px 6%", textAlign: "center", position: "relative", overflow: "hidden" }}>
-          {/* decorative circles */}
+         
           <div style={{ position: "absolute", top: "-80px", right: "-80px", width: "320px", height: "320px", borderRadius: "50%", background: "rgba(255,255,255,0.04)", pointerEvents: "none" }} />
           <div style={{ position: "absolute", bottom: "-60px", left: "-60px", width: "240px", height: "240px", borderRadius: "50%", background: "rgba(255,255,255,0.03)", pointerEvents: "none" }} />
 
@@ -119,11 +120,11 @@ const AboutUs = () => {
           </Link>
         </section>
 
-        {/* ── STATS BAR ────────────────────────────────────── */}
+        {/*  STATS BAR  */}
         <section style={{ background: C.white, borderBottom: `1px solid ${C.border}`, borderTop: `1px solid ${C.border}` }}>
           <div style={{ maxWidth: "1000px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", borderLeft: `1px solid ${C.border}` }}>
             {[
-              { value: "6+",   label: "Years of experience" },
+              { value: "6+",  label: "Years of experience" },
               { value: "12k+", label: "Happy customers" },
               { value: "200+", label: "Arrangements designed" },
               { value: "98%",  label: "Satisfaction rate" },
@@ -135,7 +136,7 @@ const AboutUs = () => {
           </div>
         </section>
 
-        {/* ── WHO WE ARE ───────────────────────────────────── */}
+        {/* WHO WE ARE */}
         <section style={{ padding: "80px 6%", background: C.cream }}>
           <div style={{ maxWidth: "1100px", margin: "0 auto", display: "flex", gap: "64px", alignItems: "center", flexWrap: "wrap" }}>
 
@@ -194,7 +195,7 @@ const AboutUs = () => {
           </div>
         </section>
 
-        {/* ── OUR VALUES ───────────────────────────────────── */}
+        {/* OUR VALUES*/}
         <section style={{ padding: "80px 6%", background: C.white }}>
           <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
@@ -211,7 +212,7 @@ const AboutUs = () => {
           </div>
         </section>
 
-        {/* ── TEAM ─────────────────────────────────────────── */}
+        {/*TEAM*/}
         <section style={{ padding: "80px 6%", background: C.cream }}>
           <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "52px" }}>
@@ -222,13 +223,13 @@ const AboutUs = () => {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "20px" }}>
               <TeamCard name="Arta Krasniqi"   role="Founder & Head Florist" emoji="🌸" />
               <TeamCard name="Besnik Hoxha"    role="Operations Manager"     emoji="📦" />
-              <TeamCard name="Drita Berisha"   role="Senior Floral Designer"  emoji="🌺" />
+              <TeamCard name="Drita Berisha"   role="Senior Floral Designer" emoji="🌺" />
               <TeamCard name="Mergim Gashi"    role="Delivery Coordinator"    emoji="🚚" />
             </div>
           </div>
         </section>
 
-        {/* ── CTA BANNER ───────────────────────────────────── */}
+        {/*CTA BANNER*/}
         <section style={{ background: `linear-gradient(135deg, ${C.teal} 0%, ${C.dark} 100%)`, padding: "64px 6%", textAlign: "center" }}>
           <h2 style={{ fontFamily: SERIF, fontSize: "clamp(28px, 4vw, 44px)", fontWeight: "700", color: "#fff", marginBottom: "16px", lineHeight: "1.2" }}>
             Ready to send something beautiful?
