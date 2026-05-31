@@ -26,64 +26,67 @@ public class SecurityConfig {
     private final JwtFilter jwtFilter;
 
     @Bean
-public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http
-        .csrf(csrf -> csrf.disable())
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        
-        .sessionManagement(session ->
-            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        )
-
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                
+
                 .requestMatchers("/auth/**").permitAll()
+
                 .requestMatchers(
-                        "/",
-                        "/api/flowers/**",
-                        "/api/occasions/**",
-                        "/api/products/**",
-                        "/api/bouquets/**"
+                    "/",
+                    "/api/flowers/**",
+                    "/api/occasions/**",
+                    "/api/products/**",
+                    "/api/bouquets/**"
                 ).permitAll()
+
                 .requestMatchers(
-                        "/api/customers/**",
-                        "/api/suppliers/**",
-                        "/api/supply-orders/**",
-                        "/api/deliveries/**"
-                ).hasAuthority("ADMIN")
+                    "/api/customers/**",
+                    "/api/suppliers/**",
+                    "/api/supply-orders/**",
+                    "/api/deliveries/**"
+                ).hasAnyAuthority("ADMIN", "ROLE_ADMIN")
+
                 .requestMatchers(
-                        "/api/porosi/**",
-                        "/api/order-details/**",
-                        "/api/reviews/**"
-                ).hasAnyAuthority("USER", "ADMIN")
+                    "/api/orders/**",
+                    "/api/porosi/**",
+                    "/api/order-details/**",
+                    "/api/reviews/**"
+                ).hasAnyAuthority("USER", "ADMIN", "ROLE_USER", "ROLE_ADMIN")
+
                 .anyRequest().authenticated()
             )
-
-            .addFilterBefore(
-                    jwtFilter,
-                    UsernamePasswordAuthenticationFilter.class
-            );
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-   @Bean
-public CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration config = new CorsConfiguration();
-    config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:3001", "http://localhost:5173"));
-    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    config.setExposedHeaders(List.of("*"));
- 
-    config.setAllowedHeaders(List.of("*"));
-    config.setAllowCredentials(true);
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of(
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "http://localhost:5173"
+        ));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
 
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", config);
-    return source;
-}
-@Bean
-public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-}
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }

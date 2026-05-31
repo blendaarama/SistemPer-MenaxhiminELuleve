@@ -237,7 +237,7 @@ const Homepage = () => {
         }}>
           {/* Logo */}
           <div style={{ fontFamily: SERIF, fontSize: "22px", fontWeight: "700", color: C.dark, letterSpacing: "-0.3px", whiteSpace: "nowrap" }}>
-            Bloom & Co.
+             You're eternal.
           </div>
 
           {/* Nav links */}
@@ -504,7 +504,7 @@ const Homepage = () => {
 
             {emailSent ? (
               <div style={{ background: "rgba(13,92,92,0.35)", border: "1px solid rgba(13,92,92,0.5)", borderRadius: "10px", padding: "20px 28px", color: "#fff", fontFamily: FONT, fontSize: "14px", lineHeight: "1.6" }}>
-                🌸 <strong>Welcome to the Bloom & Co. family!</strong><br />
+                🌸 <strong>Welcome to the Eternal Rose. family!</strong><br />
                 <span style={{ opacity: 0.8 }}>Your 10% discount code will arrive shortly.</span>
               </div>
             ) : (

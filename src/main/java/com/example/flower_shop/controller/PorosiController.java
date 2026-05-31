@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/porosi")
-
+@CrossOrigin(origins = "http://localhost:5173")
 public class PorosiController {
 
     private final OrderService service;
@@ -20,13 +20,11 @@ public class PorosiController {
         this.service = service;
     }
 
-    // GET ALL
     @GetMapping
     public List<Porosi> getAll() {
         return service.getAll();
     }
 
-    // GET BY ID
     @GetMapping("/{id}")
     public ResponseEntity<Porosi> getById(@PathVariable Integer id) {
         Porosi porosi = service.getById(id);
@@ -36,13 +34,11 @@ public class PorosiController {
                 : ResponseEntity.notFound().build();
     }
 
-    // CREATE (PA DTO PER TANI - SIMPLE VERSION)
     @PostMapping
     public Porosi create(@RequestBody Porosi porosi) {
         return service.create(porosi);
     }
 
-    // UPDATE (ME DTO)
     @PutMapping("/{id}")
     public ResponseEntity<Porosi> update(
             @PathVariable Integer id,
@@ -55,7 +51,6 @@ public class PorosiController {
                 : ResponseEntity.notFound().build();
     }
 
-    // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
 
@@ -65,6 +60,4 @@ public class PorosiController {
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }
-
-   
 }
