@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useCart } from "../context/CartContext";
 
 const Bouquets = () => {
   const [bouquets, setBouquets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
+  const { addToCart } = useCart();
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -28,6 +31,21 @@ const Bouquets = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddToCart = (b) => {
+    addToCart({
+      id: b.id,
+      name: b.emertimi,
+      price: b.cmimi,
+      image: b.foto
+    });
+
+    setMessage(`${b.emertimi} u shtua në cart!`);
+
+    setTimeout(() => {
+      setMessage("");
+    }, 2000);
   };
 
   if (loading) {
@@ -55,6 +73,19 @@ const Bouquets = () => {
       }}>
         Our Bouquet Selection
       </h1>
+
+      {/* MESSAGE / TOAST */}
+      {message && (
+        <div style={{
+          backgroundColor: "#2C1A4A",
+          color: "white",
+          padding: "10px 20px",
+          borderRadius: "6px",
+          marginBottom: "20px"
+        }}>
+          {message}
+        </div>
+      )}
 
       {error && (
         <div style={{
@@ -113,7 +144,6 @@ const Bouquets = () => {
               Madhësia: {b.madhesia}
             </p>
 
-            {/* backend field korrekt */}
             <p style={{
               color: "#777",
               fontSize: "13px"
@@ -132,7 +162,7 @@ const Bouquets = () => {
             </p>
 
             <button
-              onClick={() => alert(`Added ${b.emertimi} to cart!`)}
+              onClick={() => handleAddToCart(b)}
               style={{
                 padding: "10px 25px",
                 backgroundColor: "#2C1A4A",
