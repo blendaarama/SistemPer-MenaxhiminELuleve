@@ -32,13 +32,14 @@ public class BouquetController {
         return bouquetService.addBouquet(bouquetDTO);
     }
 
+    @PutMapping("/{id}")
+    public BouquetDTO updateBouquet(@PathVariable Integer id,
+                                     @RequestBody BouquetDTO bouquetDTO) {
+        return bouquetService.updateBouquet(id, bouquetDTO);
+    }
+
     @DeleteMapping("/{id}")
     public void deleteBouquet(@PathVariable Integer id) {
         bouquetService.deleteBouquet(id);
-    }
-
-    @PutMapping("/{id}")
-    public BouquetDTO updateBouquet(@PathVariable Integer id, @RequestBody BouquetDTO bouquetDTO) {
-        return bouquetService.updateBouquet(id, bouquetDTO);
     }
 }

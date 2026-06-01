@@ -417,94 +417,154 @@ const Homepage = () => {
           </div>
         </section>
 
+        
         {/* ── PRODUCTS ────────────────────────────────────── */}
-        <section style={{ padding: "64px 6%", background: C.cream }}>
-          <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: "10px", flexWrap: "wrap", gap: "12px" }}>
-              <h2 style={{ fontFamily: SERIF, fontSize: "28px", fontWeight: "700", color: C.dark }}>Seasonal collection</h2>
-              <span style={{ fontFamily: FONT, fontSize: "13px", color: C.muted }}>
-                Showing <strong style={{ color: C.teal }}>{occasion}</strong> arrangements
-              </span>
-            </div>
-            <p style={{ fontFamily: FONT, fontSize: "14px", color: C.muted, marginBottom: "40px" }}>
-              Hand-picked arrangements for every budget. Prices include same-day delivery packaging.
-            </p>
+<section style={{ padding: "64px 6%", background: C.cream }}>
+  <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
 
-            {loading ? (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "24px" }}>
-                {[1,2,3,4].map(i => <SkeletonCard key={i} />)}
-              </div>
-            ) : error ? (
-              <div style={{ textAlign: "center", padding: "48px 24px", background: "#FEF2F2", borderRadius: "12px", border: "1px solid #FECACA" }}>
-                <div style={{ fontSize: "32px", marginBottom: "12px" }}>⚠️</div>
-                <p style={{ fontFamily: FONT, color: C.red, fontWeight: "500" }}>{error}</p>
-                <button onClick={() => window.location.reload()} className="btn-outline" style={{ marginTop: "16px", padding: "10px 22px", borderRadius: "8px", border: `1px solid ${C.border}`, background: "transparent", cursor: "pointer", fontFamily: FONT, fontSize: "13px", transition: "background 0.2s" }}>Try again</button>
-              </div>
-            ) : filteredDeals.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "64px 24px" }}>
-                <div style={{ fontSize: "40px", marginBottom: "14px" }}>🌱</div>
-                <p style={{ fontFamily: FONT, color: C.muted, fontSize: "15px" }}>No arrangements found for <strong>"{occasion}"</strong>.</p>
-                <p style={{ fontFamily: FONT, color: C.muted, fontSize: "13px", marginTop: "6px" }}>Try a different occasion or browse all collections.</p>
-              </div>
-            ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(265px, 1fr))", gap: "24px" }}>
-                {filteredDeals.map(deal => (
-                  <div
-                    key={deal.id}
-                    className="product-card"
-                    onMouseEnter={() => setHoveredCard(deal.id)}
-                    onMouseLeave={() => setHoveredCard(null)}
-                    style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: "12px", overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.05)" }}
-                  >
-                    <div style={{ height: "240px", overflow: "hidden", position: "relative" }}>
-                      <img
-                        src={deal.imageUrl}
-                        alt={deal.name}
-                        onError={e => { e.target.src = "https://images.unsplash.com/photo-1490750967868-88df5691cc51?w=400"; }}
-                        style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease", transform: hoveredCard === deal.id ? "scale(1.07)" : "scale(1)" }}
-                      />
-                      {deal.occasion && (
-                        <span style={{ position: "absolute", top: "12px", left: "12px", background: "rgba(15,10,30,0.75)", color: "#fff", fontSize: "10px", fontWeight: "600", letterSpacing: "1px", textTransform: "uppercase", padding: "4px 10px", borderRadius: "20px", fontFamily: FONT }}>
-                          {deal.occasion}
-                        </span>
-                      )}
-                    </div>
+    {/* HEADER */}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "baseline",
+        justifyContent: "space-between",
+        marginBottom: "10px",
+        flexWrap: "wrap",
+        gap: "12px",
+      }}
+    >
+      <h2 style={{ fontFamily: SERIF, fontSize: "28px", fontWeight: "700", color: C.dark }}>
+        Seasonal collection
+      </h2>
 
-                    <div style={{ padding: "20px" }}>
-                      <div style={{ fontFamily: FONT, fontSize: "11px", fontWeight: "600", color: C.muted, textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
-                        {deal.category || "Fresh Arrangement"}
-                      </div>
-                      <h3 style={{ fontFamily: SERIF, fontSize: "18px", fontWeight: "600", color: C.dark, marginBottom: "6px", lineHeight: "1.3" }}>
-                        {deal.name}
-                      </h3>
-                      <p style={{ fontFamily: FONT, fontSize: "13px", color: C.muted, lineHeight: "1.6", marginBottom: "16px" }}>
-                        {deal.description}
-                      </p>
+      <span style={{ fontFamily: FONT, fontSize: "13px", color: C.muted }}>
+        Hand-picked fresh items for you 🌿
+      </span>
+    </div>
 
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
-                        <div>
-                          <span style={{ fontFamily: FONT, fontSize: "22px", fontWeight: "700", color: C.dark }}>${deal.price}</span>
-                          {deal.originalPrice && (
-                            <span style={{ fontFamily: FONT, fontSize: "13px", color: C.muted, textDecoration: "line-through", marginLeft: "8px" }}>${deal.originalPrice}</span>
-                          )}
-                        </div>
-                        <span style={{ fontFamily: FONT, fontSize: "11px", color: "#16a34a", fontWeight: "600" }}>✓ In stock</span>
-                      </div>
+    <p style={{ fontFamily: FONT, fontSize: "14px", color: C.muted, marginBottom: "40px" }}>
+      Discover fresh flowers, signature bouquets, and create your own arrangement.
+    </p>
 
-                      <button
-                        className="btn-dark"
-                        onClick={() => openQuantityPopup(deal)}
-                        style={{ background: C.dark, color: "#fff", border: "none", padding: "13px", width: "100%", fontSize: "13px", borderRadius: "8px", fontWeight: "600", cursor: "pointer", fontFamily: FONT, letterSpacing: "0.3px", transition: "background 0.2s" }}
-                      >
-                        Add to cart
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
+    {/* ── 3 FLOWERS ── */}
+    <h3 style={{ fontFamily: SERIF, marginBottom: "16px" }}>
+      Fresh Flowers
+    </h3>
+
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+        gap: "20px",
+        marginBottom: "40px",
+      }}
+    >
+      {deals.slice(0, 3).map((item) => (
+        <div
+          key={item.id}
+          style={{
+            background: C.white,
+            border: `1px solid ${C.border}`,
+            borderRadius: "12px",
+            padding: "16px",
+          }}
+        >
+          <img
+            src={item.foto || item.imageUrl}
+            alt={item.emertimi || item.name}
+            style={{
+              width: "100%",
+              height: "140px",
+              objectFit: "cover",
+              borderRadius: "10px",
+              marginBottom: "10px",
+            }}
+          />
+
+          <h4 style={{ fontFamily: SERIF, fontSize: "16px" }}>
+            {item.emertimi || item.name}
+          </h4>
+
+          <p style={{ fontFamily: FONT, fontSize: "13px", color: C.muted }}>
+            ${item.cmimi ?? item.price}
+          </p>
+        </div>
+      ))}
+    </div>
+
+    {/* ── 2 BOUQUETS ── */}
+    <h3 style={{ fontFamily: SERIF, marginBottom: "16px" }}>
+      Popular Bouquets
+    </h3>
+
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+        gap: "20px",
+        marginBottom: "40px",
+      }}
+    >
+      {deals.slice(0, 2).map((item) => (
+        <div
+          key={item.id}
+          style={{
+            background: C.white,
+            border: `1px solid ${C.border}`,
+            borderRadius: "12px",
+            padding: "16px",
+          }}
+        >
+          <img
+            src={item.foto || item.imageUrl}
+            alt={item.emertimi || item.name}
+            style={{
+              width: "100%",
+              height: "160px",
+              objectFit: "cover",
+              borderRadius: "10px",
+              marginBottom: "10px",
+            }}
+          />
+
+          <h4 style={{ fontFamily: SERIF, fontSize: "16px" }}>
+            {item.emertimi || item.name}
+          </h4>
+
+          <p style={{ fontFamily: FONT, fontSize: "13px", color: C.muted }}>
+            ${item.cmimi ?? item.price}
+          </p>
+        </div>
+      ))}
+    </div>
+
+    {/* ── CREATE BUTTON ── */}
+    <div style={{ textAlign: "center", marginTop: "20px" }}>
+      <h3 style={{ fontFamily: SERIF, marginBottom: "10px" }}>
+        Want something unique?
+      </h3>
+
+      <button
+        onClick={() => navigate("/user/bouquet-crud")}
+        style={{
+          background: C.teal,
+          color: "#fff",
+          border: "none",
+          padding: "14px 26px",
+          borderRadius: "10px",
+          fontSize: "14px",
+          fontWeight: "600",
+          cursor: "pointer",
+          fontFamily: FONT,
+          transition: "0.2s",
+        }}
+      >
+        🌸 Create your own bouquet
+      </button>
+    </div>
+
+  </div>
+</section>
 
         {/* ── NEWSLETTER ──────────────────────────────────── */}
         <section style={{ background: C.dark, padding: "80px 6%" }}>

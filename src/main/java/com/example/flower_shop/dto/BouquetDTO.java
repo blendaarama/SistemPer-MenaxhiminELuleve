@@ -12,5 +12,5 @@ public class BouquetDTO {
     private String foto;
     private Boolean eshteAktiv;
     private List<String> emratELuleve;
-    private List<Integer> flowerIds;
+    private List<BouquetFlowerRequestDTO> flowers;
 }

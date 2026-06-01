@@ -18,7 +18,7 @@ public class Bouquet {
     private String pershkrimi;
 
     @Column(nullable = false)
-    private Double cmimi;
+    private Double cmimi=0.0;
     
     private String madhesia;
     private String foto;

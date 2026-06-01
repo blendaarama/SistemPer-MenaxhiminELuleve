@@ -8,7 +8,28 @@ const Bouquets = () => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  const { addToCart } = useCart();
+  const { addToCart, activeOccasion } = useCart();
+
+  const isOccasionActive = (name) => {
+  const today = new Date();
+  const day = today.getDate();
+  const month = today.getMonth() + 1;
+
+  if (emertimi === "Valentines Day") {
+    return month === 2 && day >= 10 && day <= 14;
+  }
+
+  if (emertimi === "Mothers Day") {
+    return month === 3 && day >= 6 && day <= 8;
+  }
+
+  if (emertimi === "Wedding Season") {
+    return true;
+  }
+
+  return false;
+};
+
   const token = localStorage.getItem("accessToken"); 
 
   useEffect(() => {
@@ -33,11 +54,21 @@ const Bouquets = () => {
     }
   };
 
+  const applyDiscount = (price) => {
+    if (!activeOccasion) return price;
+    return price - (price * activeOccasion.zbritjaPerqindje) / 100;
+  };
+
   const handleAddToCart = (b) => {
+
+    const finalPrice = activeOccasion
+      ? applyDiscount(b.cmimi)
+      : b.cmimi;
+
     addToCart({
       id: b.id,
       name: b.emertimi,
-      price: b.cmimi,
+      price: finalPrice,
       image: b.foto
     });
 
@@ -74,7 +105,7 @@ const Bouquets = () => {
         Our Bouquet Selection
       </h1>
 
-      {/* MESSAGE / TOAST */}
+      {/* MESSAGE */}
       {message && (
         <div style={{
           backgroundColor: "#2C1A4A",
@@ -158,7 +189,18 @@ const Bouquets = () => {
               fontSize: "18px",
               margin: "10px 0"
             }}>
-              {b.cmimi} €
+              {activeOccasion ? (
+                <>
+                  <span style={{ textDecoration: "line-through", color: "#999" }}>
+                    {b.cmimi} €
+                  </span>{" "}
+                  <span style={{ fontWeight: "bold" }}>
+                    {applyDiscount(b.cmimi).toFixed(2)} €
+                  </span>
+                </>
+              ) : (
+                `${b.cmimi} €`
+              )}
             </p>
 
             <button

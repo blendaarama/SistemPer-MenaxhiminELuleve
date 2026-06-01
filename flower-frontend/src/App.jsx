@@ -28,6 +28,7 @@ import CustomerCRUD from "./components/CustomerCRUD";
 import DeliveriesCRUD from "./components/DeliveriesCRUD.jsx";
 import ReviewsCRUD from "./components/ReviewsCRUD";
 import PrivateRoute from "./components/PrivateRoute";
+import UserBouquetCrud from "./components/UserBouquetCRUD.jsx";
 
 const AppFooter = () => (
   <footer style={{ background: "#2B1A4A", color: "#FFFFFF", padding: "60px 10%", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "80px", marginTop: "auto" }}>
@@ -42,6 +43,9 @@ const AppFooter = () => (
     </div>
     <div style={{ flex: "1 1 400px" }}>
       <h3 style={{ color: "white", marginBottom: "20px", fontSize: "20px", fontWeight: "bold" }}>Contact Us</h3>
+      <p style={{ fontSize: "14px", marginBottom: "15px", lineHeight: "1.6"}}>
+      Jemi këtu për t'ju ndihmuar me çdo pyetje apo nevojë për dekorim. Na kontaktoni për çdo porosi ose paqartësi.
+      </p>
       <div style={{ display: "flex", flexDirection: "column", gap: "12px", fontSize: "14px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <FaEnvelope color="#0E5A5B" />
@@ -76,6 +80,9 @@ function AppContent() {
         <Route path="/user/bouquets"  element={<Bouquets />} />
         <Route path="/user/occasions" element={<Occasions />} />
         <Route path="/user/reviews"   element={<Reviews />} />
+        <Route path="/user/bouquet-crud"  element={<UserBouquetCrud />} />
+        
+
 
         <Route path="/order" element={<PrivateRoute><CartPage /></PrivateRoute>} />
 

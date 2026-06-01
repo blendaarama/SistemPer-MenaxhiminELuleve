@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useCart } from "../context/CartContext";
 
 const Occasions = () => {
   const [occasions, setOccasions] = useState([]);
   const [selectedOccasion, setSelectedOccasion] = useState(null);
+
+  const { setActiveOccasion } = useCart();
 
   const images = [
     "/images/valentineDays.webp",
@@ -18,10 +21,17 @@ const Occasions = () => {
       .catch((err) => console.error("Error fetching occasions:", err));
   }, []);
 
-  // 🔥 discount logic
-  const applyDiscount = (price, discount) => {
-    if (!discount) return price;
-    return price - (price * discount) / 100;
+  const isOccasionActive = (o) => {
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+
+    const name = o.emertimi?.toLowerCase();
+
+    if (name?.includes("wedding")) return true;
+
+    if (!o.dataNgjarjes) return false;
+
+    return todayStr === o.dataNgjarjes;
   };
 
   return (
@@ -33,7 +43,6 @@ const Occasions = () => {
         alignItems: "center",
       }}
     >
-      {/* TITLE */}
       <h1
         style={{
           fontFamily: "Georgia, serif",
@@ -63,7 +72,14 @@ const Occasions = () => {
           return (
             <div
               key={o.id}
-              onClick={() => setSelectedOccasion(o)}
+              onClick={() => {
+                if (isOccasionActive(o)) {
+                  setSelectedOccasion(o);
+                  setActiveOccasion(o);
+                } else {
+                  alert("Ky occasion nuk është aktiv sot!");
+                }
+              }}
               style={{
                 border: isSelected
                   ? "2px solid #0D5C5C"
@@ -76,9 +92,9 @@ const Occasions = () => {
                 boxShadow: isSelected
                   ? "0 6px 20px rgba(13,92,92,0.2)"
                   : "none",
+                opacity: isOccasionActive(o) ? 1 : 0.6,
               }}
             >
-              {/* IMAGE */}
               <img
                 src={images[index % images.length]}
                 alt={o.emertimi}
@@ -91,16 +107,14 @@ const Occasions = () => {
                 }}
               />
 
-              <h3 style={{ fontSize: "20px", marginTop: "10px" }}>
-                {o.emertimi}
-              </h3>
+              <h3>{o.emertimi}</h3>
 
               <p style={{ color: "#555", fontSize: "14px" }}>
                 {o.pershkrimi}
               </p>
 
               <p style={{ color: "#777", fontSize: "13px" }}>
-                Date: {o.dataNgjarjes}
+                Date: {o.dataNgjarjes || "Always active"}
               </p>
 
               <p style={{ color: "#C0392B", fontWeight: "bold" }}>
@@ -123,33 +137,6 @@ const Occasions = () => {
           );
         })}
       </div>
-
-      {/* 🔥 PREVIEW ZBRITJA (OPTIONAL TEST AREA) */}
-      {selectedOccasion && (
-        <div
-          style={{
-            marginTop: "40px",
-            padding: "20px",
-            border: "1px solid #ddd",
-            borderRadius: "10px",
-            width: "100%",
-            maxWidth: "500px",
-            textAlign: "center",
-          }}
-        >
-          <h3>Discount Preview</h3>
-          <p>
-            Original Price: <b>$100</b>
-          </p>
-          <p>
-            Discount: <b>{selectedOccasion.zbritjaPerqindje}%</b>
-          </p>
-          <p style={{ color: "#0D5C5C", fontSize: "20px" }}>
-            Final Price: $
-            {applyDiscount(100, selectedOccasion.zbritjaPerqindje).toFixed(2)}
-          </p>
-        </div>
-      )}
     </div>
   );
 };

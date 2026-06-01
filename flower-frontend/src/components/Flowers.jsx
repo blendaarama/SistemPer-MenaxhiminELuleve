@@ -8,7 +8,7 @@ const Flowers = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
 
-  const { addToCart } = useCart();
+  const { addToCart, activeOccasion } = useCart();
 
   useEffect(() => {
     axios.get('http://localhost:8080/api/flowers')
@@ -22,11 +22,21 @@ const Flowers = () => {
       });
   }, []);
 
+  const applyDiscount = (price) => {
+    if (!activeOccasion) return price;
+    return price - (price * activeOccasion.zbritjaPerqindje) / 100;
+  };
+
   const handleAddToCart = (flower) => {
+
+    const finalPrice = activeOccasion
+      ? applyDiscount(flower.cmimi)
+      : flower.cmimi;
+
     addToCart({
       id: flower.id,
       name: flower.emertimi,
-      price: flower.cmimi,
+      price: finalPrice, 
       image: flower.foto
     });
 
@@ -54,7 +64,7 @@ const Flowers = () => {
         Our Flower Collection
       </h1>
 
-      {/* MESSAGE / TOAST */}
+      {/* MESSAGE */}
       {message && (
         <div style={{
           backgroundColor: "#2C1A4A",
@@ -96,7 +106,19 @@ const Flowers = () => {
               </p>
 
               <p style={{ margin: '4px 0', fontSize: '14px', color: '#555' }}>
-                <strong>Price:</strong> {flower.cmimi} €
+                <strong>Price:</strong>{" "}
+                {activeOccasion ? (
+                  <>
+                    <span style={{ textDecoration: "line-through", color: "#999" }}>
+                      {flower.cmimi} €
+                    </span>{" "}
+                    <span style={{ color: "#2C1A4A", fontWeight: "bold" }}>
+                      {applyDiscount(flower.cmimi).toFixed(2)} €
+                    </span>
+                  </>
+                ) : (
+                  `${flower.cmimi} €`
+                )}
               </p>
               
               {flower.sasiaStokut > 0 ? (

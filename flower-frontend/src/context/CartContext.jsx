@@ -12,6 +12,8 @@ export const CartProvider = ({ children }) => {
     }
   });
 
+  const [activeOccasion, setActiveOccasion] = useState(null);
+
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
@@ -34,7 +36,6 @@ export const CartProvider = ({ children }) => {
     setCartItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  // NEW: set exact quantity (removes if qty <= 0)
   const updateQuantity = (id, qty) => {
     if (qty <= 0) {
       removeFromCart(id);
@@ -53,7 +54,16 @@ export const CartProvider = ({ children }) => {
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart, itemCount }}
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        itemCount,
+        activeOccasion,
+        setActiveOccasion
+      }}
     >
       {children}
     </CartContext.Provider>
