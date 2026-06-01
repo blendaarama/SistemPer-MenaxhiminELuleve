@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -31,38 +33,39 @@ public class JwtFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String path = request.getRequestURI();
-        if (path.startsWith("/api/products") || path.startsWith("/auth/") || path.equals("/") || path.startsWith("/api/orders")) { 
+
+        // PUBLIC ROUTES
+        if (
+            path.startsWith("/auth/") ||
+            path.startsWith("/api/products") ||
+            path.startsWith("/api/flowers") ||
+            path.startsWith("/api/occasions") ||
+            path.equals("/")
+        ) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        // HANDLE OPTIONS (CORS)
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        final String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String jwt = authHeader.substring(7);
+        String token = authHeader.substring(7);
 
-        if (jwt.isBlank() || jwt.split("\\.").length != 3) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String username = null;
+        String username;
 
         try {
-
-            username = jwtService.extractUsername(jwt);
-
+            username = jwtService.extractUsername(token);
         } catch (Exception e) {
-
             filterChain.doFilter(request, response);
             return;
         }
@@ -70,25 +73,25 @@ public class JwtFilter extends OncePerRequestFilter {
         if (username != null &&
                 SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails =
-                    userService.loadUserByUsername(username);
+            UserDetails userDetails = userService.loadUserByUsername(username);
 
-            if (jwtService.validateToken(jwt, userDetails)) {
+            // ✅ RREGULLUAR: userDetails (jo username)
+            if (jwtService.validateToken(token, userDetails)) {
+
+                String role = jwtService.extractRole(token);
 
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
                                 null,
-                                userDetails.getAuthorities()
+                                List.of(new SimpleGrantedAuthority(role))
                         );
 
                 authToken.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request)
+                        new WebAuthenticationDetailsSource().buildDetails(request)
                 );
 
-                SecurityContextHolder.getContext()
-                        .setAuthentication(authToken);
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
 

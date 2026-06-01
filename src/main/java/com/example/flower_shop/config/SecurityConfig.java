@@ -21,7 +21,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig {  // ✅ KLASA MUNGONTE
 
     private final JwtFilter jwtFilter;
 
@@ -35,30 +35,26 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-
                 .requestMatchers("/auth/**").permitAll()
-
                 .requestMatchers(
-                    "/",
+                    "/api/products/**",
                     "/api/flowers/**",
                     "/api/occasions/**",
-                    "/api/products/**",
                     "/api/bouquets/**"
                 ).permitAll()
 
                 .requestMatchers(
-                    "/api/customers/**",
                     "/api/suppliers/**",
+                    "/api/customers/**",
                     "/api/supply-orders/**",
                     "/api/deliveries/**"
-                ).hasAnyAuthority("ADMIN", "ROLE_ADMIN")
+                ).hasAuthority("ROLE_ADMIN")
 
                 .requestMatchers(
                     "/api/orders/**",
                     "/api/porosi/**",
-                    "/api/order-details/**",
                     "/api/reviews/**"
-                ).hasAnyAuthority("USER", "ADMIN", "ROLE_USER", "ROLE_ADMIN")
+                ).hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
 
                 .anyRequest().authenticated()
             )
@@ -75,9 +71,8 @@ public class SecurityConfig {
             "http://localhost:3001",
             "http://localhost:5173"
         ));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS","PATCH"));
         config.setAllowedHeaders(List.of("*"));
-        config.setExposedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
