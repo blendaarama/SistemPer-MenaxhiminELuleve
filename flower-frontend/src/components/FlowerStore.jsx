@@ -267,8 +267,6 @@ const Homepage = () => {
               { label: "Flowers",   to: "/user/flowers" },
               { label: "Bouquets",  to: "/user/bouquets" },
               { label: "Occasions", to: "/user/occasions" },
-              { label: "Plants",    to: "/user/plants" },
-              { label: "Gifts",     to: "/user/gifts" },
             ].map(item => (
               <Link key={item.label} to={item.to} className="nav-link"
                 style={{ fontFamily: FONT, fontSize: "13px", fontWeight: "500", color: C.text, textDecoration: "none", letterSpacing: "0.2px", paddingBottom: "4px" }}>

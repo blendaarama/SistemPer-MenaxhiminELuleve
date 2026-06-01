@@ -25,15 +25,12 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email).orElse(null);
     }
 
+    // ✅ Kthen edhe rolin saktë
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = getUserByEmail(email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found: " + email);
-        }
-
-        // ✅ RREGULLUAR: shto "ROLE_" prefix që të përputhet me JwtFilter
         String authority = user.getRole().startsWith("ROLE_")
                 ? user.getRole()
                 : "ROLE_" + user.getRole();

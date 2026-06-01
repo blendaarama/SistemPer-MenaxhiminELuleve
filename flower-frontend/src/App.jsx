@@ -5,6 +5,12 @@ import { FaEnvelope, FaInstagram, FaPhoneAlt } from "react-icons/fa";
 import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 
+import UsersCRUD        from "./components/UsersCRUD";
+import OrderItemsCRUD   from "./components/OrderItemsCRUD";
+import SupplyOrdersCRUD from "./components/SupplyOrdersCRUD";
+
+
+
 const CartPage = lazy(() => import("./pages/CartPage"));
 const AboutUs = lazy(() => import("./components/AboutUs.jsx"));
 const Flowers = lazy(() => import("./components/Flowers"));
@@ -83,7 +89,9 @@ function AppContent() {
         <Route path="/user/occasions" element={<Occasions />} />
         <Route path="/user/reviews"   element={<Reviews />} />
         <Route path="/user/bouquet-crud"  element={<UserBouquetCrud />} />
-        
+        <Route path="/users"         element={<UsersCRUD />} />
+<Route path="/order-items"   element={<OrderItemsCRUD />} />
+<Route path="/supply-orders" element={<SupplyOrdersCRUD />} />
 
 
         <Route path="/order" element={<PrivateRoute><CartPage /></PrivateRoute>} />

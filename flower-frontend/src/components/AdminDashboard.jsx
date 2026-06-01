@@ -22,7 +22,10 @@ const AdminDashboard = () => {
     { title: "Suppliers Portal", desc: "Menaxhimi i furnitorëve.", path: "/suppliers", tag: "Supply Chain" },
     { title: "Deliveries Hub", desc: "Monitorimi i dërgesave.", path: "/deliveries", tag: "Distribution" },
     { title: "Client Reviews", desc: "Moderimi i feedback-ut.", path: "/reviews", tag: "Moderation" },
-    { title: "Occasions", desc: "Menaxho rastet dhe ngjarjet speciale.", path: "/occasions", tag: "Event Management" }
+    { title: "Occasions", desc: "Menaxho rastet dhe ngjarjet speciale.", path: "/occasions", tag: "Event Management" },
+    { title: "Order Items",   desc: "Detajet e zërave të çdo porosie.",          path: "/order-items",   tag: "Sales Detail"   },
+{ title: "Supply Orders", desc: "Porositë e blerjes nga furnitorët.",         path: "/supply-orders", tag: "Procurement"    },
+{ title: "System Users",  desc: "Llogari dhe roli i përdoruesve të sistemit.", path: "/users",        tag: "Administration" },
   ];
 
   useEffect(() => {
@@ -33,7 +36,7 @@ const AdminDashboard = () => {
     setLoading(true);
 
     try {
-      const ordersRes = await axios.get("http://localhost:8080/api/orders")
+      const ordersRes = await axios.get("http://localhost:8080/api/porosi")
         .catch(() => ({
           data: JSON.parse(localStorage.getItem("orders")) || [],
         }));

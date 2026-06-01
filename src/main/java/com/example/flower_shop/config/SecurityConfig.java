@@ -1,9 +1,14 @@
 package com.example.flower_shop.config;
 
 import com.example.flower_shop.security.JwtFilter;
+import com.example.flower_shop.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -21,9 +26,10 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {  // ✅ KLASA MUNGONTE
+public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final UserService userService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -33,34 +39,62 @@ public class SecurityConfig {  // ✅ KLASA MUNGONTE
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
+            .authenticationProvider(authenticationProvider())
             .authorizeHttpRequests(auth -> auth
+
+                // ✅ CORS preflight
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+
+                // ✅ Auth endpoints — publike
                 .requestMatchers("/auth/**").permitAll()
+
+                // ✅ Produkte/lule — publike
                 .requestMatchers(
                     "/api/products/**",
                     "/api/flowers/**",
                     "/api/occasions/**",
                     "/api/bouquets/**"
                 ).permitAll()
+                
 
+                // ✅ Vetëm ADMIN
                 .requestMatchers(
+                    "/api/users/**",
                     "/api/suppliers/**",
                     "/api/customers/**",
                     "/api/supply-orders/**",
                     "/api/deliveries/**"
                 ).hasAuthority("ROLE_ADMIN")
 
-                .requestMatchers(
-                    "/api/orders/**",
-                    "/api/porosi/**",
-                    "/api/reviews/**"
-                ).hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                // ✅ USER dhe ADMIN
+               .requestMatchers(
+    "/api/orders/**",
+    "/api/porosi/**",
+    "/api/order-details/**",
+    "/api/reviews/**",
+    "/api/payments/**",
+    "/api/inventory/**"
+).hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
 
+                // ✅ Çdo gjë tjetër kërkon autentikim
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean
@@ -71,7 +105,7 @@ public class SecurityConfig {  // ✅ KLASA MUNGONTE
             "http://localhost:3001",
             "http://localhost:5173"
         ));
-        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS","PATCH"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
