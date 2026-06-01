@@ -105,6 +105,7 @@ const Occasions = () => {
                   borderRadius: "6px",
                   marginBottom: "15px",
                 }}
+                loading="lazy"
               />
 
               <h3>{o.emertimi}</h3>

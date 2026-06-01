@@ -93,6 +93,7 @@ const Flowers = () => {
               src={flower.foto} 
               alt={flower.emertimi} 
               style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '4px' }} 
+              loading="lazy"
             />
             
             <div className="flower-info" style={{ marginTop: '15px' }}>

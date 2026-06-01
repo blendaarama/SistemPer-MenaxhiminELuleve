@@ -147,6 +147,7 @@ const AboutUs = () => {
                 alt="Eternal Rose flower shop interior"
                 style={{ width: "100%", borderRadius: "16px", display: "block", boxShadow: "0 24px 64px rgba(0,0,0,0.14)" }}
                 onError={e => { e.target.src = "https://images.unsplash.com/photo-1490750967868-88df5691cc51?w=800"; }}
+                loading="lazy"
               />
               {/* floating badge */}
               <div style={{ position: "absolute", bottom: "24px", left: "24px", background: C.white, borderRadius: "12px", padding: "14px 20px", boxShadow: "0 8px 32px rgba(0,0,0,0.16)", display: "flex", alignItems: "center", gap: "12px" }}>

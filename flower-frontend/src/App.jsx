@@ -1,34 +1,35 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Link } from "react-router-dom";
 import { FaEnvelope, FaInstagram, FaPhoneAlt } from "react-icons/fa";
 
-import CartPage from "./pages/CartPage";
-import AboutUs from "./components/AboutUs.jsx";
-import Flowers from "./components/Flowers";
-import Bouquets from "./components/Bouquets";
-import Occasions from "./components/Occasions";
-import Reviews from "./components/Reviews";
-import Login from "./components/Login";
-import Register from "./components/Register";
 import Navbar from "./components/Navbar";
-import FlowerStore from "./components/FlowerStore";
-import SearchResults from "./pages/SearchResults";
-import AdminDashboard from "./components/AdminDashboard";
-import FlowerCRUD from "./components/FlowerCRUD";
-import BouquetCRUD from "./components/BouquetCRUD";
-import OccasionCRUD from "./components/OccasionCRUD";
-import SupplierCRUD from "./components/SupplierCRUD";
-import OrderPage from "./components/OrderPage";
-import OrderCRUD from "./components/OrderCRUD";
-import CategoriesCRUD from "./components/CategoriesCRUD";
-import InventoryCRUD from "./components/InventoryCRUD";
-import OrderDetails from "./components/OrderDetails";
-import PaymentsCrud from "./components/PaymentsCrud";
-import CustomerCRUD from "./components/CustomerCRUD";
-import DeliveriesCRUD from "./components/DeliveriesCRUD.jsx";
-import ReviewsCRUD from "./components/ReviewsCRUD";
 import PrivateRoute from "./components/PrivateRoute";
-import UserBouquetCrud from "./components/UserBouquetCRUD.jsx";
+
+const CartPage = lazy(() => import("./pages/CartPage"));
+const AboutUs = lazy(() => import("./components/AboutUs.jsx"));
+const Flowers = lazy(() => import("./components/Flowers"));
+const Bouquets = lazy(() => import("./components/Bouquets"));
+const Occasions = lazy(() => import("./components/Occasions"));
+const Reviews = lazy(() => import("./components/Reviews"));
+const Login = lazy(() => import("./components/Login"));
+const Register = lazy(() => import("./components/Register"));
+const FlowerStore = lazy(() => import("./components/FlowerStore"));
+const SearchResults = lazy(() => import("./pages/SearchResults"));
+const AdminDashboard = lazy(() => import("./components/AdminDashboard"));
+const FlowerCRUD = lazy(() => import("./components/FlowerCRUD"));
+const BouquetCRUD = lazy(() => import("./components/BouquetCRUD"));
+const OccasionCRUD = lazy(() => import("./components/OccasionCRUD"));
+const SupplierCRUD = lazy(() => import("./components/SupplierCRUD"));
+const OrderPage = lazy(() => import("./components/OrderPage"));
+const OrderCRUD = lazy(() => import("./components/OrderCRUD"));
+const CategoriesCRUD = lazy(() => import("./components/CategoriesCRUD"));
+const InventoryCRUD = lazy(() => import("./components/InventoryCRUD"));
+const OrderDetails = lazy(() => import("./components/OrderDetails"));
+const PaymentsCrud = lazy(() => import("./components/PaymentsCrud"));
+const CustomerCRUD = lazy(() => import("./components/CustomerCRUD"));
+const DeliveriesCRUD = lazy(() => import("./components/DeliveriesCRUD.jsx"));
+const ReviewsCRUD = lazy(() => import("./components/ReviewsCRUD"));
+const UserBouquetCrud = lazy(() => import("./components/UserBouquetCRUD.jsx"));
 
 const AppFooter = () => (
   <footer style={{ background: "#2B1A4A", color: "#FFFFFF", padding: "60px 10%", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "80px", marginTop: "auto" }}>
@@ -70,6 +71,7 @@ function AppContent() {
     <>
       {!isAuth && <Navbar />}
 
+      <Suspense fallback={<div style={{padding:"40px", textAlign:"center"}}>Loading...</div>}>
       <Routes>
         <Route path="/login"    element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -106,6 +108,7 @@ function AppContent() {
         <Route path="/search" element={<SearchResults />} />
         <Route path="*"       element={<Navigate to="/" />} />
       </Routes>
+      </Suspense>
 
       {!isAuth && <AppFooter />}
     </>

@@ -154,6 +154,7 @@ const Bouquets = () => {
                 objectFit: "cover",
                 borderRadius: "4px"
               }}
+              loading="lazy"
             />
 
             <h3 style={{ fontSize: "20px", marginTop: "15px" }}>

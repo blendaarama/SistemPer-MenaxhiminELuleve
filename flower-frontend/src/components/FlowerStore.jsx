@@ -304,6 +304,7 @@ const Homepage = () => {
               src="https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=1200"
               alt="Summer bloom bouquet"
               style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", minHeight: "420px" }}
+              loading="lazy"
             />
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(15,10,30,0.18) 0%, transparent 60%)" }} />
           </div>
@@ -408,7 +409,7 @@ const Homepage = () => {
               {categories.map(cat => (
                 <div key={cat.name} className="cat-item" style={{ flex: "0 0 120px", textAlign: "center" }}>
                   <div style={{ width: "110px", height: "110px", borderRadius: "50%", overflow: "hidden", margin: "0 auto 12px", border: `3px solid ${C.border}`, transition: "border-color 0.25s" }}>
-                    <img src={cat.img} alt={cat.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <img src={cat.img} alt={cat.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy"/>
                   </div>
                   <div className="cat-label" style={{ fontFamily: FONT, fontSize: "13px", fontWeight: "600", color: C.text, transition: "color 0.25s" }}>{cat.name}</div>
                 </div>
@@ -479,6 +480,7 @@ const Homepage = () => {
               borderRadius: "10px",
               marginBottom: "10px",
             }}
+            loading="lazy"
           />
 
           <h4 style={{ fontFamily: SERIF, fontSize: "16px" }}>
@@ -525,6 +527,7 @@ const Homepage = () => {
               borderRadius: "10px",
               marginBottom: "10px",
             }}
+            loading="lazy"
           />
 
           <h4 style={{ fontFamily: SERIF, fontSize: "16px" }}>
