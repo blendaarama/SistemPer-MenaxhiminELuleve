@@ -9,7 +9,7 @@ const Bouquets = () => {
   const [message, setMessage] = useState("");
 
   const { addToCart } = useCart();
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("accessToken"); 
 
   useEffect(() => {
     fetchBouquets();

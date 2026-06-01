@@ -36,11 +36,31 @@ const SkeletonCard = () => (
 );
 
 /* ─── STAR RATING ────────────────────────────────────── */
-const StarRating = ({ score = 5 }) => (
-  <div style={{ color: C.gold, fontSize: "14px", letterSpacing: "2px", marginBottom: "10px" }}>
-    {"★".repeat(Math.min(5, score))}{"☆".repeat(5 - Math.min(5, score))}
-  </div>
-);
+/*
+ * Self-contained component.
+ * - score  : current rating value (0-5)
+ * - onRate : callback(newScore) — if omitted the stars are read-only
+ */
+const StarRating = ({ score = 0, onRate }) => {
+  const [hoverRating, setHoverRating] = useState(0);
+  const interactive = typeof onRate === "function";
+
+  return (
+    <div style={{ color: C.gold, fontSize: "22px", cursor: interactive ? "pointer" : "default", userSelect: "none", marginBottom: "4px" }}>
+      {[1, 2, 3, 4, 5].map(i => (
+        <span
+          key={i}
+          onClick={() => interactive && onRate(i)}
+          onMouseEnter={() => interactive && setHoverRating(i)}
+          onMouseLeave={() => interactive && setHoverRating(0)}
+          style={{ marginRight: "2px", transition: "color 0.15s", color: i <= (hoverRating || score) ? C.gold : "#D9D0C4" }}
+        >
+          {i <= (hoverRating || score) ? "★" : "☆"}
+        </span>
+      ))}
+    </div>
+  );
+};
 
 /* ═══════════════════════════════════════════════════════
    HOMEPAGE
@@ -65,8 +85,9 @@ const Homepage = () => {
     try { return JSON.parse(localStorage.getItem("reviews") || "[]"); }
     catch { return []; }
   });
-  const [newReview,       setNewReview]       = useState({ customerId: "", comment: "" });
-  const [isAdmin]                             = useState(() => localStorage.getItem("role") === "ADMIN");
+  const [newReview,  setNewReview]  = useState({ customerId: "", comment: "" });
+  const [reviewRating, setReviewRating] = useState(5);
+  const [isAdmin]                   = useState(() => localStorage.getItem("role") === "ADMIN");
 
   /* search state — used by the hero search bar */
   const [searchQuery, setSearchQuery] = useState("");
@@ -102,7 +123,7 @@ const Homepage = () => {
   const handleConfirmAdd  = () => { addToCart(selectedProduct, quantity); setShowPopup(false); };
   const scrollToTop       = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  /* ── unified search handler (used by both search bars) */
+  /* unified search handler */
   const handleSearch = e => {
     e.preventDefault();
     const q = searchQuery.trim();
@@ -123,12 +144,13 @@ const Homepage = () => {
       id: Date.now(),
       customerId: newReview.customerId.trim() || "Anonymous",
       comment: newReview.comment,
-      score: 5,
+      score: reviewRating,
     };
     const updated = [...reviews, entry];
     localStorage.setItem("reviews", JSON.stringify(updated));
     setReviews(updated);
     setNewReview({ customerId: "", comment: "" });
+    setReviewRating(5);
     setShowReviewModal(false);
   };
 
@@ -211,7 +233,6 @@ const Homepage = () => {
         .back-to-top:hover { background: ${C.tealLt} !important; transform: scale(1.1) !important; }
         input::placeholder, textarea::placeholder { color: #AAA; }
         input:focus, textarea:focus, select:focus { border-color: ${C.teal} !important; box-shadow: 0 0 0 3px rgba(13,92,92,0.12); }
-        /* search bar focus ring override for dark bg */
         .search-dark:focus { border-color: rgba(255,255,255,0.6) !important; box-shadow: 0 0 0 3px rgba(255,255,255,0.12) !important; }
       `}</style>
 
@@ -269,6 +290,8 @@ const Homepage = () => {
               <button style={{ background: "transparent", border: `1px solid ${C.border}`, padding: "8px 18px", borderRadius: "6px", fontSize: "13px", fontWeight: "500", cursor: "pointer", color: C.text, fontFamily: FONT, transition: "border-color 0.2s" }}>
                 Sign In
               </button>
+            </Link>
+            <Link to="/order" style={{ textDecoration: "none" }}>
             </Link>
           </div>
         </nav>
@@ -543,6 +566,7 @@ const Homepage = () => {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "20px" }}>
               {allTestimonials.map((t, i) => (
                 <div key={i} style={{ background: C.cream, border: `1px solid ${C.border}`, borderRadius: "12px", padding: "26px", animation: `fadeUp 0.5s ease ${i * 0.08}s both` }}>
+                  {/* read-only stars — no onRate passed */}
                   <StarRating score={t.score} />
                   <h4 style={{ fontFamily: SERIF, fontSize: "16px", fontWeight: "600", color: C.dark, marginBottom: "10px" }}>{t.title}</h4>
                   <p style={{ fontFamily: FONT, fontSize: "14px", color: C.muted, lineHeight: "1.7", marginBottom: "18px" }}>{t.text}</p>
@@ -630,6 +654,23 @@ const Homepage = () => {
                 Share your experience — your feedback helps thousands of customers.
               </p>
 
+              {/* ── INTERACTIVE STAR RATING ── */}
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{ fontFamily: FONT, fontSize: "12px", fontWeight: "600", color: C.muted, textTransform: "uppercase", letterSpacing: "0.8px", display: "block", marginBottom: "8px" }}>
+                  Your rating
+                </label>
+                {/* onRate prop passed → becomes interactive (0 click resets to 0) */}
+                <StarRating score={reviewRating} onRate={setReviewRating} />
+                <span style={{ fontFamily: FONT, fontSize: "12px", color: C.muted, marginTop: "4px", display: "inline-block" }}>
+                  {reviewRating === 0 && "Select a rating"}
+                  {reviewRating === 1 && "★ Poor"}
+                  {reviewRating === 2 && "★★ Fair"}
+                  {reviewRating === 3 && "★★★ Good"}
+                  {reviewRating === 4 && "★★★★ Very good"}
+                  {reviewRating === 5 && "★★★★★ Excellent"}
+                </span>
+              </div>
+
               <label style={{ fontFamily: FONT, fontSize: "12px", fontWeight: "600", color: C.muted, textTransform: "uppercase", letterSpacing: "0.8px", display: "block", marginBottom: "6px" }}>Your name</label>
               <input
                 placeholder="e.g. Sarah M."
@@ -647,13 +688,18 @@ const Homepage = () => {
               />
 
               <div style={{ display: "flex", gap: "10px" }}>
-                <button className="btn-outline"
-                  onClick={() => { setShowReviewModal(false); setNewReview({ customerId: "", comment: "" }); }}
-                  style={{ flex: 1, padding: "13px", border: `1px solid ${C.border}`, background: "transparent", cursor: "pointer", borderRadius: "8px", fontFamily: FONT, fontSize: "14px", transition: "background 0.2s" }}>
+                <button
+                  className="btn-outline"
+                  onClick={() => { setShowReviewModal(false); setNewReview({ customerId: "", comment: "" }); setReviewRating(5); }}
+                  style={{ flex: 1, padding: "13px", border: `1px solid ${C.border}`, background: "transparent", cursor: "pointer", borderRadius: "8px", fontFamily: FONT, fontSize: "14px", transition: "background 0.2s" }}
+                >
                   Cancel
                 </button>
-                <button className="btn-teal" onClick={handleSubmitReview}
-                  style={{ flex: 1, padding: "13px", background: C.teal, color: "#fff", border: "none", cursor: "pointer", borderRadius: "8px", fontWeight: "600", fontFamily: FONT, fontSize: "14px", transition: "background 0.2s" }}>
+                <button
+                  className="btn-teal"
+                  onClick={handleSubmitReview}
+                  style={{ flex: 1, padding: "13px", background: C.teal, color: "#fff", border: "none", cursor: "pointer", borderRadius: "8px", fontWeight: "600", fontFamily: FONT, fontSize: "14px", transition: "background 0.2s" }}
+                >
                   Submit review
                 </button>
               </div>

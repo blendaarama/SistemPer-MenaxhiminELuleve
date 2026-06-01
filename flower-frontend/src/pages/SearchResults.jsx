@@ -216,14 +216,17 @@ const SearchResults = () => {
                 >
                   {/* product image */}
                   <div style={{ height: "220px", overflow: "hidden", position: "relative" }}>
-                    <img
-                      src={product.imageUrl || product.image}
-                      alt={product.name}
-                      onError={e => { e.target.src = "https://images.unsplash.com/photo-1490750967868-88df5691cc51?w=400"; }}
-                      style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" }}
-                      onMouseEnter={e => e.currentTarget.style.transform = "scale(1.06)"}
-                      onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
-                    />
+                   <img
+  src={product.imageUrl || "https://images.unsplash.com/photo-1490750967868-88df5691cc51?w=400"}
+  alt={product.name}
+  onError={e => { 
+    e.target.onerror = null; 
+    e.target.src = "https://images.unsplash.com/photo-1490750967868-88df5691cc51?w=400"; 
+  }}
+  style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" }}
+  onMouseEnter={e => e.currentTarget.style.transform = "scale(1.06)"}
+  onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+/>
                     {product.occasion && (
                       <span style={{ position: "absolute", top: "10px", left: "10px", background: "rgba(15,10,30,0.72)", color: "#fff", fontSize: "10px", fontWeight: "600", letterSpacing: "1px", textTransform: "uppercase", padding: "3px 9px", borderRadius: "20px", fontFamily: FONT }}>
                         {product.occasion}

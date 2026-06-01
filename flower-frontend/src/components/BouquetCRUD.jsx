@@ -22,7 +22,7 @@ const BouquetCRUD = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const config = { headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` } };
+    const config = { headers: { "Authorization": `Bearer ${localStorage.getItem("accessToken")}` } };
 
     useEffect(() => {
         loadBouquets();
