@@ -36,11 +36,6 @@ const SkeletonCard = () => (
 );
 
 /* ─── STAR RATING ────────────────────────────────────── */
-/*
- * Self-contained component.
- * - score  : current rating value (0-5)
- * - onRate : callback(newScore) — if omitted the stars are read-only
- */
 const StarRating = ({ score = 0, onRate }) => {
   const [hoverRating, setHoverRating] = useState(0);
   const interactive = typeof onRate === "function";
@@ -81,15 +76,17 @@ const Homepage = () => {
   const [quantity,        setQuantity]        = useState(1);
   const [showPopup,       setShowPopup]       = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [reviews,         setReviews]         = useState(() => {
+
+  // FIX: lexo reviews nga localStorage (e njëjta key si CRUD)
+  const [reviews, setReviews] = useState(() => {
     try { return JSON.parse(localStorage.getItem("reviews") || "[]"); }
     catch { return []; }
   });
-  const [newReview,  setNewReview]  = useState({ customerId: "", comment: "" });
-  const [reviewRating, setReviewRating] = useState(5);
-  const [isAdmin]                   = useState(() => localStorage.getItem("role") === "ADMIN");
 
-  /* search state — used by the hero search bar */
+  const [newReview,    setNewReview]    = useState({ customerId: "", customerName: "", comment: "" });
+  const [reviewRating, setReviewRating] = useState(5);
+  const [isAdmin]                       = useState(() => localStorage.getItem("role") === "ADMIN");
+
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -123,7 +120,6 @@ const Homepage = () => {
   const handleConfirmAdd  = () => { addToCart(selectedProduct, quantity); setShowPopup(false); };
   const scrollToTop       = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  /* unified search handler */
   const handleSearch = e => {
     e.preventDefault();
     const q = searchQuery.trim();
@@ -138,18 +134,27 @@ const Homepage = () => {
     setEmail("");
   };
 
+  // FIX: struktura e review-it është kompatibël me CRUD (customerId, customerName, productType, score, comment)
   const handleSubmitReview = () => {
     if (!newReview.comment.trim()) return;
+
     const entry = {
-      id: Date.now(),
-      customerId: newReview.customerId.trim() || "Anonymous",
-      comment: newReview.comment,
-      score: reviewRating,
+      id:           Date.now(),
+      customerId:   newReview.customerId.trim() || "Anonymous",
+      customerName: newReview.customerName.trim() || newReview.customerId.trim() || "Anonymous",
+      productId:    null,
+      productType:  "BOUQUET",   // default — nuk e dimë nga homepage
+      score:        reviewRating,
+      comment:      newReview.comment.trim(),
     };
-    const updated = [...reviews, entry];
+
+    // FIX: shkruaj në localStorage me të njëjtën key "reviews"
+    const existing = JSON.parse(localStorage.getItem("reviews") || "[]");
+    const updated  = [...existing, entry];
     localStorage.setItem("reviews", JSON.stringify(updated));
+
     setReviews(updated);
-    setNewReview({ customerId: "", comment: "" });
+    setNewReview({ customerId: "", customerName: "", comment: "" });
     setReviewRating(5);
     setShowReviewModal(false);
   };
@@ -163,15 +168,21 @@ const Homepage = () => {
   ];
 
   const testimonials = [
-    { name: "Pamela R.",   title: "Absolutely stunning arrangement", text: "Ordered for my Nana's 80th birthday — the bouquet arrived perfectly fresh and she was in tears. Will absolutely order again.", score: 5 },
-    { name: "Michelle T.", title: "Exactly as pictured",             text: "I've had bad experiences with other florists sending wilted flowers. These were vibrant, fragrant, and lasted over two weeks.", score: 5 },
-    { name: "Betty K.",    title: "A gift that keeps giving",        text: "Loved that the roses came with planting instructions. My mom planted them in her garden — she messages me photos every week.", score: 5 },
+    { name: "Pamela R.",   title: "Absolutely stunning arrangement",      text: "Ordered for my Nana's 80th birthday — the bouquet arrived perfectly fresh and she was in tears. Will absolutely order again.", score: 5 },
+    { name: "Michelle T.", title: "Exactly as pictured",                  text: "I've had bad experiences with other florists sending wilted flowers. These were vibrant, fragrant, and lasted over two weeks.", score: 5 },
+    { name: "Betty K.",    title: "A gift that keeps giving",             text: "Loved that the roses came with planting instructions. My mom planted them in her garden — she messages me photos every week.", score: 5 },
     { name: "Brian M.",    title: "Delivered on time, perfect condition", text: "Ordered chocolate-covered strawberries for our anniversary. Same-day delivery was flawless and packaging was really premium.", score: 5 },
   ];
 
+  // Kombino testimonials statikë me reviews nga localStorage
   const allTestimonials = [
     ...testimonials,
-    ...reviews.map(r => ({ name: r.customerId, title: "Verified Purchase", text: r.comment, score: r.score })),
+    ...reviews.map(r => ({
+      name:  r.customerName || r.customerId,
+      title: "Verified Purchase",
+      text:  r.comment,
+      score: r.score,
+    })),
   ];
 
   const trustBadges = [
@@ -181,7 +192,6 @@ const Homepage = () => {
     { icon: "🔒", label: "Secure checkout",     sub: "256-bit SSL encrypted" },
   ];
 
-  /* shared input style */
   const inputStyle = {
     width: "100%",
     padding: "12px 14px",
@@ -196,22 +206,15 @@ const Homepage = () => {
     transition: "border-color 0.2s",
   };
 
-  const flowers = deals.filter(
-    item => item.category?.toLowerCase() === "flower"
-  );
-
-  const bouquets = deals.filter(
-    item => item.category?.toLowerCase() === "bouquet"
-  );
+  const flowers  = deals.filter(item => item.category?.toLowerCase() === "flower");
+  const bouquets = deals.filter(item => item.category?.toLowerCase() === "bouquet");
 
   return (
     <>
-      {/* Google Fonts */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href={FONT_URL} rel="stylesheet" />
 
-      {/* Global CSS */}
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
@@ -241,13 +244,13 @@ const Homepage = () => {
 
       <div style={{ fontFamily: FONT, background: C.cream, color: C.text, minHeight: "100vh", width: "100%", overflowX: "hidden", opacity: isVisible ? 1 : 0, transition: "opacity 0.55s ease" }}>
 
-        {/* ── ANNOUNCEMENT BAR ────────────────────────────── */}
+        {/* ── ANNOUNCEMENT BAR ── */}
         <div style={{ background: C.teal, color: "#fff", fontSize: "12px", fontWeight: "500", letterSpacing: "0.5px", padding: "9px 24px", textAlign: "center" }}>
           🌸 Free shipping on orders over $60 &nbsp;·&nbsp; Same-day delivery available in select cities &nbsp;·&nbsp;
           <span style={{ textDecoration: "underline", cursor: "pointer" }}>See delivery areas →</span>
         </div>
 
-        {/* ── STICKY NAV ──────────────────────────────────── */}
+        {/* ── STICKY NAV ── */}
         <nav style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "0 40px", height: "64px",
@@ -259,12 +262,9 @@ const Homepage = () => {
           boxShadow: isSticky ? "0 2px 20px rgba(0,0,0,0.08)" : "none",
           transition: "box-shadow 0.3s, background 0.3s",
         }}>
-          {/* Logo */}
           <div style={{ fontFamily: SERIF, fontSize: "22px", fontWeight: "700", color: C.dark, letterSpacing: "-0.3px", whiteSpace: "nowrap" }}>
-             You're eternal.
+            You're eternal.
           </div>
-
-          {/* Nav links */}
           <div style={{ display: "flex", gap: "36px", alignItems: "center" }}>
             {[
               { label: "Flowers",   to: "/user/flowers" },
@@ -277,8 +277,6 @@ const Homepage = () => {
               </Link>
             ))}
           </div>
-
-          {/* Right side */}
           <div style={{ display: "flex", gap: "14px", alignItems: "center" }}>
             {isAdmin && (
               <Link to="/admin/dashboard" style={{ textDecoration: "none" }}>
@@ -292,13 +290,11 @@ const Homepage = () => {
                 Sign In
               </button>
             </Link>
-            <Link to="/order" style={{ textDecoration: "none" }}>
-            </Link>
           </div>
         </nav>
         {isSticky && <div style={{ height: "64px" }} />}
 
-        {/* ── HERO ────────────────────────────────────────── */}
+        {/* ── HERO ── */}
         <section style={{ display: "flex", background: C.offWht, alignItems: "stretch", minHeight: "540px", flexWrap: "wrap" }}>
           <div style={{ flex: "1 1 520px", position: "relative", overflow: "hidden" }}>
             <img
@@ -314,17 +310,14 @@ const Homepage = () => {
             <span style={{ display: "inline-block", background: C.teal, color: "#fff", fontSize: "11px", fontWeight: "600", letterSpacing: "1.5px", textTransform: "uppercase", padding: "5px 14px", borderRadius: "20px", marginBottom: "20px", width: "fit-content", fontFamily: FONT }}>
               Summer Sale — Up to 20% off
             </span>
-
             <h1 style={{ fontFamily: SERIF, fontSize: "clamp(32px, 4vw, 52px)", fontWeight: "700", color: C.dark, lineHeight: "1.15", marginBottom: "18px" }}>
               Fresh flowers<br />delivered to<br />your door
             </h1>
-
             <p style={{ fontFamily: FONT, fontSize: "15px", color: C.muted, lineHeight: "1.75", marginBottom: "24px", maxWidth: "380px" }}>
               Hand-arranged by local florists, sourced from sustainable farms.
               Same-day delivery available Monday through Saturday.
             </p>
 
-            {/* ── HERO SEARCH BAR ── */}
             <form onSubmit={handleSearch} style={{ display: "flex", maxWidth: "400px", marginBottom: "24px", borderRadius: "8px", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}>
               <input
                 type="text"
@@ -342,52 +335,27 @@ const Homepage = () => {
                 Search
               </button>
             </form>
-<div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-  {/* Shop the Sale */}
-  <button
-    className="btn-teal"
-    onClick={() => navigate("/user/occasions")}
-    style={{
-      background: C.teal,
-      color: "#fff",
-      border: "none",
-      padding: "14px 28px",
-      borderRadius: "8px",
-      fontSize: "14px",
-      fontWeight: "600",
-      cursor: "pointer",
-      fontFamily: FONT,
-      transition: "background 0.2s",
-    }}
-  >
-    Shop the Sale
-  </button>
 
-  {/* View All Collections */}
-  <button
-    className="btn-outline"
-    onClick={() => navigate("/user/flowers")}
-    style={{
-      background: "transparent",
-      color: C.text,
-      border: `1px solid ${C.border}`,
-      padding: "14px 28px",
-      borderRadius: "8px",
-      fontSize: "14px",
-      fontWeight: "500",
-      cursor: "pointer",
-      fontFamily: FONT,
-      transition: "background 0.2s",
-    }}
-  >
-    View All Collections
-  </button>
-</div>   {/* ← KJO KA MUNGU */}
+            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+              <button
+                className="btn-teal"
+                onClick={() => navigate("/user/occasions")}
+                style={{ background: C.teal, color: "#fff", border: "none", padding: "14px 28px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", cursor: "pointer", fontFamily: FONT, transition: "background 0.2s" }}
+              >
+                Shop the Sale
+              </button>
+              <button
+                className="btn-outline"
+                onClick={() => navigate("/user/flowers")}
+                style={{ background: "transparent", color: C.text, border: `1px solid ${C.border}`, padding: "14px 28px", borderRadius: "8px", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: FONT, transition: "background 0.2s" }}
+              >
+                View All Collections
+              </button>
+            </div>
+          </div>
+        </section>
 
-
-</div>
-</section>
-        {/* ── TRUST BADGES ────────────────────────────────── */}
+        {/* ── TRUST BADGES ── */}
         <section style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 6%" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", borderLeft: `1px solid ${C.border}` }}>
             {trustBadges.map((b, i) => (
@@ -402,7 +370,7 @@ const Homepage = () => {
           </div>
         </section>
 
-        {/* ── SEARCH / FILTER BAR ─────────────────────────── */}
+        {/* ── SEARCH / FILTER BAR ── */}
         <section style={{ background: C.dark, padding: "28px 6%" }}>
           <div style={{ maxWidth: "860px", margin: "0 auto", display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", justifyContent: "center" }}>
             <span style={{ fontFamily: SERIF, fontSize: "18px", color: "#fff", fontWeight: "600", whiteSpace: "nowrap" }}>Find a gift for:</span>
@@ -432,196 +400,92 @@ const Homepage = () => {
           </div>
         </section>
 
-        {/* ── CATEGORIES ──────────────────────────────────── */}
+        {/* ── CATEGORIES ── */}
         <section style={{ padding: "64px 6%", background: C.white }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-           <div style={{ display: "flex", gap: "28px", overflowX: "auto", paddingBottom: "8px" }}>
-  {categories.map(cat => (
-    /* Këtu e mbështjellim me Link */
-    <Link 
-      key={cat.name} 
-      to={`/user/${cat.name.toLowerCase()}`} 
-      style={{ textDecoration: "none" }}
-    >
-      <div className="cat-item" style={{ flex: "0 0 120px", textAlign: "center" }}>
-        <div style={{ width: "110px", height: "110px", borderRadius: "50%", overflow: "hidden", margin: "0 auto 12px", border: `3px solid ${C.border}` }}>
-          <img src={cat.img} alt={cat.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-        </div>
-        <div className="cat-label" style={{ fontFamily: FONT, fontSize: "13px", fontWeight: "600", color: C.text }}>
-          {cat.name}
-        </div>
-      </div>
-    </Link>
-  ))}
-</div>
+            <div style={{ display: "flex", gap: "28px", overflowX: "auto", paddingBottom: "8px" }}>
+              {categories.map(cat => (
+                <Link key={cat.name} to={`/user/${cat.name.toLowerCase()}`} style={{ textDecoration: "none" }}>
+                  <div className="cat-item" style={{ flex: "0 0 120px", textAlign: "center" }}>
+                    <div style={{ width: "110px", height: "110px", borderRadius: "50%", overflow: "hidden", margin: "0 auto 12px", border: `3px solid ${C.border}` }}>
+                      <img src={cat.img} alt={cat.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    </div>
+                    <div className="cat-label" style={{ fontFamily: FONT, fontSize: "13px", fontWeight: "600", color: C.text }}>
+                      {cat.name}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
 
-        
-        {/* ── PRODUCTS ────────────────────────────────────── */}
-<section style={{ padding: "64px 6%", background: C.cream }}>
-  <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        {/* ── PRODUCTS ── */}
+        <section style={{ padding: "64px 6%", background: C.cream }}>
+          <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: "10px", flexWrap: "wrap", gap: "12px" }}>
+              <h2 style={{ fontFamily: SERIF, fontSize: "28px", fontWeight: "700", color: C.dark }}>Seasonal collection</h2>
+              <span style={{ fontFamily: FONT, fontSize: "13px", color: C.muted }}>Hand-picked fresh items for you 🌿</span>
+            </div>
+            <p style={{ fontFamily: FONT, fontSize: "14px", color: C.muted, marginBottom: "40px" }}>
+              Discover fresh flowers, signature bouquets, and create your own arrangement.
+            </p>
 
-    {/* HEADER */}
-    <div
-      style={{
-        display: "flex",
-        alignItems: "baseline",
-        justifyContent: "space-between",
-        marginBottom: "10px",
-        flexWrap: "wrap",
-        gap: "12px",
-      }}
-    >
-      <h2 style={{ fontFamily: SERIF, fontSize: "28px", fontWeight: "700", color: C.dark }}>
-        Seasonal collection
-      </h2>
+            <h3 style={{ fontFamily: SERIF, marginBottom: "16px" }}>Fresh Flowers</h3>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "20px", marginBottom: "40px" }}>
+              {flowers.slice(0, 5).map(item => (
+                <div key={item.id} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: "12px", padding: "16px" }}>
+                  <img
+                    src={item.foto || item.imageUrl}
+                    alt={item.emertimi || item.name}
+                    style={{ width: "100%", height: "140px", objectFit: "cover", borderRadius: "10px", marginBottom: "10px" }}
+                    loading="lazy"
+                  />
+                  <h4 style={{ fontFamily: SERIF, fontSize: "16px" }}>{item.emertimi || item.name}</h4>
+                  <p style={{ fontFamily: FONT, fontSize: "13px", color: C.muted }}>${item.cmimi ?? item.price}</p>
+                </div>
+              ))}
+            </div>
 
-      <span style={{ fontFamily: FONT, fontSize: "13px", color: C.muted }}>
-        Hand-picked fresh items for you 🌿
-      </span>
-    </div>
+            <h3 style={{ fontFamily: SERIF, marginBottom: "16px" }}>Popular Bouquets</h3>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "20px", marginBottom: "40px" }}>
+              {bouquets.slice(0, 3).map(item => (
+                <div key={item.id} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: "12px", padding: "16px" }}>
+                  <img
+                    src={item.foto || item.imageUrl}
+                    alt={item.emertimi || item.name}
+                    style={{ width: "100%", height: "160px", objectFit: "cover", borderRadius: "10px", marginBottom: "10px" }}
+                    loading="lazy"
+                  />
+                  <h4 style={{ fontFamily: SERIF, fontSize: "16px" }}>{item.emertimi || item.name}</h4>
+                  <p style={{ fontFamily: FONT, fontSize: "13px", color: C.muted }}>${item.cmimi ?? item.price}</p>
+                </div>
+              ))}
+            </div>
 
-    <p style={{ fontFamily: FONT, fontSize: "14px", color: C.muted, marginBottom: "40px" }}>
-      Discover fresh flowers, signature bouquets, and create your own arrangement.
-    </p>
+            <div style={{ textAlign: "center", marginTop: "20px" }}>
+              <h3 style={{ fontFamily: SERIF, marginBottom: "10px" }}>Want something unique?</h3>
+              <button
+                onClick={() => navigate("/user/bouquet-crud")}
+                style={{ background: C.teal, color: "#fff", border: "none", padding: "14px 26px", borderRadius: "10px", fontSize: "14px", fontWeight: "600", cursor: "pointer", fontFamily: FONT, transition: "0.2s" }}
+              >
+                🌸 Create your own bouquet
+              </button>
+            </div>
+          </div>
+        </section>
 
-    {/* ── 3 FLOWERS ── */}
-    <h3 style={{ fontFamily: SERIF, marginBottom: "16px" }}>
-      Fresh Flowers
-    </h3>
-
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-        gap: "20px",
-        marginBottom: "40px",
-      }}
-    >
-      {flowers.slice(0, 5).map((item) =>  (
-        <div
-          key={item.id}
-          style={{
-            background: C.white,
-            border: `1px solid ${C.border}`,
-            borderRadius: "12px",
-            padding: "16px",
-          }}
-        >
-          <img
-            src={item.foto || item.imageUrl}
-            alt={item.emertimi || item.name}
-            style={{
-              width: "100%",
-              height: "140px",
-              objectFit: "cover",
-              borderRadius: "10px",
-              marginBottom: "10px",
-            }}
-            loading="lazy"
-          />
-
-          <h4 style={{ fontFamily: SERIF, fontSize: "16px" }}>
-            {item.emertimi || item.name}
-          </h4>
-
-          <p style={{ fontFamily: FONT, fontSize: "13px", color: C.muted }}>
-            ${item.cmimi ?? item.price}
-          </p>
-        </div>
-      ))}
-    </div>
-
-    {/* ── 2 BOUQUETS ── */}
-    <h3 style={{ fontFamily: SERIF, marginBottom: "16px" }}>
-      Popular Bouquets
-    </h3>
-
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-        gap: "20px",
-        marginBottom: "40px",
-      }}
-    >
-      {bouquets.slice(0, 3).map((item) => (
-        <div
-          key={item.id}
-          style={{
-            background: C.white,
-            border: `1px solid ${C.border}`,
-            borderRadius: "12px",
-            padding: "16px",
-          }}
-        >
-          <img
-            src={item.foto || item.imageUrl}
-            alt={item.emertimi || item.name}
-            style={{
-              width: "100%",
-              height: "160px",
-              objectFit: "cover",
-              borderRadius: "10px",
-              marginBottom: "10px",
-            }}
-            loading="lazy"
-          />
-
-          <h4 style={{ fontFamily: SERIF, fontSize: "16px" }}>
-            {item.emertimi || item.name}
-          </h4>
-
-          <p style={{ fontFamily: FONT, fontSize: "13px", color: C.muted }}>
-            ${item.cmimi ?? item.price}
-          </p>
-        </div>
-      ))}
-    </div>
-
-    {/* ── CREATE BUTTON ── */}
-    <div style={{ textAlign: "center", marginTop: "20px" }}>
-      <h3 style={{ fontFamily: SERIF, marginBottom: "10px" }}>
-        Want something unique?
-      </h3>
-
-      <button
-        onClick={() => navigate("/user/bouquet-crud")}
-        style={{
-          background: C.teal,
-          color: "#fff",
-          border: "none",
-          padding: "14px 26px",
-          borderRadius: "10px",
-          fontSize: "14px",
-          fontWeight: "600",
-          cursor: "pointer",
-          fontFamily: FONT,
-          transition: "0.2s",
-        }}
-      >
-        🌸 Create your own bouquet
-      </button>
-    </div>
-
-  </div>
-</section>
-
-        {/* ── NEWSLETTER ──────────────────────────────────── */}
+        {/* ── NEWSLETTER ── */}
         <section style={{ background: C.dark, padding: "80px 6%" }}>
           <div style={{ maxWidth: "600px", margin: "0 auto", textAlign: "center" }}>
             <span style={{ display: "inline-block", background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)", fontSize: "11px", fontWeight: "600", letterSpacing: "2px", textTransform: "uppercase", padding: "5px 14px", borderRadius: "20px", marginBottom: "20px", fontFamily: FONT }}>
               Newsletter
             </span>
-            <h2 style={{ fontFamily: SERIF, fontSize: "36px", fontWeight: "700", color: "#fff", marginBottom: "14px", lineHeight: "1.2" }}>
-              Subscribe and save 10%
-            </h2>
+            <h2 style={{ fontFamily: SERIF, fontSize: "36px", fontWeight: "700", color: "#fff", marginBottom: "14px", lineHeight: "1.2" }}>Subscribe and save 10%</h2>
             <p style={{ fontFamily: FONT, fontSize: "15px", color: "rgba(255,255,255,0.6)", lineHeight: "1.8", marginBottom: "36px" }}>
               Get early access to seasonal collections, exclusive subscriber discounts,
               and care tips from our expert florists — delivered once a week.
             </p>
-
             {emailSent ? (
               <div style={{ background: "rgba(13,92,92,0.35)", border: "1px solid rgba(13,92,92,0.5)", borderRadius: "10px", padding: "20px 28px", color: "#fff", fontFamily: FONT, fontSize: "14px", lineHeight: "1.6" }}>
                 🌸 <strong>Welcome to the Eternal Rose. family!</strong><br />
@@ -650,25 +514,17 @@ const Homepage = () => {
           </div>
         </section>
 
-        {/* ── TESTIMONIALS ────────────────────────────────── */}
+        {/* ── TESTIMONIALS ── */}
         <section style={{ padding: "80px 6%", background: C.white }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "48px" }}>
-              <p style={{ fontFamily: FONT, fontSize: "12px", fontWeight: "600", letterSpacing: "2px", textTransform: "uppercase", color: C.teal, marginBottom: "10px" }}>
-                Customer reviews
-              </p>
-              <h2 style={{ fontFamily: SERIF, fontSize: "32px", fontWeight: "700", color: C.dark, marginBottom: "10px" }}>
-                Loved by thousands of customers
-              </h2>
-              <p style={{ fontFamily: FONT, fontSize: "14px", color: C.muted }}>
-                Over 12,000 five-star reviews and counting.
-              </p>
+              <p style={{ fontFamily: FONT, fontSize: "12px", fontWeight: "600", letterSpacing: "2px", textTransform: "uppercase", color: C.teal, marginBottom: "10px" }}>Customer reviews</p>
+              <h2 style={{ fontFamily: SERIF, fontSize: "32px", fontWeight: "700", color: C.dark, marginBottom: "10px" }}>Loved by thousands of customers</h2>
+              <p style={{ fontFamily: FONT, fontSize: "14px", color: C.muted }}>Over 12,000 five-star reviews and counting.</p>
             </div>
-
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "20px" }}>
               {allTestimonials.map((t, i) => (
                 <div key={i} style={{ background: C.cream, border: `1px solid ${C.border}`, borderRadius: "12px", padding: "26px", animation: `fadeUp 0.5s ease ${i * 0.08}s both` }}>
-                  {/* read-only stars — no onRate passed */}
                   <StarRating score={t.score} />
                   <h4 style={{ fontFamily: SERIF, fontSize: "16px", fontWeight: "600", color: C.dark, marginBottom: "10px" }}>{t.title}</h4>
                   <p style={{ fontFamily: FONT, fontSize: "14px", color: C.muted, lineHeight: "1.7", marginBottom: "18px" }}>{t.text}</p>
@@ -684,7 +540,6 @@ const Homepage = () => {
                 </div>
               ))}
             </div>
-
             <div style={{ textAlign: "center", marginTop: "40px" }}>
               <button
                 className="btn-teal"
@@ -697,7 +552,7 @@ const Homepage = () => {
           </div>
         </section>
 
-        {/* ── BACK TO TOP ─────────────────────────────────── */}
+        {/* ── BACK TO TOP ── */}
         {showBackToTop && (
           <button
             className="back-to-top"
@@ -709,7 +564,7 @@ const Homepage = () => {
           </button>
         )}
 
-        {/* ── QUANTITY MODAL ──────────────────────────────── */}
+        {/* ── QUANTITY MODAL ── */}
         {showPopup && selectedProduct && (
           <div style={{ position: "fixed", inset: 0, background: "rgba(15,10,30,0.6)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999, padding: "20px" }}>
             <div style={{ background: C.white, padding: "36px", width: "100%", maxWidth: "420px", borderRadius: "16px", boxShadow: "0 32px 80px rgba(0,0,0,0.28)", animation: "popIn 0.25s ease" }}>
@@ -717,28 +572,15 @@ const Homepage = () => {
               <p style={{ fontFamily: FONT, fontSize: "14px", color: C.muted, marginBottom: "28px" }}>
                 How many of <strong style={{ color: C.dark }}>{selectedProduct.name}</strong> would you like?
               </p>
-
               <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "24px", marginBottom: "16px" }}>
-                <button
-                  className="btn-outline"
-                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                  style={{ width: "44px", height: "44px", border: `1px solid ${C.border}`, borderRadius: "8px", cursor: "pointer", fontSize: "20px", background: C.cream, fontFamily: FONT, transition: "background 0.2s" }}
-                >−</button>
-                <span style={{ fontSize: "36px", fontWeight: "700", color: C.dark, fontFamily: SERIF, minWidth: "48px", textAlign: "center" }}>
-                  {quantity}
-                </span>
-                <button
-                  className="btn-outline"
-                  onClick={() => setQuantity(q => q + 1)}
-                  style={{ width: "44px", height: "44px", border: `1px solid ${C.border}`, borderRadius: "8px", cursor: "pointer", fontSize: "20px", background: C.cream, fontFamily: FONT, transition: "background 0.2s" }}
-                >+</button>
+                <button className="btn-outline" onClick={() => setQuantity(q => Math.max(1, q - 1))} style={{ width: "44px", height: "44px", border: `1px solid ${C.border}`, borderRadius: "8px", cursor: "pointer", fontSize: "20px", background: C.cream, fontFamily: FONT, transition: "background 0.2s" }}>−</button>
+                <span style={{ fontSize: "36px", fontWeight: "700", color: C.dark, fontFamily: SERIF, minWidth: "48px", textAlign: "center" }}>{quantity}</span>
+                <button className="btn-outline" onClick={() => setQuantity(q => q + 1)} style={{ width: "44px", height: "44px", border: `1px solid ${C.border}`, borderRadius: "8px", cursor: "pointer", fontSize: "20px", background: C.cream, fontFamily: FONT, transition: "background 0.2s" }}>+</button>
               </div>
-
               <div style={{ textAlign: "center", marginBottom: "26px", padding: "14px", background: C.cream, borderRadius: "8px", border: `1px solid ${C.border}` }}>
                 <span style={{ fontFamily: FONT, fontSize: "13px", color: C.muted }}>Total: </span>
                 <span style={{ fontFamily: SERIF, fontSize: "22px", fontWeight: "700", color: C.teal }}>${(selectedProduct.price * quantity).toFixed(2)}</span>
               </div>
-
               <div style={{ display: "flex", gap: "10px" }}>
                 <button className="btn-outline" onClick={() => setShowPopup(false)} style={{ flex: 1, padding: "13px", border: `1px solid ${C.border}`, background: "transparent", cursor: "pointer", borderRadius: "8px", fontFamily: FONT, fontSize: "14px", transition: "background 0.2s" }}>Cancel</button>
                 <button className="btn-dark" onClick={handleConfirmAdd} style={{ flex: 1, padding: "13px", background: C.dark, color: "#fff", border: "none", cursor: "pointer", borderRadius: "8px", fontWeight: "600", fontFamily: FONT, fontSize: "14px", transition: "background 0.2s" }}>Add to cart</button>
@@ -747,7 +589,7 @@ const Homepage = () => {
           </div>
         )}
 
-        {/* ── REVIEW MODAL ────────────────────────────────── */}
+        {/* ── REVIEW MODAL ── */}
         {showReviewModal && (
           <div style={{ position: "fixed", inset: 0, background: "rgba(15,10,30,0.6)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999, padding: "20px" }}>
             <div style={{ background: C.white, padding: "36px", width: "100%", maxWidth: "420px", borderRadius: "16px", boxShadow: "0 32px 80px rgba(0,0,0,0.28)", animation: "popIn 0.25s ease" }}>
@@ -756,12 +598,8 @@ const Homepage = () => {
                 Share your experience — your feedback helps thousands of customers.
               </p>
 
-              {/* ── INTERACTIVE STAR RATING ── */}
               <div style={{ marginBottom: "20px" }}>
-                <label style={{ fontFamily: FONT, fontSize: "12px", fontWeight: "600", color: C.muted, textTransform: "uppercase", letterSpacing: "0.8px", display: "block", marginBottom: "8px" }}>
-                  Your rating
-                </label>
-                {/* onRate prop passed → becomes interactive (0 click resets to 0) */}
+                <label style={{ fontFamily: FONT, fontSize: "12px", fontWeight: "600", color: C.muted, textTransform: "uppercase", letterSpacing: "0.8px", display: "block", marginBottom: "8px" }}>Your rating</label>
                 <StarRating score={reviewRating} onRate={setReviewRating} />
                 <span style={{ fontFamily: FONT, fontSize: "12px", color: C.muted, marginTop: "4px", display: "inline-block" }}>
                   {reviewRating === 0 && "Select a rating"}
@@ -773,11 +611,12 @@ const Homepage = () => {
                 </span>
               </div>
 
+              {/* FIX: shtuam fushën "Emri" (customerName) për compatibilitet me CRUD */}
               <label style={{ fontFamily: FONT, fontSize: "12px", fontWeight: "600", color: C.muted, textTransform: "uppercase", letterSpacing: "0.8px", display: "block", marginBottom: "6px" }}>Your name</label>
               <input
                 placeholder="e.g. Sarah M."
-                value={newReview.customerId}
-                onChange={e => setNewReview({ ...newReview, customerId: e.target.value })}
+                value={newReview.customerName}
+                onChange={e => setNewReview({ ...newReview, customerName: e.target.value, customerId: e.target.value })}
                 style={{ ...inputStyle, marginBottom: "16px" }}
               />
 
@@ -792,7 +631,7 @@ const Homepage = () => {
               <div style={{ display: "flex", gap: "10px" }}>
                 <button
                   className="btn-outline"
-                  onClick={() => { setShowReviewModal(false); setNewReview({ customerId: "", comment: "" }); setReviewRating(5); }}
+                  onClick={() => { setShowReviewModal(false); setNewReview({ customerId: "", customerName: "", comment: "" }); setReviewRating(5); }}
                   style={{ flex: 1, padding: "13px", border: `1px solid ${C.border}`, background: "transparent", cursor: "pointer", borderRadius: "8px", fontFamily: FONT, fontSize: "14px", transition: "background 0.2s" }}
                 >
                   Cancel
@@ -810,7 +649,7 @@ const Homepage = () => {
         )}
 
       </div>
-</>
+    </>
   );
 };
 

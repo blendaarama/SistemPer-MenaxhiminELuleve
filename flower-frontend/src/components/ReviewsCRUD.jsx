@@ -21,25 +21,39 @@ const ReviewsCRUD = () => {
 
   useEffect(() => { fetchReviews(); }, []);
 
+  // ─── FETCH ───────────────────────────────────────────────────────────────────
   const fetchReviews = async () => {
     setLoading(true);
     setError("");
+
+    // Gjithmonë lexo localStorage fillimisht
+    const local = JSON.parse(localStorage.getItem("reviews") || "[]");
+
     try {
-      const res = await axios.get(API_URL);
-      setReviews(Array.isArray(res.data) ? res.data : res.data?.content ?? []);
+      const token = localStorage.getItem("token");
+      const res = await axios.get(API_URL, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
+      const backendData = Array.isArray(res.data) ? res.data : res.data?.content ?? [];
+
+      // Merge: backend + reviews vetëm-lokale (që nuk janë në backend)
+      const backendIds = new Set(backendData.map(r => String(r.id)));
+      const localOnly  = local.filter(r => !backendIds.has(String(r.id)));
+      setReviews([...backendData, ...localOnly]);
+
     } catch {
-      const local = JSON.parse(localStorage.getItem("reviews") || "[]");
-      setReviews(local.length ? local : [
-        { id: 1, customerId: "C-001", customerName: "Elena Krasniqi", productId: 3, productType: "BOUQUET", score: 5, comment: "Buqeta ishte mahnitëse, shumë elegante!" },
-        { id: 2, customerId: "C-002", customerName: "Arben Hoxha", productId: 1, productType: "FLOWER", score: 4, comment: "Lule të freskëta, dorëzim i shpejtë." },
-        { id: 3, customerId: "C-003", customerName: "Mirlinda Gashi", productId: 5, productType: "BOUQUET", score: 3, comment: "E mirë, por çmimi pak i lartë." }
-      ]);
-      setError("⚠️ Backend jo aktiv — po shfaqen të dhëna lokale.");
+      // 403 ose backend i fikur — shfaq localStorage
+      setReviews(local);
+      setError(local.length === 0
+        ? "⚠️ Backend jo aktiv — nuk ka vlerësime ende."
+        : "⚠️ Po shfaqen të dhëna lokale."
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  // ─── SUBMIT (Shto / Ndrysho) ──────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.customerId || !form.comment) {
@@ -60,13 +74,16 @@ const ReviewsCRUD = () => {
     };
 
     try {
+      const token = localStorage.getItem("token");
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
       if (form.id) {
-        await axios.put(`${API_URL}/${form.id}`, payload);
+        await axios.put(`${API_URL}/${form.id}`, payload, { headers });
       } else {
-        await axios.post(API_URL, payload);
+        await axios.post(API_URL, payload, { headers });
       }
       fetchReviews();
     } catch {
+      // Ruaj në localStorage nëse backend dështon
       const local = JSON.parse(localStorage.getItem("reviews") || "[]");
       const updated = form.id
         ? local.map(r => r.id === form.id ? payload : r)
@@ -77,22 +94,29 @@ const ReviewsCRUD = () => {
     setForm(initialForm);
   };
 
+  // ─── EDIT ─────────────────────────────────────────────────────────────────
   const handleEdit = (r) => {
     setForm({ ...r });
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // ─── DELETE ───────────────────────────────────────────────────────────────
   const handleDelete = async (id) => {
     if (!window.confirm("A jeni të sigurt që dëshironi ta fshini këtë vlerësim?")) return;
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      const token = localStorage.getItem("token");
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      await axios.delete(`${API_URL}/${id}`, { headers });
+      fetchReviews();
     } catch {
-      const updated = reviews.filter(r => r.id !== id);
+      const local = JSON.parse(localStorage.getItem("reviews") || "[]");
+      const updated = local.filter(r => r.id !== id);
       localStorage.setItem("reviews", JSON.stringify(updated));
+      setReviews(updated);
     }
-    setReviews(prev => prev.filter(r => r.id !== id));
   };
 
+  // ─── HELPERS ──────────────────────────────────────────────────────────────
   const StarDisplay = ({ score }) => (
     <span style={{ color: "#F9A825", fontSize: "14px", letterSpacing: "2px" }}>
       {"★".repeat(score)}{"☆".repeat(5 - score)}
@@ -103,6 +127,7 @@ const ReviewsCRUD = () => {
     ? (reviews.reduce((sum, r) => sum + r.score, 0) / reviews.length).toFixed(1)
     : "0.0";
 
+  // ─── RENDER ───────────────────────────────────────────────────────────────
   return (
     <div style={{ background: "#FAF8F5", minHeight: "100vh", padding: "40px 6%", fontFamily: "system-ui, -apple-system, sans-serif", color: "#1F1F1F" }}>
       <div style={{ maxWidth: "1300px", margin: "0 auto" }}>
