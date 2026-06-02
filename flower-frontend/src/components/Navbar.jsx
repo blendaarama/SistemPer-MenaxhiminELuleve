@@ -7,6 +7,13 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { cartItems } = useCart();
 
+  const role      = localStorage.getItem("role");
+  const isLoggedIn = Boolean(localStorage.getItem("accessToken"));
+
+  const isAdmin      = role === "ROLE_ADMIN";
+  const isModerator  = role === "ROLE_MODERATOR";
+  const isStaff      = role === "ROLE_STAFF";
+
   const handleSearch = (e) => {
     e.preventDefault();
     const q = search.trim();
@@ -17,12 +24,39 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     localStorage.removeItem("userEmail");
     localStorage.removeItem("role");
     navigate("/login");
   };
 
-  const isLoggedIn = Boolean(localStorage.getItem("accessToken"));
+  const linkStyle = {
+    color: "#1F1F1F",
+    textDecoration: "none",
+    fontSize: "12px",
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: "1px",
+    transition: "color 0.2s",
+  };
+
+  const badgeStyle = (color) => ({
+    display: "inline-block",
+    fontSize: "10px",
+    fontWeight: "700",
+    padding: "2px 8px",
+    borderRadius: "4px",
+    letterSpacing: "0.5px",
+    textTransform: "uppercase",
+    background: color === "admin"      ? "#EDE7F6"
+               : color === "moderator" ? "#E3F2FD"
+               : color === "staff"     ? "#E8F5E9"
+               : "transparent",
+    color: color === "admin"      ? "#4527A0"
+          : color === "moderator" ? "#1565C0"
+          : color === "staff"     ? "#2E7D32"
+          : "transparent",
+  });
 
   return (
     <nav
@@ -120,15 +154,36 @@ const Navbar = () => {
             </form>
           </div>
 
-          {/* RIGHT: ACCOUNT & CART */}
+          {/* RIGHT SIDE */}
           <div className="d-flex align-items-center justify-content-center gap-4 flex-wrap">
-            <Link
-              className="nav-link px-2 small fw-semibold text-uppercase"
-              style={{ fontSize: "12px", color: "#1F1F1F", letterSpacing: "1px", textDecoration: "none" }}
-              to="/"
+
+            <Link to="/" style={linkStyle}
+              onMouseEnter={e => e.currentTarget.style.color = "#0E5A5B"}
+              onMouseLeave={e => e.currentTarget.style.color = "#1F1F1F"}
             >
               Home
             </Link>
+
+            {/* ADMIN BADGE + LINK */}
+            {isAdmin && (
+              <Link to="/admin/dashboard" style={{ textDecoration: "none" }}>
+                <span style={badgeStyle("admin")}>Admin Panel</span>
+              </Link>
+            )}
+
+            {/* MODERATOR BADGE + LINK */}
+            {isModerator && (
+              <Link to="/reviews" style={{ textDecoration: "none" }}>
+                <span style={badgeStyle("moderator")}>Moderator</span>
+              </Link>
+            )}
+
+            {/* STAFF BADGE + LINK */}
+            {isStaff && (
+              <Link to="/staff/orders" style={{ textDecoration: "none" }}>
+                <span style={badgeStyle("staff")}>Staff</span>
+              </Link>
+            )}
 
             {/* LOGIN / LOGOUT */}
             {isLoggedIn ? (
@@ -146,46 +201,27 @@ const Navbar = () => {
                   padding: 0,
                   transition: "color 0.2s",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#0E5A5B")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "#1F1F1F")}
+                onMouseEnter={e => e.currentTarget.style.color = "#0E5A5B"}
+                onMouseLeave={e => e.currentTarget.style.color = "#1F1F1F"}
               >
                 Logout
               </button>
             ) : (
-              <Link
-                to="/login"
-                style={{
-                  color: "#1F1F1F",
-                  textDecoration: "none",
-                  fontSize: "12px",
-                  fontWeight: "600",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  transition: "color 0.2s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#0E5A5B")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "#1F1F1F")}
+              <Link to="/login" style={linkStyle}
+                onMouseEnter={e => e.currentTarget.style.color = "#0E5A5B"}
+                onMouseLeave={e => e.currentTarget.style.color = "#1F1F1F"}
               >
                 Sign In
               </Link>
             )}
 
-            <Link
-              to="/order"
-              style={{
-                color: "#1F1F1F",
-                textDecoration: "none",
-                fontSize: "12px",
-                fontWeight: "600",
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-                transition: "color 0.2s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#0E5A5B")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#1F1F1F")}
+            <Link to="/order" style={linkStyle}
+              onMouseEnter={e => e.currentTarget.style.color = "#0E5A5B"}
+              onMouseLeave={e => e.currentTarget.style.color = "#1F1F1F"}
             >
               Cart ({cartItems.length})
             </Link>
+
           </div>
         </div>
       </div>
