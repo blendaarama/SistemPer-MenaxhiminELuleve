@@ -39,40 +39,77 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authenticationProvider(authenticationProvider())
-            .authorizeHttpRequests(auth -> auth
+           .authorizeHttpRequests(auth -> auth
 
-                // PUBLIC
-                .requestMatchers("/auth/**").permitAll()
+    // PUBLIC
+    .requestMatchers("/auth/**").permitAll()
 
-                // PUBLIC (TEMP FIX - që mos me të blloku frontend)
-                .requestMatchers(
-                    "/api/products/**",
-                    "/api/flowers/**",
-                    "/api/occasions/**",
-                    "/api/bouquets/**",
-                    "/api/suppliers/**",
-                    "/api/supply-orders/**"
-                ).permitAll()
+    // PUBLIC
+    .requestMatchers(
+        "/api/products/**",
+        "/api/flowers/**",
+        "/api/occasions/**",
+        "/api/bouquets/**"
+    ).permitAll()
 
-                // USER + ADMIN
-                .requestMatchers(
-                    "/api/orders/**",
-                    "/api/order-details/**",
-                    "/api/reviews/**",
-                    "/api/payments/**",
-                    "/api/inventory/**"
-                ).hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+    // REVIEWS -> USER + MODERATOR + ADMIN
+    .requestMatchers("/api/reviews/**")
+    .hasAnyAuthority(
+        "ROLE_USER",
+        "ROLE_MODERATOR",
+        "ROLE_ADMIN"
+    )
 
-                // ADMIN ONLY (mbajmë vetëm këto sensitive)
-                .requestMatchers(
-                    "/api/users/**",
-                    "/api/customers/**",
-                    "/api/deliveries/**"
-                ).hasAuthority("ROLE_ADMIN")
+    // ORDERS -> USER + STAFF + ADMIN
+    .requestMatchers(
+        "/api/orders/**",
+        "/api/order-details/**"
+    )
+    .hasAnyAuthority(
+        "ROLE_USER",
+        "ROLE_STAFF",
+        "ROLE_ADMIN"
+    )
 
-                // EVERYTHING ELSE
-                .anyRequest().authenticated()
-            )
+    // DELIVERIES -> STAFF + ADMIN
+    .requestMatchers("/api/deliveries/**")
+    .hasAnyAuthority(
+        "ROLE_STAFF",
+        "ROLE_ADMIN"
+    )
+
+    // INVENTORY
+    .requestMatchers("/api/inventory/**")
+    .hasAnyAuthority(
+        "ROLE_ADMIN",
+        "ROLE_STAFF"
+    )
+
+    // PAYMENTS
+    .requestMatchers("/api/payments/**")
+    .hasAnyAuthority(
+        "ROLE_ADMIN",
+        "ROLE_STAFF"
+    )
+
+    // USERS
+    .requestMatchers("/api/users/**")
+    .hasAuthority("ROLE_ADMIN")
+
+    // CUSTOMERS
+    .requestMatchers("/api/customers/**")
+    .hasAuthority("ROLE_ADMIN")
+
+    // SUPPLIERS
+    .requestMatchers("/api/suppliers/**")
+    .hasAuthority("ROLE_ADMIN")
+
+    // SUPPLY ORDERS
+    .requestMatchers("/api/supply-orders/**")
+    .hasAuthority("ROLE_ADMIN")
+
+    .anyRequest().authenticated()
+)
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

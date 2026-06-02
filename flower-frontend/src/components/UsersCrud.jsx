@@ -62,10 +62,31 @@ const UsersCRUD = () => {
     } catch { setError("Fshirja dështoi."); }
   };
 
-  const ROLE_STYLE = {
-    ROLE_ADMIN: { background: "#EDE7F6", color: "#4527A0", border: "1px solid #D1C4E9" },
-    ROLE_USER:  { background: "#E8F5E9", color: "#2E7D32", border: "1px solid #C8E6C9" },
-  };
+const ROLE_STYLE = {
+  ROLE_ADMIN: {
+    background: "#EDE7F6",
+    color: "#4527A0",
+    border: "1px solid #D1C4E9"
+  },
+
+  ROLE_USER: {
+    background: "#E8F5E9",
+    color: "#2E7D32",
+    border: "1px solid #C8E6C9"
+  },
+
+  ROLE_MODERATOR: {
+    background: "#FFF3E0",
+    color: "#E65100",
+    border: "1px solid #FFCC80"
+  },
+
+  ROLE_STAFF: {
+    background: "#E3F2FD",
+    color: "#1565C0",
+    border: "1px solid #90CAF9"
+  }
+};
 
   const S = {
     page:  { background: "#FAF8F5", minHeight: "100vh", padding: "40px 6%", fontFamily: "system-ui, sans-serif", color: "#1F1F1F" },
@@ -124,8 +145,10 @@ const UsersCRUD = () => {
             <div style={{ marginBottom: "25px" }}>
               <label style={S.label}>Roli i Sistemit</label>
               <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} style={S.input}>
-                <option value="ROLE_USER">ROLE_USER — Përdorues Standard</option>
-                <option value="ROLE_ADMIN">ROLE_ADMIN — Administrator</option>
+               <option value="ROLE_USER">User</option>
+<option value="ROLE_STAFF">Staff</option>
+<option value="ROLE_MODERATOR">Moderator</option>
+<option value="ROLE_ADMIN">Admin</option>
               </select>
             </div>
 
@@ -171,7 +194,15 @@ const UsersCRUD = () => {
 </td>
                     <td style={S.td}>
                       <span style={{ fontSize: "10px", fontWeight: "700", padding: "4px 8px", textTransform: "uppercase", ...(ROLE_STYLE[u.role] || ROLE_STYLE.ROLE_USER) }}>
-                        {u.role === "ROLE_ADMIN" ? "Admin" : "User"}
+                        {
+  u.role === "ROLE_ADMIN"
+    ? "Admin"
+    : u.role === "ROLE_MODERATOR"
+    ? "Moderator"
+    : u.role === "ROLE_STAFF"
+    ? "Staff"
+    : "User"
+}
                       </span>
                     </td>
                     <td style={{ ...S.td, textAlign: "center" }}>

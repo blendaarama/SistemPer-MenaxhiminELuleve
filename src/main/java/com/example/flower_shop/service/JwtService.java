@@ -24,18 +24,19 @@ public class JwtService {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    public String generateToken(String username, String role) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("role", "ROLE_" + role);
+   public String generateToken(String username, String role) {
+    Map<String, Object> claims = new HashMap<>();
 
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
+    claims.put("role", role);
+
+    return Jwts.builder()
+            .setClaims(claims)
+            .setSubject(username)
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .compact();
+}
 
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
