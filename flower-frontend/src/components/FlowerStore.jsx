@@ -285,11 +285,6 @@ const Homepage = () => {
                 </button>
               </Link>
             )}
-            <Link to="/login" style={{ textDecoration: "none" }}>
-              <button style={{ background: "transparent", border: `1px solid ${C.border}`, padding: "8px 18px", borderRadius: "6px", fontSize: "13px", fontWeight: "500", cursor: "pointer", color: C.text, fontFamily: FONT, transition: "border-color 0.2s" }}>
-                Sign In
-              </button>
-            </Link>
           </div>
         </nav>
         {isSticky && <div style={{ height: "64px" }} />}

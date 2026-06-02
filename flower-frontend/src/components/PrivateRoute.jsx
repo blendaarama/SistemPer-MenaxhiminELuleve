@@ -1,40 +1,28 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
-
-// Rolet e disponueshme:
-// ROLE_ADMIN     — gjithçka
-// ROLE_MODERATOR — vetëm reviews
-// ROLE_STAFF     — vetëm porositë
-// ROLE_USER      — homepage + blerje
+import { Navigate, useLocation } from "react-router-dom";
 
 const PrivateRoute = ({
-  children,
-  adminOnly      = false,
-  moderatorOnly  = false,
-  staffOnly      = false,
+ children,
+ adminOnly = false,
+ moderatorOnly = false,
+ staffOnly = false,
 }) => {
-  const token = localStorage.getItem("accessToken");
-  const role  = localStorage.getItem("role");
+ const token = localStorage.getItem("accessToken");
+ const role = localStorage.getItem("role");
+ const location = useLocation();
 
-  // Nuk është kyçur
-  if (!token) return <Navigate to="/login" replace />;
+ if (!token) return <Navigate to="/login" state={{ from: location }} replace />;
 
-  // Vetëm ADMIN
-  if (adminOnly && role !== "ROLE_ADMIN") {
-    return <Navigate to="/" replace />;
-  }
+ if (adminOnly && role !== "ROLE_ADMIN")
+ return <Navigate to="/" replace />;
 
-  // MODERATOR ose ADMIN
-  if (moderatorOnly && role !== "ROLE_MODERATOR" && role !== "ROLE_ADMIN") {
-    return <Navigate to="/" replace />;
-  }
+ if (moderatorOnly && role !== "ROLE_MODERATOR" && role !== "ROLE_ADMIN")
+ return <Navigate to="/" replace />;
 
-  // STAFF ose ADMIN
-  if (staffOnly && role !== "ROLE_STAFF" && role !== "ROLE_ADMIN") {
-    return <Navigate to="/" replace />;
-  }
+ if (staffOnly && role !== "ROLE_STAFF" && role !== "ROLE_ADMIN")
+ return <Navigate to="/" replace />;
 
-  return children;
+ return children;
 };
 
 export default PrivateRoute;
