@@ -1,5 +1,4 @@
 package com.example.flower_shop.model;
-import com.example.flower_shop.model.Porosi;
 import jakarta.persistence.*;
 import lombok.Data;
 

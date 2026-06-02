@@ -20,8 +20,7 @@ const C = {
 
 const FONT  = "'DM Sans', system-ui, sans-serif";
 const SERIF = "'Cormorant Garamond', Georgia, serif";
-
-/* skeleton card */
+ 
 const SkeletonCard = () => (
   <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: "12px", overflow: "hidden" }}>
     <div style={{ height: "220px", background: "linear-gradient(90deg, #f0ede8 25%, #e8e3dd 50%, #f0ede8 75%)", backgroundSize: "200% 100%", animation: "shimmer 1.4s infinite" }} />
@@ -43,15 +42,12 @@ const SearchResults = () => {
   const navigate  = useNavigate();
   const { addToCart } = useCart();
 
-  /* read ?query= from URL */
   const query = new URLSearchParams(location.search).get("query") || "";
 
-  /* keep local input in sync when URL changes */
   useEffect(() => {
     setSearchInput(query);
   }, [query]);
 
-  /* fetch on query change */
   useEffect(() => {
     if (!query.trim()) {
       setResults([]);
@@ -63,7 +59,13 @@ const SearchResults = () => {
 
     axios
       .get(`http://localhost:8080/api/products/search?q=${encodeURIComponent(query)}`)
-      .then(res => setResults(res.data))
+      .then(res => {const allResults = [
+            ...(res.data.flowers || []),
+            ...(res.data.bouquets || [])
+            ];
+
+            setResults(allResults);
+      })
       .catch(err => {
         console.error("Search error:", err);
         setError("Could not fetch results. Please try again.");
@@ -71,7 +73,6 @@ const SearchResults = () => {
       .finally(() => setLoading(false));
   }, [query]);
 
-  /* inline search inside the results page */
   const handleSearch = e => {
     e.preventDefault();
     const q = searchInput.trim();
@@ -79,10 +80,8 @@ const SearchResults = () => {
     navigate(`/search?query=${encodeURIComponent(q)}`);
   };
 
-  /* ── RENDER ─────────────────────────────────────── */
   return (
     <>
-      {/* Fonts */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href={FONT_URL} rel="stylesheet" />
@@ -100,10 +99,9 @@ const SearchResults = () => {
 
       <div style={{ fontFamily: FONT, background: C.cream, minHeight: "100vh", color: C.text }}>
 
-        {/* ── TOP BAR ──────────────────────────────────── */}
         <div style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "20px 6%" }}>
           <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-            {/* breadcrumb */}
+        
             <div style={{ display: "flex", alignItems: "center", gap: "8px", fontFamily: FONT, fontSize: "12px", color: C.muted, marginBottom: "16px" }}>
               <Link to="/" style={{ color: C.teal, textDecoration: "none", fontWeight: "500" }}>Home</Link>
               <span>›</span>
@@ -116,7 +114,6 @@ const SearchResults = () => {
               )}
             </div>
 
-            {/* search bar */}
             <form onSubmit={handleSearch} style={{ display: "flex", maxWidth: "560px", borderRadius: "10px", overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}>
               <input
                 type="text"
@@ -137,10 +134,8 @@ const SearchResults = () => {
           </div>
         </div>
 
-        {/* ── RESULTS AREA ─────────────────────────────── */}
         <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "48px 6%" }}>
 
-          {/* heading */}
           {query && (
             <div style={{ marginBottom: "32px" }}>
               <h1 style={{ fontFamily: SERIF, fontSize: "clamp(22px, 3vw, 32px)", fontWeight: "700", color: C.dark, marginBottom: "6px" }}>
@@ -156,7 +151,6 @@ const SearchResults = () => {
             </div>
           )}
 
-          {/* empty query state */}
           {!query && (
             <div style={{ textAlign: "center", padding: "80px 24px" }}>
               <div style={{ fontSize: "48px", marginBottom: "16px" }}>🔍</div>
@@ -167,14 +161,12 @@ const SearchResults = () => {
             </div>
           )}
 
-          {/* loading skeletons */}
           {loading && (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "24px" }}>
               {[1,2,3,4,5,6].map(i => <SkeletonCard key={i} />)}
             </div>
           )}
 
-          {/* error state */}
           {error && !loading && (
             <div style={{ textAlign: "center", padding: "48px 24px", background: "#FEF2F2", borderRadius: "12px", border: "1px solid #FECACA" }}>
               <div style={{ fontSize: "32px", marginBottom: "12px" }}>⚠️</div>
@@ -188,7 +180,6 @@ const SearchResults = () => {
             </div>
           )}
 
-          {/* no results */}
           {!loading && !error && query && results.length === 0 && (
             <div style={{ textAlign: "center", padding: "80px 24px" }}>
               <div style={{ fontSize: "48px", marginBottom: "16px" }}>🌱</div>
@@ -205,7 +196,6 @@ const SearchResults = () => {
             </div>
           )}
 
-          {/* results grid */}
           {!loading && !error && results.length > 0 && (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "24px" }}>
               {results.map((product, i) => (
@@ -214,19 +204,19 @@ const SearchResults = () => {
                   className="result-card"
                   style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: "12px", overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", animation: `fadeUp 0.4s ease ${i * 0.05}s both` }}
                 >
-                  {/* product image */}
+
                   <div style={{ height: "220px", overflow: "hidden", position: "relative" }}>
                    <img
-  src={product.imageUrl || "https://images.unsplash.com/photo-1490750967868-88df5691cc51?w=400"}
-  alt={product.name}
-  onError={e => { 
-    e.target.onerror = null; 
-    e.target.src = "https://images.unsplash.com/photo-1490750967868-88df5691cc51?w=400"; 
-  }}
-  style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" }}
-  onMouseEnter={e => e.currentTarget.style.transform = "scale(1.06)"}
-  onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
-/>
+                      src={product.imageUrl || "https://images.unsplash.com/photo-1490750967868-88df5691cc51?w=400"}
+                      alt={product.name}
+                      onError={e => { 
+                      e.target.onerror = null; 
+                      e.target.src = "https://images.unsplash.com/photo-1490750967868-88df5691cc51?w=400";}}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" }}
+                      onMouseEnter={e => e.currentTarget.style.transform = "scale(1.06)"}
+                      onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+                      loading="lazy"
+                    />
                     {product.occasion && (
                       <span style={{ position: "absolute", top: "10px", left: "10px", background: "rgba(15,10,30,0.72)", color: "#fff", fontSize: "10px", fontWeight: "600", letterSpacing: "1px", textTransform: "uppercase", padding: "3px 9px", borderRadius: "20px", fontFamily: FONT }}>
                         {product.occasion}
@@ -234,7 +224,6 @@ const SearchResults = () => {
                     )}
                   </div>
 
-                  {/* product info */}
                   <div style={{ padding: "18px" }}>
                     <div style={{ fontFamily: FONT, fontSize: "10px", fontWeight: "600", color: C.muted, textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>
                       {product.category || "Fresh Arrangement"}

@@ -196,9 +196,14 @@ const Homepage = () => {
     transition: "border-color 0.2s",
   };
 
-  /* ═══════════════════════════════════════════════════════
-     RENDER
-  ═══════════════════════════════════════════════════════ */
+  const flowers = deals.filter(
+    item => item.category?.toLowerCase() === "flower"
+  );
+
+  const bouquets = deals.filter(
+    item => item.category?.toLowerCase() === "bouquet"
+  );
+
   return (
     <>
       {/* Google Fonts */}
@@ -494,7 +499,7 @@ const Homepage = () => {
         marginBottom: "40px",
       }}
     >
-      {deals.slice(0, 3).map((item) => (
+      {flowers.slice(0, 5).map((item) =>  (
         <div
           key={item.id}
           style={{
@@ -541,7 +546,7 @@ const Homepage = () => {
         marginBottom: "40px",
       }}
     >
-      {deals.slice(0, 2).map((item) => (
+      {bouquets.slice(0, 3).map((item) => (
         <div
           key={item.id}
           style={{
