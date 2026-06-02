@@ -113,6 +113,11 @@ function AppContent() {
         <Route path="/deliveries"    element={<PrivateRoute adminOnly><DeliveriesCRUD /></PrivateRoute>} />
         <Route path="/reviews"       element={<PrivateRoute adminOnly><ReviewsCRUD /></PrivateRoute>} />
 
+
+        <Route path="/user/birthday"  element={<Flowers />} /> {/* Ose faqen që shfaq produktet e ditëlindjes */}
+<Route path="/user/sympathy"  element={<Bouquets />} />
+<Route path="/user/occasions"  element={<Flowers />} />
+
         <Route path="/search" element={<SearchResults />} />
         <Route path="*"       element={<Navigate to="/" />} />
       </Routes>

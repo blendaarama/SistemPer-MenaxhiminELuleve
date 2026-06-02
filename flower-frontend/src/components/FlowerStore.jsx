@@ -156,12 +156,10 @@ const Homepage = () => {
 
   /* data */
   const categories = [
-    { name: "Birthday",  img: "https://images.unsplash.com/photo-1533616688419-b7a585564566?q=80&w=300" },
-    { name: "Sympathy",  img: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=300" },
-    { name: "Occasions", img: "https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=300" },
-    { name: "Flowers",   img: "https://images.unsplash.com/photo-1520763185298-1b434c919102?q=80&w=300" },
-    { name: "Plants",    img: "https://images.unsplash.com/photo-1463936575829-25148e1db1b8?q=80&w=300" },
-    { name: "Gifts",     img: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=300" },
+    { name: "Birthday",  img: "/images/birthday.jpeg" },
+    { name: "Sympathy",  img: "/images/images.jpeg" },
+    { name: "Occasions", img: "/images/occassion.jpeg" },
+    { name: "Flowers",   img: "/images/imagess.jpeg" },
   ];
 
   const testimonials = [
@@ -339,18 +337,51 @@ const Homepage = () => {
                 Search
               </button>
             </form>
+<div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+  {/* Shop the Sale */}
+  <button
+    className="btn-teal"
+    onClick={() => navigate("/user/occasions")}
+    style={{
+      background: C.teal,
+      color: "#fff",
+      border: "none",
+      padding: "14px 28px",
+      borderRadius: "8px",
+      fontSize: "14px",
+      fontWeight: "600",
+      cursor: "pointer",
+      fontFamily: FONT,
+      transition: "background 0.2s",
+    }}
+  >
+    Shop the Sale
+  </button>
 
-            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-              <button className="btn-teal" style={{ background: C.teal, color: "#fff", border: "none", padding: "14px 28px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", cursor: "pointer", fontFamily: FONT, transition: "background 0.2s" }}>
-                Shop the Sale
-              </button>
-              <button className="btn-outline" style={{ background: "transparent", color: C.text, border: `1px solid ${C.border}`, padding: "14px 28px", borderRadius: "8px", fontSize: "14px", fontWeight: "500", cursor: "pointer", fontFamily: FONT, transition: "background 0.2s" }}>
-                View All Collections
-              </button>
-            </div>
-          </div>
-        </section>
+  {/* View All Collections */}
+  <button
+    className="btn-outline"
+    onClick={() => navigate("/user/flowers")}
+    style={{
+      background: "transparent",
+      color: C.text,
+      border: `1px solid ${C.border}`,
+      padding: "14px 28px",
+      borderRadius: "8px",
+      fontSize: "14px",
+      fontWeight: "500",
+      cursor: "pointer",
+      fontFamily: FONT,
+      transition: "background 0.2s",
+    }}
+  >
+    View All Collections
+  </button>
+</div>   {/* ← KJO KA MUNGU */}
 
+
+</div>
+</section>
         {/* ── TRUST BADGES ────────────────────────────────── */}
         <section style={{ background: C.white, borderBottom: `1px solid ${C.border}`, padding: "0 6%" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", borderLeft: `1px solid ${C.border}` }}>
@@ -399,20 +430,25 @@ const Homepage = () => {
         {/* ── CATEGORIES ──────────────────────────────────── */}
         <section style={{ padding: "64px 6%", background: C.white }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: "36px", flexWrap: "wrap", gap: "12px" }}>
-              <h2 style={{ fontFamily: SERIF, fontSize: "28px", fontWeight: "700", color: C.dark }}>Shop by occasion</h2>
-              <Link to="/user/occasions" style={{ fontFamily: FONT, fontSize: "13px", fontWeight: "500", color: C.teal, textDecoration: "none" }}>View all →</Link>
-            </div>
-            <div style={{ display: "flex", gap: "28px", overflowX: "auto", paddingBottom: "8px" }}>
-              {categories.map(cat => (
-                <div key={cat.name} className="cat-item" style={{ flex: "0 0 120px", textAlign: "center" }}>
-                  <div style={{ width: "110px", height: "110px", borderRadius: "50%", overflow: "hidden", margin: "0 auto 12px", border: `3px solid ${C.border}`, transition: "border-color 0.25s" }}>
-                    <img src={cat.img} alt={cat.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy"/>
-                  </div>
-                  <div className="cat-label" style={{ fontFamily: FONT, fontSize: "13px", fontWeight: "600", color: C.text, transition: "color 0.25s" }}>{cat.name}</div>
-                </div>
-              ))}
-            </div>
+           <div style={{ display: "flex", gap: "28px", overflowX: "auto", paddingBottom: "8px" }}>
+  {categories.map(cat => (
+    /* Këtu e mbështjellim me Link */
+    <Link 
+      key={cat.name} 
+      to={`/user/${cat.name.toLowerCase()}`} 
+      style={{ textDecoration: "none" }}
+    >
+      <div className="cat-item" style={{ flex: "0 0 120px", textAlign: "center" }}>
+        <div style={{ width: "110px", height: "110px", borderRadius: "50%", overflow: "hidden", margin: "0 auto 12px", border: `3px solid ${C.border}` }}>
+          <img src={cat.img} alt={cat.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        </div>
+        <div className="cat-label" style={{ fontFamily: FONT, fontSize: "13px", fontWeight: "600", color: C.text }}>
+          {cat.name}
+        </div>
+      </div>
+    </Link>
+  ))}
+</div>
           </div>
         </section>
 
@@ -769,7 +805,7 @@ const Homepage = () => {
         )}
 
       </div>
-    </>
+</>
   );
 };
 
