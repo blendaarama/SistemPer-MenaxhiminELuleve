@@ -35,13 +35,15 @@ public class JwtFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // PUBLIC ROUTES
-        if (
-            path.startsWith("/auth/") ||
-            path.startsWith("/api/products") ||
-            path.startsWith("/api/flowers") ||
-            path.startsWith("/api/occasions") ||
-            path.equals("/")
-        ) {
+       if (
+    path.startsWith("/auth/") ||
+    path.startsWith("/api/products") ||
+    path.startsWith("/api/flowers") ||
+    path.startsWith("/api/occasions") ||
+    path.startsWith("/api/suppliers") ||
+    path.startsWith("/api/supply-orders") ||
+    path.equals("/")
+) {
             filterChain.doFilter(request, response);
             return;
         }

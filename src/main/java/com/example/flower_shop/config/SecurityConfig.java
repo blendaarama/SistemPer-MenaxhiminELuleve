@@ -18,7 +18,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
@@ -42,41 +41,36 @@ public class SecurityConfig {
             .authenticationProvider(authenticationProvider())
             .authorizeHttpRequests(auth -> auth
 
-                // ✅ CORS preflight
-                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-
-                // ✅ Auth endpoints — publike
+                // PUBLIC
                 .requestMatchers("/auth/**").permitAll()
 
-                // ✅ Produkte/lule — publike
+                // PUBLIC (TEMP FIX - që mos me të blloku frontend)
                 .requestMatchers(
                     "/api/products/**",
                     "/api/flowers/**",
                     "/api/occasions/**",
-                    "/api/bouquets/**"
+                    "/api/bouquets/**",
+                    "/api/suppliers/**",
+                    "/api/supply-orders/**"
                 ).permitAll()
-                
 
-                // ✅ Vetëm ADMIN
+                // USER + ADMIN
+                .requestMatchers(
+                    "/api/orders/**",
+                    "/api/order-details/**",
+                    "/api/reviews/**",
+                    "/api/payments/**",
+                    "/api/inventory/**"
+                ).hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+
+                // ADMIN ONLY (mbajmë vetëm këto sensitive)
                 .requestMatchers(
                     "/api/users/**",
-                    "/api/suppliers/**",
                     "/api/customers/**",
-                    "/api/supply-orders/**",
                     "/api/deliveries/**"
                 ).hasAuthority("ROLE_ADMIN")
 
-                // ✅ USER dhe ADMIN
-               .requestMatchers(
-    "/api/orders/**",
-    "/api/porosi/**",
-    "/api/order-details/**",
-    "/api/reviews/**",
-    "/api/payments/**",
-    "/api/inventory/**"
-).hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
-
-                // ✅ Çdo gjë tjetër kërkon autentikim
+                // EVERYTHING ELSE
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -100,17 +94,20 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
+
         config.setAllowedOrigins(List.of(
             "http://localhost:3000",
             "http://localhost:3001",
             "http://localhost:5173"
         ));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 

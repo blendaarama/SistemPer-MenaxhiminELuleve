@@ -75,7 +75,13 @@ const SupplierCRUD = () => {
       setError("Emri i Kompanisë dhe Email-i janë të detyrueshme.");
       return;
     }
-    const newSupplier = { id: Date.now(), ...formData };
+    const newSupplier = {
+  emertimi: formData.corporateName,
+  email: formData.email,
+  kontakti: formData.pointOfContact,
+  telefoni: formData.telephone,
+  adresa: formData.address,
+};
 
     if (isOffline) {
       const updated = [...suppliers, newSupplier];
@@ -201,16 +207,16 @@ const SupplierCRUD = () => {
                     suppliers.map((sup) => (
                       <tr key={sup.id} style={{ borderBottom: "1px solid #E6E0D8" }}>
                         <td style={{ padding: "16px 15px" }}>
-                          <span style={{ display: "block", fontWeight: "600", color: "#2B1A4A" }}>{sup.corporateName}</span>
+                          <span style={{ display: "block", fontWeight: "600", color: "#2B1A4A" }}>{sup.emertimi}</span>
                           <span style={{ fontSize: "11px", color: "#0E5A5B", fontWeight: "600" }}>ID: #{String(sup.id).slice(-4)}</span>
                         </td>
                         <td style={{ padding: "16px 15px" }}>
                           <span style={{ display: "block" }}>{sup.email}</span>
-                          <span style={{ fontSize: "12px", color: "rgba(31,31,31,0.6)" }}>{sup.telephone || "Nuk ka telefon"}</span>
+                          <span style={{ fontSize: "12px", color: "rgba(31,31,31,0.6)" }}>{sup.telefoni || "Nuk ka telefon"}</span>
                         </td>
                         <td style={{ padding: "16px 15px" }}>
-                          <span style={{ display: "block", fontWeight: "600", color: "rgba(31,31,31,0.8)" }}>{sup.pointOfContact || "Nuk ka emër"}</span>
-                          <span style={{ fontFamily: "Georgia, serif", fontSize: "13px", color: "rgba(31,31,31,0.6)" }}>{sup.address || "Nuk ka adresë"}</span>
+                          <span style={{ display: "block", fontWeight: "600", color: "rgba(31,31,31,0.8)" }}>{sup.kontakti || "Nuk ka emër"}</span>
+                          <span style={{ fontFamily: "Georgia, serif", fontSize: "13px", color: "rgba(31,31,31,0.6)" }}>{sup.adresa || "Nuk ka adresë"}</span>
                         </td>
                         <td style={{ padding: "16px 15px", textAlign: "center" }}>
                           <button onClick={() => handleDelete(sup.id)} style={{ background: "transparent", color: "#C0392B", border: "1px solid #C0392B", padding: "4px 10px", fontSize: "11px", textTransform: "uppercase", cursor: "pointer", letterSpacing: "0.5px" }}>
