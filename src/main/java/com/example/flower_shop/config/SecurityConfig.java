@@ -45,12 +45,14 @@ public class SecurityConfig {
     .requestMatchers("/auth/**").permitAll()
 
     // PUBLIC
-    .requestMatchers(
-        "/api/products/**",
-        "/api/flowers/**",
-        "/api/occasions/**",
-        "/api/bouquets/**"
-    ).permitAll()
+   // PUBLIC
+.requestMatchers(
+    "/api/products/**",
+    "/api/flowers/**",
+    "/api/occasions/**",
+    "/api/bouquets/**",
+    "/images/**"
+).permitAll()
 
     // REVIEWS -> USER + MODERATOR + ADMIN
     .requestMatchers("/api/reviews/**")
