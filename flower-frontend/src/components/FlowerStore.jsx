@@ -420,37 +420,6 @@ const Homepage = () => {
           </div>
         </section>
 
-        {/* NEWSLETTER */}
-        <section style={{ background: C.dark, padding: "80px 6%" }}>
-          <div style={{ maxWidth: "600px", margin: "0 auto", textAlign: "center" }}>
-            <span style={{ display: "inline-block", background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)", fontSize: "11px", fontWeight: "600", letterSpacing: "2px", textTransform: "uppercase", padding: "5px 14px", borderRadius: "20px", marginBottom: "20px", fontFamily: FONT }}>
-              Newsletter
-            </span>
-            <h2 style={{ fontFamily: SERIF, fontSize: "36px", fontWeight: "700", color: "#fff", marginBottom: "14px", lineHeight: "1.2" }}>Subscribe and save 10%</h2>
-            <p style={{ fontFamily: FONT, fontSize: "15px", color: "rgba(255,255,255,0.6)", lineHeight: "1.8", marginBottom: "36px" }}>
-              Get early access to seasonal collections, exclusive subscriber discounts, and care tips from our expert florists.
-            </p>
-            {emailSent ? (
-              <div style={{ background: "rgba(13,92,92,0.35)", border: "1px solid rgba(13,92,92,0.5)", borderRadius: "10px", padding: "20px 28px", color: "#fff", fontFamily: FONT, fontSize: "14px", lineHeight: "1.6" }}>
-                🌸 <strong>Welcome to the Eternal Rose. family!</strong><br />
-                <span style={{ opacity: 0.8 }}>Your 10% discount code will arrive shortly.</span>
-              </div>
-            ) : (
-              <div>
-                <form onSubmit={handleNewsletterSubmit} style={{ display: "flex", maxWidth: "460px", margin: "0 auto 12px", borderRadius: "10px", overflow: "hidden", boxShadow: "0 4px 24px rgba(0,0,0,0.3)" }}>
-                  <input type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} required
-                    style={{ flex: 1, padding: "15px 18px", border: "none", fontSize: "14px", fontFamily: FONT, outline: "none", color: C.text }} />
-                  <button type="submit" className="btn-teal"
-                    style={{ background: C.teal, color: "#fff", border: "none", padding: "15px 22px", fontSize: "13px", fontWeight: "700", cursor: "pointer", fontFamily: FONT, whiteSpace: "nowrap" }}>
-                    Get 10% off
-                  </button>
-                </form>
-                <p style={{ fontFamily: FONT, fontSize: "12px", color: "rgba(255,255,255,0.35)" }}>By subscribing you agree to our Privacy Policy. Unsubscribe anytime.</p>
-              </div>
-            )}
-          </div>
-        </section>
-
         {/* TESTIMONIALS */}
         <section style={{ padding: "80px 6%", background: C.white }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
