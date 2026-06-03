@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-// Komponenti për Statusin (Professional Badge)
 const StatusBadge = ({ status }) => {
   const getStyle = (s) => {
     switch (s) {

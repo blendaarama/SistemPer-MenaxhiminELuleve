@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/order-items";
-const ORDERS_API = "http://localhost:8080/api/orders";
+const API_URL = "http://localhost:8080/api/order-details";
+const ORDERS_API = "http://localhost:8080/api/porosi";
 const FLOWERS_API = "http://localhost:8080/api/flowers";
 const BOUQUETS_API = "http://localhost:8080/api/bouquets";
 
@@ -40,7 +40,6 @@ const OrderItemsCRUD = () => {
   }, []);
 
   useEffect(() => {
-    console.log("ORDERS:", orders);
   }, [orders]);
 
   const fetchItems = async () => {
@@ -66,8 +65,6 @@ const OrderItemsCRUD = () => {
   const fetchOrders = async () => {
     try {
       const res = await axios.get(ORDERS_API);
-
-      console.log("ORDERS RESPONSE:", res.data);
 
       setOrders(
         Array.isArray(res.data)
@@ -176,9 +173,7 @@ const OrderItemsCRUD = () => {
     try {
       await axios.delete(`${API_URL}/${id}`);
     } catch {
-      const updated = items.filter(
-        (i) => i.id !== id
-      );
+      const updated = items.filter((i) => i.id !== id);
 
       localStorage.setItem(
         "orderItems",
@@ -186,9 +181,7 @@ const OrderItemsCRUD = () => {
       );
     }
 
-    setItems((prev) =>
-      prev.filter((i) => i.id !== id)
-    );
+    setItems((prev) => prev.filter((i) => i.id !== id));
   };
 
   const handleEdit = (item) => {
@@ -225,7 +218,6 @@ const OrderItemsCRUD = () => {
           margin: "0 auto",
         }}
       >
-        {/* HEADER */}
 
         <div
           style={{
@@ -256,7 +248,7 @@ const OrderItemsCRUD = () => {
                 fontFamily: "Georgia",
               }}
             >
-              Detajet e Zërave të Porosive
+              Detajet e Porosive
             </h2>
           </div>
 
@@ -267,7 +259,7 @@ const OrderItemsCRUD = () => {
                 color: "#777",
               }}
             >
-              VLERA TOTALE E ZËRAVE
+              VLERA TOTALE E DETAJEVE
             </div>
 
             <div
@@ -302,7 +294,6 @@ const OrderItemsCRUD = () => {
             gap: "40px",
           }}
         >
-          {/* FORM */}
 
           <div
             style={{
@@ -320,8 +311,7 @@ const OrderItemsCRUD = () => {
             </h3>
 
             <form onSubmit={handleSubmit}>
-              {/* ORDER */}
-
+             
               <select
                 value={form.orderId}
                 onChange={(e) =>
@@ -355,7 +345,6 @@ const OrderItemsCRUD = () => {
                 ))}
               </select>
 
-              {/* PRODUCT TYPE */}
 
               <select
                 value={form.productType}
@@ -380,7 +369,6 @@ const OrderItemsCRUD = () => {
                 </option>
               </select>
 
-              {/* FLOWERS */}
 
               {form.productType ===
                 "FLOWER" && (
@@ -423,7 +411,6 @@ const OrderItemsCRUD = () => {
                 </select>
               )}
 
-              {/* BOUQUETS */}
 
               {form.productType ===
                 "BOUQUET" && (
@@ -466,7 +453,6 @@ const OrderItemsCRUD = () => {
                 </select>
               )}
 
-              {/* QUANTITY */}
 
               <input
                 type="number"
@@ -486,7 +472,6 @@ const OrderItemsCRUD = () => {
                 }}
               />
 
-              {/* PRICE */}
 
               <input
                 type="number"
@@ -524,7 +509,6 @@ const OrderItemsCRUD = () => {
             </form>
           </div>
 
-          {/* TABLE */}
 
           <div
             style={{

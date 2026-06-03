@@ -21,12 +21,10 @@ const ReviewsCRUD = () => {
 
   useEffect(() => { fetchReviews(); }, []);
 
-  // ─── FETCH ───────────────────────────────────────────────────────────────────
   const fetchReviews = async () => {
     setLoading(true);
     setError("");
 
-    // Gjithmonë lexo localStorage fillimisht
     const local = JSON.parse(localStorage.getItem("reviews") || "[]");
 
     try {
@@ -36,13 +34,11 @@ const ReviewsCRUD = () => {
       });
       const backendData = Array.isArray(res.data) ? res.data : res.data?.content ?? [];
 
-      // Merge: backend + reviews vetëm-lokale (që nuk janë në backend)
       const backendIds = new Set(backendData.map(r => String(r.id)));
       const localOnly  = local.filter(r => !backendIds.has(String(r.id)));
       setReviews([...backendData, ...localOnly]);
 
     } catch {
-      // 403 ose backend i fikur — shfaq localStorage
       setReviews(local);
       setError(local.length === 0
         ? "⚠️ Backend jo aktiv — nuk ka vlerësime ende."
@@ -53,7 +49,6 @@ const ReviewsCRUD = () => {
     }
   };
 
-  // ─── SUBMIT (Shto / Ndrysho) ──────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.customerId || !form.comment) {
@@ -83,7 +78,6 @@ const ReviewsCRUD = () => {
       }
       fetchReviews();
     } catch {
-      // Ruaj në localStorage nëse backend dështon
       const local = JSON.parse(localStorage.getItem("reviews") || "[]");
       const updated = form.id
         ? local.map(r => r.id === form.id ? payload : r)
@@ -94,13 +88,11 @@ const ReviewsCRUD = () => {
     setForm(initialForm);
   };
 
-  // ─── EDIT ─────────────────────────────────────────────────────────────────
   const handleEdit = (r) => {
     setForm({ ...r });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // ─── DELETE ───────────────────────────────────────────────────────────────
   const handleDelete = async (id) => {
     if (!window.confirm("A jeni të sigurt që dëshironi ta fshini këtë vlerësim?")) return;
     try {
@@ -116,7 +108,6 @@ const ReviewsCRUD = () => {
     }
   };
 
-  // ─── HELPERS ──────────────────────────────────────────────────────────────
   const StarDisplay = ({ score }) => (
     <span style={{ color: "#F9A825", fontSize: "14px", letterSpacing: "2px" }}>
       {"★".repeat(score)}{"☆".repeat(5 - score)}
@@ -127,7 +118,6 @@ const ReviewsCRUD = () => {
     ? (reviews.reduce((sum, r) => sum + r.score, 0) / reviews.length).toFixed(1)
     : "0.0";
 
-  // ─── RENDER ───────────────────────────────────────────────────────────────
   return (
     <div style={{ background: "#FAF8F5", minHeight: "100vh", padding: "40px 6%", fontFamily: "system-ui, -apple-system, sans-serif", color: "#1F1F1F" }}>
       <div style={{ maxWidth: "1300px", margin: "0 auto" }}>

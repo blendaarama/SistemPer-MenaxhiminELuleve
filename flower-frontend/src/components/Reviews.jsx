@@ -5,7 +5,6 @@ const Reviews = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // user input
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -23,7 +22,6 @@ const Reviews = () => {
       });
   }, []);
 
-  // ⭐ star input
  const StarInput = () => {
   const [hover, setHover] = useState(0);
 
@@ -48,7 +46,6 @@ const Reviews = () => {
   );
 };
 
-  // submit review
   const submitReview = () => {
     if (rating === 0 || comment.trim() === "") return;
 
@@ -60,7 +57,7 @@ const Reviews = () => {
         komenti: comment,
       })
       .then((res) => {
-        setReviews([res.data, ...reviews]); // add new review on top
+        setReviews([res.data, ...reviews]);
         setRating(0);
         setComment("");
       })
@@ -142,7 +139,7 @@ const Reviews = () => {
               "{review.komenti}"
             </p>
 
-            {/* ⭐ DISPLAY STARS */}
+            {/*  DISPLAY STARS */}
             <div style={{ color: "#D4A853", fontSize: "14px" }}>
               {"★".repeat(review.vleresimi)}
               {"☆".repeat(5 - review.vleresimi)}

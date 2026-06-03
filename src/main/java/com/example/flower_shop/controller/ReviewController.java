@@ -20,13 +20,11 @@ public class ReviewController {
         this.service = service;
     }
 
-    // GET ALL
     @GetMapping
     public List<Review> getAll() {
         return service.getAll();
     }
 
-    // GET BY ID
     @GetMapping("/{id}")
     public ResponseEntity<Review> getById(@PathVariable Integer id) {
         Review review = service.getById(id);
@@ -35,7 +33,6 @@ public class ReviewController {
                 : ResponseEntity.notFound().build();
     }
 
-    // CREATE
     @PostMapping
     public ResponseEntity<Review> create(@RequestBody ReviewDTO dto) {
         Review created = service.create(dto);
@@ -44,7 +41,6 @@ public class ReviewController {
                 : ResponseEntity.badRequest().build();
     }
 
-    // UPDATE
     @PutMapping("/{id}")
     public ResponseEntity<Review> update(
             @PathVariable Integer id,
@@ -56,7 +52,6 @@ public class ReviewController {
                 : ResponseEntity.notFound().build();
     }
 
-    // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         boolean deleted = service.delete(id);

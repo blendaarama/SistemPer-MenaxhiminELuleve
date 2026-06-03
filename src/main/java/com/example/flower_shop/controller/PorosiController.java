@@ -1,7 +1,7 @@
 package com.example.flower_shop.controller;
 
 import com.example.flower_shop.model.Porosi;
-import com.example.flower_shop.service.OrderService;
+import com.example.flower_shop.service.PorosiService;
 import com.example.flower_shop.dto.PorosiUpdateDTO;
 
 import org.springframework.http.ResponseEntity;
@@ -14,9 +14,9 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173")
 public class PorosiController {
 
-    private final OrderService service;
+    private final PorosiService service;
 
-    public PorosiController(OrderService service) {
+    public PorosiController(PorosiService service) {
         this.service = service;
     }
 

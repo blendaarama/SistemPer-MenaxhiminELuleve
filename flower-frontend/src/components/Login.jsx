@@ -41,8 +41,7 @@ const Login = ({ onLoginSuccess }) => {
  window.dispatchEvent(new Event("localStorageChange"));
 
  if (onLoginSuccess) onLoginSuccess();
-
- // ✅ Nese vinte nga /order kthehu atje, otherwise sipas rolit
+ 
  if (from) {
  navigate(from, { replace: true });
  } else if (role === "ROLE_ADMIN") {

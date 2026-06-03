@@ -27,17 +27,14 @@ public class ReviewService {
         this.porosiRepository = porosiRepository;
     }
 
-    // GET ALL
     public List<Review> getAll() {
         return reviewRepository.findAll();
     }
 
-    // GET BY ID
     public Review getById(Integer id) {
         return reviewRepository.findById(id).orElse(null);
     }
 
-    // CREATE (ME DTO)
     public Review create(ReviewDTO dto) {
 
         Customer klienti = customerRepository.findById(dto.getKlientiId()).orElse(null);
@@ -54,7 +51,6 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-    // UPDATE
     public Review update(Integer id, ReviewDTO dto) {
 
         Review existing = getById(id);
@@ -73,7 +69,6 @@ public class ReviewService {
         return reviewRepository.save(existing);
     }
 
-    // DELETE
     public boolean delete(Integer id) {
         Review existing = getById(id);
         if (existing == null) return false;

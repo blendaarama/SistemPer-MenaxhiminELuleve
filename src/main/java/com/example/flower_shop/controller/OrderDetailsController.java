@@ -16,25 +16,21 @@ public class OrderDetailsController {
     @Autowired
 private OrderDetailsService service;
 
-    // GET ALL
     @GetMapping
 public List<OrderDetails> getAll() {
     return service.getAll();
 }
 
-    // GET BY ID
     @GetMapping("/{id}")
       public ResponseEntity<OrderDetails> getById(@PathVariable Integer id) {
          OrderDetails od = service.getById(id);
               return od != null ? ResponseEntity.ok(od) : ResponseEntity.notFound().build();
 }
-    // CREATE
     @PostMapping
       public OrderDetails create(@RequestBody OrderDetails od) {
           return service.create(od);
 }
 
-    // UPDATE
     @PutMapping("/{id}")
     public ResponseEntity<OrderDetails> update(
         @PathVariable Integer id,

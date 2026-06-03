@@ -99,7 +99,6 @@ const Homepage = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // ✅ FIX KRYESOR: nuk filtrojmë me category — të gjitha janë lule
   const flowers  = deals;
   const bouquets = [];
 
@@ -379,14 +378,14 @@ const Homepage = () => {
 
             <h3 style={{ fontFamily: SERIF, marginBottom: "16px" }}>Fresh Flowers</h3>
 
-            {/* ✅ ERROR STATE */}
+            {/*  ERROR STATE */}
             {error && (
               <div style={{ padding: "16px", background: "#fff0f0", border: "1px solid #ffcccc", borderRadius: "8px", color: C.red, fontFamily: FONT, fontSize: "14px", marginBottom: "20px" }}>
                 {error}
               </div>
             )}
 
-            {/* ✅ LOADING STATE */}
+            {/* LOADING STATE */}
             {loading ? (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "20px", marginBottom: "40px" }}>
                 {[1,2,3,4,5].map(i => <SkeletonCard key={i} />)}

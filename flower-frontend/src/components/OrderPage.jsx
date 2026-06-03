@@ -5,7 +5,7 @@ const API_URL = "http://localhost:8080/api/porosi";
 
 const initialFormState = {
   id: null,
-  klientiId: "", // Përdoret për të lidhur ID-në e klientit nga formulari
+  klientiId: "", 
   adresaDorezimit: "",
   shumeTotale: "",
   statusi: "PRITJE"
@@ -47,7 +47,6 @@ function OrderPage() {
     e.preventDefault();
     setError("");
 
-    // Përgatitja e payload-it sipas strukturës që pret Spring Boot
     const payload = {
       id: formData.id,
       adresaDorezimit: formData.adresaDorezimit,

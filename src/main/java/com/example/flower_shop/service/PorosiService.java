@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class OrderService {
+public class PorosiService {
 
     @Autowired
     private PorosiRepository repository;

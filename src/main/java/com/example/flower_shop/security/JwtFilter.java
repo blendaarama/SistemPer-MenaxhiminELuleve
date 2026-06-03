@@ -34,21 +34,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // PUBLIC ROUTES
        if (
     path.startsWith("/auth/") ||
     path.startsWith("/api/products") ||
     path.startsWith("/api/flowers") ||
     path.startsWith("/api/occasions") ||
-    path.startsWith("/api/suppliers") ||
-    path.startsWith("/api/supply-orders") ||
     path.equals("/")
 ) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // HANDLE OPTIONS (CORS)
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
             return;
@@ -77,7 +73,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
             UserDetails userDetails = userService.loadUserByUsername(username);
 
-            // ✅ RREGULLUAR: userDetails (jo username)
             if (jwtService.validateToken(token, userDetails)) {
 
                 String role = jwtService.extractRole(token);

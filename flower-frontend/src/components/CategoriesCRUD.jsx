@@ -6,7 +6,6 @@ const CategoriesCRUD = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Shteti për formën e krijimit
   const [formData, setFormData] = useState({
     name: "",
     description: ""
@@ -18,7 +17,6 @@ const CategoriesCRUD = () => {
     fetchCategories();
   }, []);
 
-  // 1. Leximi i kategorive (Backend -> LocalStorage)
   const fetchCategories = async () => {
     setLoading(true);
     setError("");
@@ -41,7 +39,6 @@ const CategoriesCRUD = () => {
     }
   };
 
-  // 2. Krijimi i një kategorie të re
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name) {
@@ -69,7 +66,6 @@ const CategoriesCRUD = () => {
     setError("");
   };
 
-  // 3. Fshirja e një kategorie
   const handleDelete = async (id) => {
     if (!window.confirm("A jeni të sigurt që dëshironi të fshini këtë kategori?")) return;
     try {

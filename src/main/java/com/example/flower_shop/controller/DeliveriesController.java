@@ -20,13 +20,11 @@ public class DeliveriesController {
         this.service = service;
     }
 
-    // GET ALL
     @GetMapping
     public List<Deliveries> getAll() {
         return service.getAll();
     }
 
-    // GET BY ID
     @GetMapping("/{id}")
     public ResponseEntity<Deliveries> getById(@PathVariable Integer id) {
         Deliveries delivery = service.getById(id);
@@ -36,13 +34,11 @@ public class DeliveriesController {
                 : ResponseEntity.notFound().build();
     }
 
-    // CREATE
     @PostMapping
 public Deliveries create(@RequestBody DeliveriesDTO dto) {
     return service.create(dto);
 }
 
-    // UPDATE
     @PutMapping("/{id}")
 public ResponseEntity<Deliveries> update(
         @PathVariable Integer id,
@@ -54,7 +50,6 @@ public ResponseEntity<Deliveries> update(
             ? ResponseEntity.ok(result)
             : ResponseEntity.notFound().build();
 }
-    // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
 

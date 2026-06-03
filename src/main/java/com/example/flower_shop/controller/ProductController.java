@@ -20,13 +20,11 @@ public class ProductController {
         this.repository = repository;
     }
 
-    // ALL PRODUCTS
     @GetMapping("/all")
     public List<Product> getAll() {
         return repository.findAll();
     }
 
-    // SEARCH (FLOWERS + BOUQUETS)
     @GetMapping("/search")
     public Map<String, List<Product>> search(@RequestParam String q) {
 

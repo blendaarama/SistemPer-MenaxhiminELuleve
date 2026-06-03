@@ -6,7 +6,6 @@ const CustomerCRUD = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Forma për regjistrim të ri
   const [formData, setFormData] = useState({
     emri: "",
     mbiemri: "",
@@ -22,7 +21,6 @@ const CustomerCRUD = () => {
     fetchCustomers();
   }, []);
 
-  // 1. Leximi i klientëve (Backend -> LocalStorage)
   const fetchCustomers = async () => {
     setLoading(true);
     setError("");
@@ -38,7 +36,6 @@ const CustomerCRUD = () => {
     }
   };
 
-  // 2. Ruajtja e një klienti të ri
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.emri || !formData.email) {
@@ -47,30 +44,26 @@ const CustomerCRUD = () => {
     }
 
     const newCustomer = {
-      id: formData.id || Date.now(), // ID unike nëse jemi në local
+      id: formData.id || Date.now(),
       ...formData
     };
 
     try {
-      // Tentojmë ruajtjen në Backend
       const res = await axios.post(API_URL, newCustomer);
       setCustomers([...customers, res.data]);
     } catch (err) {
       console.log("Ruajtja në backend dështoi. Po ruhet në LocalStorage...");
       
-      // Ruajtja lokale
       const localCustomers = JSON.parse(localStorage.getItem("customers")) || [];
       const updated = [...localCustomers, newCustomer];
       localStorage.setItem("customers", JSON.stringify(updated));
       setCustomers(updated);
     }
 
-    // Reseto formën
     setFormData({ emri: "", mbiemri: "", email: "", telefoni: "", adresa: "", isVip: false });
     setError("");
   };
-
-  // 3. Fshirja e një klienti
+  
   const handleDelete = async (id) => {
     if (!window.confirm("A jeni të sigurt që dëshironi të fshini këtë klient?")) return;
     try {

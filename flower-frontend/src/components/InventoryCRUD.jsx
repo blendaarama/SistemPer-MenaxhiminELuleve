@@ -6,7 +6,6 @@ const InventoryCRUD = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Shteti për formën e regjistrimit të stokut
   const [formData, setFormData] = useState({
     flowerId: "",
     physicalStock: "",
@@ -21,7 +20,6 @@ const InventoryCRUD = () => {
     fetchInventory();
   }, []);
 
-  // 1. Leximi i të dhënave të magazinës (Backend -> LocalStorage)
   const fetchInventory = async () => {
     setLoading(true);
     setError("");
@@ -44,7 +42,6 @@ const InventoryCRUD = () => {
     }
   };
 
-  // 2. Ruajtja e një regjistrimi të ri në Stok
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.flowerId || !formData.physicalStock) {
@@ -81,7 +78,6 @@ const InventoryCRUD = () => {
     setError("");
   };
 
-  // 3. Fshirja e një regjistrimi
   const handleDelete = async (id) => {
     if (!window.confirm("A jeni të sigurt që dëshironi të hiqni këtë regjistrim nga magazina?")) return;
     try {

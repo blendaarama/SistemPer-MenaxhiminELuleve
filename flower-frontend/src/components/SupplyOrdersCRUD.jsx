@@ -5,6 +5,16 @@ const API_URL = "http://localhost:8080/api/supply-orders";
 const SUPPLIERS_API = "http://localhost:8080/api/suppliers";
 const FLOWERS_API = "http://localhost:8080/api/flowers";
 
+const getAuthHeader = () => {
+  const token = localStorage.getItem("token");
+
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+};
+
 const initialForm = {
   supplierId: "",
   flowerId: "",
@@ -55,7 +65,7 @@ const SupplyOrdersCRUD = () => {
     setLoading(true);
 
     try {
-      const res = await axios.get(API_URL);
+      const res = await axios.get(API_URL, getAuthHeader());
 
       setOrders(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
@@ -68,7 +78,7 @@ const SupplyOrdersCRUD = () => {
 
   const fetchSuppliers = async () => {
     try {
-      const res = await axios.get(SUPPLIERS_API);
+      const res = await axios.get(SUPPLIERS_API, getAuthHeader());
 
       setSuppliers(res.data || []);
     } catch (err) {
@@ -78,7 +88,7 @@ const SupplyOrdersCRUD = () => {
 
   const fetchFlowers = async () => {
     try {
-      const res = await axios.get(FLOWERS_API);
+      const res = await axios.get(FLOWERS_API, getAuthHeader());
 
       setFlowers(res.data || []);
     } catch (err) {
@@ -131,7 +141,7 @@ const SupplyOrdersCRUD = () => {
     };
 
     try {
-      await axios.post(API_URL, payload);
+      await axios.post(API_URL, payload, getAuthHeader());
 
       fetchOrders();
 
@@ -148,7 +158,7 @@ const SupplyOrdersCRUD = () => {
     if (!window.confirm("A jeni të sigurt?")) return;
 
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await axios.delete(`${API_URL}/${id}`, getAuthHeader());
 
       setOrders((prev) =>
         prev.filter((o) => o.id !== id)
@@ -365,8 +375,6 @@ const SupplyOrdersCRUD = () => {
                 </select>
               </div>
 
-              {/* QTY + COST */}
-
               <div
                 style={{
                   display: "grid",
@@ -413,8 +421,6 @@ const SupplyOrdersCRUD = () => {
                 </div>
               </div>
 
-              {/* DATE */}
-
               <div style={{ marginBottom: "15px" }}>
                 <label style={S.label}>
                   Data e Porosisë
@@ -432,8 +438,6 @@ const SupplyOrdersCRUD = () => {
                   style={S.input}
                 />
               </div>
-
-              {/* STATUS */}
 
               <div style={{ marginBottom: "25px" }}>
                 <label style={S.label}>Statusi</label>
@@ -475,7 +479,6 @@ const SupplyOrdersCRUD = () => {
             </form>
           </div>
 
-          {/* TABLE */}
 
           <div
             style={{

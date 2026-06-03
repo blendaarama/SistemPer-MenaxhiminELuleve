@@ -56,7 +56,6 @@ const Register = ({ onRegisterSuccess }) => {
             if (response.status === 200 || response.data) {
                 setSuccess('Regjistrimi u krye me sukses!');
                 
-                // Pastrimi i fushave te formularit
                 setName('');
                 setEmail('');
                 setPassword('');
@@ -66,7 +65,6 @@ const Register = ({ onRegisterSuccess }) => {
                     onRegisterSuccess();
                 }
 
-                // Redirect automatik te faqja login pas 2 sekondave
                 setTimeout(() => {
                     navigate('/login');
                 }, 2000);

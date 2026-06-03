@@ -20,17 +20,15 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final UserClaimsRepository userClaimsRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    // GET ALL USERS
+   
     @GetMapping
     public List<User> getAll() {
         return userRepository.findAll();
     }
 
-    // CREATE USER
     @PostMapping
     public User create(@RequestBody User user) {
 
-        // ENCODE PASSWORD
         user.setPassword(
             passwordEncoder.encode(user.getPassword())
         );
@@ -38,7 +36,6 @@ public class UserController {
         return userRepository.save(user);
     }
 
-    // UPDATE USER
     @PutMapping("/{id}")
     public User update(
             @PathVariable Integer id,
@@ -52,7 +49,6 @@ public class UserController {
         user.setMbiemri(updated.getMbiemri());
         user.setEmail(updated.getEmail());
 
-        // vetëm nëse ndryshohet passwordi
         if (updated.getPassword() != null &&
             !updated.getPassword().isEmpty()) {
 
@@ -66,7 +62,6 @@ public class UserController {
         return userRepository.save(user);
     }
 
-    // DELETE USER
   @Transactional
 @DeleteMapping("/{id}")
 public void delete(@PathVariable Integer id) {
@@ -74,13 +69,10 @@ public void delete(@PathVariable Integer id) {
     User user = userRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("User nuk ekziston"));
 
-    // Fshij refresh tokens
     refreshTokenRepository.deleteByUser(user);
 
-    // Fshij claims
     userClaimsRepository.deleteByUserId(id);
 
-    // Fshij userin
     userRepository.delete(user);
 }
 }

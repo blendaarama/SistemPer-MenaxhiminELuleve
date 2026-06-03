@@ -82,7 +82,7 @@ function AppContent() {
  <Route path="/register" element={<Register />} />
  <Route path="/about" element={<AboutUs />} />
 
- {/* ✅ HOME — publike, pa nevoj per login */}
+ {/* HOME */}
  <Route path="/" element={<FlowerStore />} />
 
  <Route path="/user/flowers" element={<Flowers />} />
@@ -94,21 +94,19 @@ function AppContent() {
  <Route path="/user/sympathy" element={<Bouquets />} />
  <Route path="/search" element={<SearchResults />} />
 
- {/* ✅ ORDER — duhet login, nese jo ridrejto te /login */}
  <Route path="/order" element={
  <PrivateRoute>
  <CartPage />
  </PrivateRoute>
  } />
 
- {/* MODERATOR — reviews */}
  <Route path="/reviews" element={
  <PrivateRoute moderatorOnly>
  <ReviewsCRUD />
  </PrivateRoute>
  } />
 
- {/* STAFF — porositë */}
+ {/* STAFF */}
  <Route path="/staff/orders" element={
  <PrivateRoute staffOnly>
  <OrderCRUD />
@@ -149,8 +147,13 @@ function AppContent() {
 
 export default function App() {
  return (
- <Router>
- <AppContent />
+ <Router
+   future={{
+     v7_startTransition: true,
+     v7_relativeSplatPath: true,
+   }}
+ >
+   <AppContent />
  </Router>
  );
 }

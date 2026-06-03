@@ -80,7 +80,6 @@ const AdminDashboard = () => {
         return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
       });
 
-      // ✅ RREGULLUAR — shumeTotale si prioritet i parë
       const monthlyRevenue = monthlyOrders.reduce(
         (sum, o) => sum + parseFloat(o.shumeTotale || o.shume_totale || o.totalRevenue || o.totalPrice || 0),
         0
@@ -93,7 +92,6 @@ const AdminDashboard = () => {
         usersRegistered: users.length || 0,
       });
 
-      // REVENUE CHART — ✅ shumeTotale si prioritet
       const revenueMap = {};
       orders.forEach((o) => {
         const d     = new Date(o.dataPorosise || o.data_porosise);
@@ -103,7 +101,6 @@ const AdminDashboard = () => {
       });
       setChartData(Object.keys(revenueMap).map((m) => ({ month: m, revenue: revenueMap[m] })));
 
-      // ORDERS CHART
       const orderMap = {};
       orders.forEach((o) => {
         const d     = new Date(o.dataPorosise || o.data_porosise);
@@ -113,7 +110,6 @@ const AdminDashboard = () => {
       });
       setOrdersChart(Object.keys(orderMap).map((m) => ({ month: m, orders: orderMap[m] })));
 
-      // TOP FLOWERS — nga statusi i porosive
       const statusMap = {};
       orders.forEach((o) => {
         const s = o.statusi || "PRITJE";

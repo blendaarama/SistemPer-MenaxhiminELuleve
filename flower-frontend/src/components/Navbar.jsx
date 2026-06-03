@@ -7,11 +7,9 @@ const Navbar = () => {
  const navigate = useNavigate();
  const { cartItems } = useCart();
 
- // ✅ State për login dhe role — ri-renderohet kur ndryshon
  const [isLoggedIn, setIsLoggedIn] = useState(Boolean(localStorage.getItem("accessToken")));
  const [role, setRole] = useState(localStorage.getItem("role"));
 
- // ✅ Degjojë ndryshimet e localStorage
  useEffect(() => {
  const handleStorage = () => {
  setIsLoggedIn(Boolean(localStorage.getItem("accessToken")));
@@ -20,7 +18,6 @@ const Navbar = () => {
 
  window.addEventListener("storage", handleStorage);
  
- // ✅ Kjo është kyçe — dëgjon edhe ndryshimet brenda të njëjtit tab
  window.addEventListener("localStorageChange", handleStorage);
 
  return () => {
@@ -42,7 +39,7 @@ const Navbar = () => {
  localStorage.removeItem("refreshToken");
  localStorage.removeItem("userEmail");
  localStorage.removeItem("role");
- // ✅ Update state menjëherë
+ 
  setIsLoggedIn(false);
  setRole(null);
  navigate("/");

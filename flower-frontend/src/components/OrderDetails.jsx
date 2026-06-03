@@ -35,7 +35,6 @@ const OrderDetailsCRUD = () => {
     const save = async (e) => {
         e.preventDefault();
 
-        // Konstruktimi i saktë i payload-it me parsers numerikë
         const payload = {
             id: form.id,
             orderId: parseInt(form.orderId),
