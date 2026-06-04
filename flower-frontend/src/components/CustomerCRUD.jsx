@@ -43,10 +43,13 @@ const CustomerCRUD = () => {
       return;
     }
 
-    const newCustomer = {
-      id: formData.id || Date.now(),
-      ...formData
-    };
+  const newCustomer = {
+    emri: formData.emri,
+    mbiemri: formData.mbiemri,
+    email: formData.email,
+    telefoni: formData.telefoni,
+    adresa: formData.adresa
+  };
 
     try {
       const res = await axios.post(API_URL, newCustomer);

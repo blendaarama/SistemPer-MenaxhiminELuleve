@@ -3,6 +3,8 @@ package com.example.flower_shop.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "inventory")
 @Data
@@ -12,9 +14,15 @@ public class Inventory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String flowerName;
+    private String flowerId;
 
-    private Integer quantity;
+    private String flowerDescription;
 
-    private String status;
+    private Integer physicalStock;
+
+    private Integer reservedOrders;
+
+    private Integer safetyLevel;
+
+    private LocalDate lastAuditDate;
 }

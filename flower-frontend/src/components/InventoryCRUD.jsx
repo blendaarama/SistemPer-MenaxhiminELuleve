@@ -54,7 +54,6 @@ const InventoryCRUD = () => {
     if (formData.flowerId === "105") generatedDesc = "Arranxhim me luledielli të artë";
 
     const newLog = {
-      id: Date.now(),
       flowerId: formData.flowerId,
       flowerDescription: generatedDesc,
       physicalStock: parseInt(formData.physicalStock) || 0,

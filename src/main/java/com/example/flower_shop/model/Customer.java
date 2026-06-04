@@ -32,4 +32,6 @@ public class Customer {
     protected void onCreate() {
         this.dataRegjistrimit = LocalDate.now();
     }
+
+    private Boolean isVip;
 }

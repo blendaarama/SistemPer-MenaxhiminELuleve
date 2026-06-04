@@ -45,14 +45,14 @@ const PaymentsCRUD = () => {
       return;
     }
 
-    const newPayment = {
-      id: Date.now(),
-      orderId: "ORD-" + formData.orderId,
-      amount: parseFloat(formData.amount) || 0,
-      paymentMethod: formData.paymentMethod,
-      clearanceStatus: formData.clearanceStatus,
-      processingDate: formData.processingDate || new Date().toISOString().split("T")[0]
-    };
+  const newPayment = {
+    amount: parseFloat(formData.amount),
+    paymentMethod: formData.paymentMethod,
+    status: formData.clearanceStatus,
+    porosia: {
+      id: parseInt(formData.orderId)
+    }
+  };
 
     try {
       const res = await axios.post(API_URL, newPayment);

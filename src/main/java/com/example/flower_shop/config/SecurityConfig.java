@@ -41,20 +41,16 @@ public class SecurityConfig {
             .authenticationProvider(authenticationProvider())
            .authorizeHttpRequests(auth -> auth
 
-    // PUBLIC
     .requestMatchers("/auth/**").permitAll()
 
-    // PUBLIC
-   // PUBLIC
-.requestMatchers(
-    "/api/products/**",
-    "/api/flowers/**",
-    "/api/occasions/**",
-    "/api/bouquets/**",
-    "/images/**"
-).permitAll()
+    .requestMatchers(
+        "/api/products/**",
+        "/api/flowers/**",
+        "/api/occasions/**",
+        "/api/bouquets/**",
+        "/images/**"
+    ).permitAll()
 
-    // REVIEWS -> USER + MODERATOR + ADMIN
     .requestMatchers("/api/reviews/**")
     .hasAnyAuthority(
         "ROLE_USER",
@@ -62,7 +58,6 @@ public class SecurityConfig {
         "ROLE_ADMIN"
     )
 
-    // ORDERS -> USER + STAFF + ADMIN
     .requestMatchers(
         "/api/orders/**",
         "/api/order-details/**"
@@ -73,40 +68,33 @@ public class SecurityConfig {
         "ROLE_ADMIN"
     )
 
-    // DELIVERIES -> STAFF + ADMIN
     .requestMatchers("/api/deliveries/**")
     .hasAnyAuthority(
         "ROLE_STAFF",
         "ROLE_ADMIN"
     )
 
-    // INVENTORY
     .requestMatchers("/api/inventory/**")
     .hasAnyAuthority(
         "ROLE_ADMIN",
         "ROLE_STAFF"
     )
 
-    // PAYMENTS
     .requestMatchers("/api/payments/**")
     .hasAnyAuthority(
         "ROLE_ADMIN",
         "ROLE_STAFF"
     )
 
-    // USERS
     .requestMatchers("/api/users/**")
     .hasAuthority("ROLE_ADMIN")
 
-    // CUSTOMERS
     .requestMatchers("/api/customers/**")
     .hasAuthority("ROLE_ADMIN")
 
-    // SUPPLIERS
     .requestMatchers("/api/suppliers/**")
     .hasAuthority("ROLE_ADMIN")
 
-    // SUPPLY ORDERS
     .requestMatchers("/api/supply-orders/**")
     .hasAuthority("ROLE_ADMIN")
 

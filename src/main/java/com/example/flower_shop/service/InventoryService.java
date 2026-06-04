@@ -24,11 +24,14 @@ public class InventoryService {
     public Inventory update(Integer id, Inventory updated) {
 
         Inventory inventory = inventoryRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("Inventory not found"));
 
-        inventory.setFlowerName(updated.getFlowerName());
-        inventory.setQuantity(updated.getQuantity());
-        inventory.setStatus(updated.getStatus());
+        inventory.setFlowerId(updated.getFlowerId());
+        inventory.setFlowerDescription(updated.getFlowerDescription());
+        inventory.setPhysicalStock(updated.getPhysicalStock());
+        inventory.setReservedOrders(updated.getReservedOrders());
+        inventory.setSafetyLevel(updated.getSafetyLevel());
+        inventory.setLastAuditDate(updated.getLastAuditDate());
 
         return inventoryRepository.save(inventory);
     }

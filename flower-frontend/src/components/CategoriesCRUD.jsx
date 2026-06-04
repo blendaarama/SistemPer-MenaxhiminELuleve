@@ -46,10 +46,10 @@ const CategoriesCRUD = () => {
       return;
     }
 
-    const newCategory = {
-      id: Date.now(),
-      ...formData
-    };
+  const newCategory = {
+    name: formData.name,
+    description: formData.description
+  };
 
     try {
       const res = await axios.post(API_URL, newCategory);
