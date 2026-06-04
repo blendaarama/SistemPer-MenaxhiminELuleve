@@ -1,9 +1,10 @@
 package com.example.flower_shop.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import lombok.Data;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -15,13 +16,13 @@ public class Porosi {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER)   // ✅ EAGER që të ngarkohet me Porosi
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "klienti_id")
-    @JsonIgnoreProperties({"porositë", "orders", "hibernateLazyInitializer"}) // ✅ ndalo recursion
+    @JsonIgnoreProperties({"porosite", "orders", "hibernateLazyInitializer", "handler"})
     private Customer klienti;
 
     @Column(name = "data_porosis")
-    private LocalDate dataPorosise;
+    private LocalDateTime dataPorosise;
 
     @Column(name = "data_dorezimit")
     private Date dataDorezimit;

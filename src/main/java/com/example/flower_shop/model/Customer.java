@@ -1,14 +1,18 @@
 package com.example.flower_shop.model;
 
-import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "customers")
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Customer {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -23,15 +27,26 @@ public class Customer {
     private String email;
 
     private String telefoni;
+
     private String adresa;
 
     @Column(name = "data_regjistrimit")
     private LocalDate dataRegjistrimit;
 
+    private Boolean isVip = false;
+
+    @OneToMany(mappedBy = "klienti")
+    @JsonIgnoreProperties({"klienti", "hibernateLazyInitializer", "handler"})
+    private List<Porosi> porosite;
+
     @PrePersist
     protected void onCreate() {
-        this.dataRegjistrimit = LocalDate.now();
-    }
+        if (this.dataRegjistrimit == null) {
+            this.dataRegjistrimit = LocalDate.now();
+        }
 
-    private Boolean isVip;
+        if (this.isVip == null) {
+            this.isVip = false;
+        }
+    }
 }
