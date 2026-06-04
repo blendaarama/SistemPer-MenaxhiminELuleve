@@ -79,7 +79,15 @@ public class PorosiService {
                     klienti.setIsVip(false);
                 }
 
-                savedCustomer = customerRepository.save(klienti);
+                Customer existingCustomer =
+        customerRepository.findByEmail(klienti.getEmail())
+                .orElse(null);
+
+        if (existingCustomer != null) {
+            savedCustomer = existingCustomer;
+        } else {
+            savedCustomer = customerRepository.save(klienti);
+        }
             }
 
             porosi.setKlienti(savedCustomer);
