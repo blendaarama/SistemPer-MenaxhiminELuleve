@@ -164,7 +164,7 @@ const Homepage = () => {
   ];
 
   const trustBadges = [
-    { icon: "🚚", label: "Free delivery",       sub: "On orders over $60" },
+    { icon: "🚚", label: "Free delivery",       sub: "On orders over $50" },
     { icon: "🌿", label: "Farm-fresh flowers",  sub: "Sourced within 48 hrs" },
     { icon: "↩️", label: "Freshness guarantee", sub: "7-day happiness promise" },
     { icon: "🔒", label: "Secure checkout",     sub: "256-bit SSL encrypted" },
@@ -212,8 +212,7 @@ const Homepage = () => {
 
         {/* ANNOUNCEMENT BAR */}
         <div style={{ background: C.teal, color: "#fff", fontSize: "12px", fontWeight: "500", letterSpacing: "0.5px", padding: "9px 24px", textAlign: "center" }}>
-          🌸 Free shipping on orders over $60 &nbsp;·&nbsp; Same-day delivery available in select cities &nbsp;·&nbsp;
-          <span style={{ textDecoration: "underline", cursor: "pointer" }}>See delivery areas →</span>
+          🌸 Free shipping on orders over $50 &nbsp;·&nbsp; Same-day delivery available in select cities 
         </div>
 
         {/* NAV */}
