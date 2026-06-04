@@ -156,7 +156,7 @@ const CartPage = () => {
     }
   };
 
-  const handleCheckout = async () => {
+ const handleCheckout = async () => {
   if (!customerName.trim() || !phone.trim() || !address.trim()) {
     alert("Ju lutem plotësoni emrin, numrin dhe adresën.");
     return;
@@ -190,7 +190,34 @@ const CartPage = () => {
   try {
     const orderRes = await axios.post(API_URL, orderPayload, authHeaders());
     const savedOrder = orderRes.data;
+    
+    for (const item of cartItems) {
+      const quantity = Number(item.quantity || 1);
+      const price = Number(item.price || item.cmimi || 0);
 
+      const isBouquet =
+        item.type === "BOUQUET" ||
+        item.productType === "BOUQUET" ||
+        item.category === "Bouquet" ||
+        item.category === "Buqete";
+
+      const detailPayload = {
+        porosia: { id: savedOrder.id },
+        flower: isBouquet ? null : { id: Number(item.id) },
+        buqeta: isBouquet ? { id: Number(item.id) } : null,
+        sasia: quantity,
+        cmimi_njesi: price,
+        shuma: Number((quantity * price).toFixed(2)),
+      };
+
+      await axios.post(
+        "http://localhost:8080/api/order-details",
+        detailPayload,
+        authHeaders()
+      );
+    }
+
+    // 2. KRIJO PAYMENT AUTOMATIKISHT
     const paymentPayload = {
       amount: Number(total.toFixed(2)),
       paymentMethod: paymentMethod === "card" ? "CARD" : "CASH",
@@ -209,14 +236,14 @@ const CartPage = () => {
     clearCart();
     setStep(3);
   } catch (err) {
-    console.error("Order/Payment POST error:", err.response?.data || err.message);
+    console.error("Checkout error:", err.response?.data || err.message);
 
     const status = err.response?.status;
 
     if (status === 401 || status === 403) {
       setSubmitError("Sesioni ka skaduar. Ju lutem kyçuni sërish.");
     } else {
-      setSubmitError("Porosia ose pagesa nuk u dërgua. Kontrollo backend-in.");
+      setSubmitError("Porosia, detajet ose pagesa nuk u ruajtën. Kontrollo backend-in.");
     }
   } finally {
     setSubmitting(false);

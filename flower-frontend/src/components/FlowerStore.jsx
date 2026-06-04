@@ -69,7 +69,10 @@ const Homepage = () => {
   const [showPopup,       setShowPopup]       = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
 
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reviews") || "[]"); }
+    catch { return []; }
+  });
 
   const [newReview,    setNewReview]    = useState({ customerId: "", customerName: "", comment: "" });
   const [reviewRating, setReviewRating] = useState(5);
@@ -89,28 +92,12 @@ const Homepage = () => {
   }, []);
 
   useEffect(() => {
-  axios
-    .get("http://localhost:8080/api/reviews")
-    .then((res) => {
-      const data = Array.isArray(res.data) ? res.data : [];
-
-      setReviews(
-        data.map((r) => ({
-          id: r.id,
-          customerName:
-            r.customerName ||
-            (r.klienti
-              ? `${r.klienti.emri || ""} ${r.klienti.mbiemri || ""}`.trim()
-              : "Anonymous"),
-          score: r.vleresimi,
-          comment: r.komenti,
-        }))
-      );
-    })
-    .catch((err) => {
-      console.error("Gabim gjate marrjes se reviews:", err.response?.data || err.message);
-    });
-}, []);
+    setIsVisible(true);
+    axios.get("http://localhost:8080/api/flowers")
+      .then(res => setDeals(res.data))
+      .catch(() => setError("Failed to load products. Please try again."))
+      .finally(() => setLoading(false));
+  }, []);
 
   const flowers  = deals;
   const bouquets = [];
@@ -132,47 +119,25 @@ const Homepage = () => {
     setEmail("");
   };
 
-  const handleSubmitReview = async () => {
-  if (!newReview.comment.trim()) {
-    alert("Shkruaj komentin para se ta dergosh.");
-    return;
-  }
-
-  const payload = {
-    customerName: newReview.customerName.trim() || "Anonymous",
-    vleresimi: reviewRating,
-    komenti: newReview.comment.trim(),
-  };
-
-  try {
-    const res = await axios.post("http://localhost:8080/api/reviews", payload);
-
-    const saved = res.data;
-
-    setReviews((prev) => [
-      ...prev,
-      {
-        id: saved.id,
-        customerName:
-          saved.customerName ||
-          (saved.klienti
-            ? `${saved.klienti.emri || ""} ${saved.klienti.mbiemri || ""}`.trim()
-            : "Anonymous"),
-        score: saved.vleresimi,
-        comment: saved.komenti,
-      },
-    ]);
-
+  const handleSubmitReview = () => {
+    if (!newReview.comment.trim()) return;
+    const entry = {
+      id:           Date.now(),
+      customerId:   newReview.customerId.trim() || "Anonymous",
+      customerName: newReview.customerName.trim() || newReview.customerId.trim() || "Anonymous",
+      productId:    null,
+      productType:  "BOUQUET",
+      score:        reviewRating,
+      comment:      newReview.comment.trim(),
+    };
+    const existing = JSON.parse(localStorage.getItem("reviews") || "[]");
+    const updated  = [...existing, entry];
+    localStorage.setItem("reviews", JSON.stringify(updated));
+    setReviews(updated);
     setNewReview({ customerId: "", customerName: "", comment: "" });
     setReviewRating(5);
     setShowReviewModal(false);
-
-    alert("Review u ruajt me sukses!");
-  } catch (err) {
-    console.error("Review POST error:", err.response?.data || err.message);
-    alert("Review nuk u ruajt.");
-  }
-};
+  };
 
   const categories = [
     { name: "Birthday",  img: "/images/birthday.jpeg" },
