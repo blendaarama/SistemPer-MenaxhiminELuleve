@@ -22,7 +22,9 @@ public class Review {
     @JoinColumn(name = "porosia_id")
     private Porosi porosia;
 
-    private Integer vleresimi; // p.sh 1-5
+    private String customerName;
+
+    private Integer vleresimi;
 
     private String komenti;
 

@@ -35,8 +35,6 @@ const AdminDashboard = () => {
     { title: "Bouquet Flowers",     desc: "Ndërtimi i buqetave.",                        path: "/bouquets",              tag: "Composition"       },
     { title: "Orders Registry",     desc: "Menaxho porositë e klientëve.",               path: "/admin/orders-registry", tag: "Sales Control"     },
     { title: "Customers Matrix",    desc: "Menaxho profilet e klientëve.",               path: "/customers",             tag: "CRM Accounts"      },
-    { title: "Categories",          desc: "Kategorizimi i produkteve.",                  path: "/categories",            tag: "Store Structure"   },
-    { title: "Inventory Log",       desc: "Gjendja e magazinës.",                        path: "/inventory",             tag: "Logistics"         },
     { title: "Payments & Invoices", desc: "Faturat dhe transaksionet.",                  path: "/payments",              tag: "Financials"        },
     { title: "Suppliers Portal",    desc: "Menaxhimi i furnitorëve.",                    path: "/suppliers",             tag: "Supply Chain"      },
     { title: "Deliveries Hub",      desc: "Monitorimi i dërgesave.",                     path: "/deliveries",            tag: "Distribution"      },

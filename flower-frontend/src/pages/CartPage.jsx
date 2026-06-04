@@ -157,56 +157,71 @@ const CartPage = () => {
   };
 
   const handleCheckout = async () => {
-    if (!customerName.trim() || !phone.trim() || !address.trim()) {
-      alert("Ju lutem plotësoni emrin, numrin dhe adresën.");
-      return;
-    }
+  if (!customerName.trim() || !phone.trim() || !address.trim()) {
+    alert("Ju lutem plotësoni emrin, numrin dhe adresën.");
+    return;
+  }
 
-    setSubmitting(true);
-    setSubmitError("");
+  setSubmitting(true);
+  setSubmitError("");
 
-    const nameParts = customerName.trim().split(/\s+/);
-    const firstName = nameParts[0];
-    const lastName = nameParts.slice(1).join(" ") || "";
+  const nameParts = customerName.trim().split(/\s+/);
+  const firstName = nameParts[0];
+  const lastName = nameParts.slice(1).join(" ") || "";
 
-    const payload = {
-  adresaDorezimit: address.trim(),
-  mesazhiKartoline: notes || "",
-  shumeTotale: Number(total.toFixed(2)),
-  statusi: "PRITJE",
-  dataPorosise: new Date().toISOString().slice(0, 19),
+  const orderPayload = {
+    adresaDorezimit: address.trim(),
+    mesazhiKartoline: notes || "",
+    shumeTotale: Number(total.toFixed(2)),
+    statusi: "PRITJE",
+    dataPorosise: new Date().toISOString().slice(0, 19),
 
-  klienti: {
-    emri: firstName,
-    mbiemri: lastName,
-    telefoni: phone.trim(),
-    adresa: address.trim(),
-    email:
-      localStorage.getItem("userEmail") ||
-      `${Date.now()}@customer.com`,
-  },
-};
-
-    console.log("Payload porosia:", payload);
-
-    try {
-      await axios.post(API_URL, payload, authHeaders());
-      clearCart();
-      setStep(3);
-    } catch (err) {
-      console.error("Order POST error:", err.response?.data || err.message);
-
-      const status = err.response?.status;
-
-      if (status === 401 || status === 403) {
-        setSubmitError("Sesioni ka skaduar. Ju lutem kyçuni sërish.");
-      } else {
-        setSubmitError("Porosia nuk u dërgua. Kontrollo backend-in ose payload-in.");
-      }
-    } finally {
-      setSubmitting(false);
-    }
+    klienti: {
+      emri: firstName,
+      mbiemri: lastName,
+      telefoni: phone.trim(),
+      adresa: address.trim(),
+      email:
+        localStorage.getItem("userEmail") ||
+        `${Date.now()}@customer.com`,
+    },
   };
+
+  try {
+    const orderRes = await axios.post(API_URL, orderPayload, authHeaders());
+    const savedOrder = orderRes.data;
+
+    const paymentPayload = {
+      amount: Number(total.toFixed(2)),
+      paymentMethod: paymentMethod === "card" ? "CARD" : "CASH",
+      status: paymentMethod === "card" ? "COMPLETED" : "PENDING",
+      porosia: {
+        id: savedOrder.id,
+      },
+    };
+
+    await axios.post(
+      "http://localhost:8080/api/payments",
+      paymentPayload,
+      authHeaders()
+    );
+
+    clearCart();
+    setStep(3);
+  } catch (err) {
+    console.error("Order/Payment POST error:", err.response?.data || err.message);
+
+    const status = err.response?.status;
+
+    if (status === 401 || status === 403) {
+      setSubmitError("Sesioni ka skaduar. Ju lutem kyçuni sërish.");
+    } else {
+      setSubmitError("Porosia ose pagesa nuk u dërgua. Kontrollo backend-in.");
+    }
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   if (step === 3) {
     return (

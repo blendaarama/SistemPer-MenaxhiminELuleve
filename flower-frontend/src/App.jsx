@@ -26,8 +26,6 @@ const OccasionCRUD = lazy(() => import("./components/OccasionCRUD"));
 const SupplierCRUD = lazy(() => import("./components/SupplierCRUD"));
 const OrderPage = lazy(() => import("./components/OrderPage"));
 const OrderCRUD = lazy(() => import("./components/OrderCRUD"));
-const CategoriesCRUD = lazy(() => import("./components/CategoriesCRUD"));
-const InventoryCRUD = lazy(() => import("./components/InventoryCRUD"));
 const OrderDetails = lazy(() => import("./components/OrderDetails"));
 const PaymentsCrud = lazy(() => import("./components/PaymentsCrud"));
 const CustomerCRUD = lazy(() => import("./components/CustomerCRUD"));
@@ -129,8 +127,6 @@ function AppContent() {
  <Route path="/order-details" element={<PrivateRoute adminOnly><OrderDetails /></PrivateRoute>} />
  <Route path="/payments" element={<PrivateRoute adminOnly><PaymentsCrud /></PrivateRoute>} />
  <Route path="/customers" element={<PrivateRoute adminOnly><CustomerCRUD /></PrivateRoute>} />
- <Route path="/inventory" element={<PrivateRoute adminOnly><InventoryCRUD /></PrivateRoute>} />
- <Route path="/categories" element={<PrivateRoute adminOnly><CategoriesCRUD /></PrivateRoute>} />
  <Route path="/deliveries" element={<PrivateRoute adminOnly><DeliveriesCRUD /></PrivateRoute>} />
  <Route path="/users" element={<PrivateRoute adminOnly><UsersCRUD /></PrivateRoute>} />
  <Route path="/order-items" element={<PrivateRoute adminOnly><OrderItemsCRUD /></PrivateRoute>} />
